@@ -1,0 +1,13 @@
+Alternatively, before calling getline(), *lineptr can contain a
+       pointer to a malloc(3)-allocated buffer *n bytes in size.  If the
+       buffer is not large enough to hold the line, getline() resizes it
+       with realloc(3), updating *lineptr and *n as necessary.
+
+       In either case, on a successful call, *lineptr and *n will be
+       updated to reflect the buffer address and allocated size
+       respectively.
+
+       getdelim() works like getline(), except that a line delimiter
+       other than newline can be specified as the delimiter argument.
+       As with getline(), a delimiter character is not added if one was
+       not present in the input before end of file was reached.
