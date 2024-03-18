@@ -29,6 +29,14 @@ void print(pnode v) {
 	print(v->prawy);
 }
 
+int min(pnode v) {
+	return (v->lewy == NULL ? v->klucz : min(v->lewy));
+}
+
+int max(pnode v) {
+	return (v->prawy == NULL ? v->klucz : max(v->prawy));
+}
+
 int main () {
 	pnode root = NULL;
 
@@ -39,7 +47,8 @@ int main () {
 	insert(&root, 9);
 
 	print(root);
-	
+
+	printf("\n%d %d\n", min(root), max(root));	
 
 	return 0;
 }
