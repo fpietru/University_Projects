@@ -14,21 +14,6 @@ void push(list *h, int a) {
 	*h = u;
 }
 
-void pop(list *h) {
-	list u;
-	if (*h != NULL) {
-		u = *h;
-		*h = (*h)->next;
-		free(u);
-	}
-}
-
-list find(list h, int a) {
-	while ((h!=NULL) && (h->wart!=a))
-		h = h->next;
-	return h;
-}
-
 int size(list h) {
 	int res = 0;
 	while (h != NULL) {
@@ -71,17 +56,6 @@ void split(list *h, list *l2) {
 	*h = pocz;
 }
 
-void reverse(list *h) {
-	list h2 = NULL, p = NULL;
-	while (*h != NULL) {
-		p = (*h)->next;
-		(*h)->next = h2;
-		h2 = *h;
-		*h = p;
-	}
-	*h = h2;
-}
-
 void przeszczep(list *n1, list *n2) {
 	list pom = *n1;
 	(*n1) = pom->next;
@@ -109,33 +83,27 @@ list merge(list h, list l2) {
 	return (res_pocz.next);
 }
 
+void MergeSort(list *h) {
+	if (size(*h) == 1) return;
+	list h2 = NULL;
+	split(h, &h2);
+	MergeSort(h);
+	MergeSort(&h2);
+	(*h) = merge(*h, h2);
+}
+
 int main () {
 	list head = NULL;
-	list l2 = NULL;
 	
 	push(&head, 5);
-	push(&head, 4);
-	push(&head, 3);
-	push(&head, 2);
 	push(&head, 1);
-	
-	push(&l2, 5);
-	push(&l2, 5);
-	push(&l2, 4);
-	push(&l2, 4);
-	push(&l2, 3);
-	
-	
+	push(&head, 6);
+	push(&head, 1);
+	push(&head, 9);
+
 	print(head);
-	print(l2);
-	
-	list merged = merge(head, l2);
-	
-	print(merged);
+	MergeSort(&head);
 	print(head);
-	print(l2);
-	
-	
 	
 	return 0;
 }
