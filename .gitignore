@@ -55,4 +55,4 @@ dkms.conf
 makefile
 
 # vscode
-.vscode
+.vscode/
