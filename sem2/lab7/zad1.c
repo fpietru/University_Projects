@@ -1,0 +1,1 @@
+// TODO: Napisz funkcje, sprawdzającą, czy w drzewie binarnym istnieje wierzchołek który w obu poddrzewach ma tyle samo elementów
