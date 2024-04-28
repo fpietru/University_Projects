@@ -1,35 +1,33 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef struct Node {
+typedef struct node {
 	int wart;
-	struct Node *next;
-} Node, *list;
+	struct node *next;
+} node, *pnode;
 
-void push(list *h, int a) {
-	list u;
-	u = malloc(sizeof(Node));
+void push(pnode *h, int a) {
+	pnode u = malloc(sizeof(node));
 	u->wart = a;
 	u->next = *h;
 	*h = u;
 }
 
-void pop(list *h) {
-	list u;
+void pop(pnode *h) {
 	if (*h != NULL) {
-		u = *h;
+		pnode u = *h;
 		*h = (*h)->next;
 		free(u);
 	}
 }
 
-list find(list h, int a) {
+pnode find(pnode h, int a) {
 	while ((h!=NULL) && (h->wart!=a))
 		h = h->next;
 	return h;
 }
 
-int size(list h) {
+int size(pnode h) {
 	int res = 0;
 	while (h != NULL) {
 		res++;
@@ -38,7 +36,7 @@ int size(list h) {
 	return res;
 }
 
-void print(list h) {
+void print(pnode h) {
 	while (h != NULL) {
 		printf("%d ", h->wart);
 		h = h->next;
@@ -46,13 +44,13 @@ void print(list h) {
 	printf("\n");
 }
 
-void wczytaj(list *h) {
+void wczytaj(pnode *h) {
 	int a;
 	while (scanf("%d", &a) > 0)
 		push(h, a);
 }
 
-void zpliku(list *h) {
+void zpliku(pnode *h) {
 	FILE *fin = fopen("dane.txt", "r");
 	int a;
 	while (fscanf(fin, "%d", &a) != EOF)
@@ -60,38 +58,31 @@ void zpliku(list *h) {
 	fclose(fin);
 }
 
-// TODO: nie zmieniac h przy splitcie
-void split(list h, list *l1, list *l2) {
-	list pocz = h;
-	*l1 = h;
-	for (int i=0; i<size(h)/2; i++) {
-		(*l1) = (*l1)->next;
-		h = h->next;
-	}
-	*l2 = h->next;
-	(*l1)->next = NULL;
-	*l1 = pocz;
+// Rozdziel listę na dwie prawie równe połowy
+void split(pnode *h, pnode *h2) {
+	pnode pocz = *h;
+	int sz = size(*h);
+	for (int i=1; i<sz/2; i++)
+		(*h) = (*h)->next;
+	
+	(*h2) = (*h)->next;
+	(*h)->next = NULL;
+	(*h) = pocz;
 }
 
 int main () {
-	list head = NULL;
-	
-	// wczytaj(&head);
-	zpliku(&head);
-	
+	pnode head = NULL;
+
+	zpliku(&head);	
 	print(head);
 	
 	printf("%d\n", size(head));
 	
-	list l1 = NULL;
-	list l2 = NULL;
-	split(head, &l1, &l2);
-	print(l1);
-	print(l2);
-	
-	printf("%d %d %d\n", size(head), size(l1), size(l2));
-	
+	pnode head2 = NULL;
+	split(&head, &head2);
 	print(head);
+	print(head2);
+	
 	
 	return 0;
 }

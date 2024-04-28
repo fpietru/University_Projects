@@ -1,20 +1,28 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef struct Node {
+typedef struct node {
 	int wart;
-	struct Node *next;
-} Node, *list;
+	struct node *next;
+} node, *pnode;
 
-void push(list *h, int a) {
-	list u;
-	u = malloc(sizeof(Node));
+void push(pnode *h, int a) {
+	pnode u;
+	u = malloc(sizeof(node));
 	u->wart = a;
 	u->next = *h;
 	*h = u;
 }
 
-int size(list h) {
+void print(pnode h) {
+	while (h != NULL) {
+		printf("%d ", h->wart);
+		h = h->next;
+	}
+	printf("\n");
+}
+
+int size(pnode h) {
 	int res = 0;
 	while (h != NULL) {
 		res++;
@@ -23,49 +31,27 @@ int size(list h) {
 	return res;
 }
 
-void print(list h) {
-	while (h != NULL) {
-		printf("%d ", h->wart);
-		h = h->next;
-	}
-	printf("\n");
-}
-
-void wczytaj(list *h) {
-	int a;
-	while (scanf("%d", &a) > 0)
-		push(h, a);
-}
-
-void zpliku(list *h) {
-	FILE *fin = fopen("dane.txt", "r");
-	int a;
-	while (fscanf(fin, "%d", &a) != EOF)
-		push(h, a);
-	fclose(fin);
-}
-
-void split(list *h, list *l2) {
-	list pocz = *h;
-	int n = size(*h);
-	for (int i=(!(n&1)); i<n/2; i++) {
-		*h = (*h)->next;
-	}
-	*l2 = (*h)->next;
+void split(pnode *h, pnode *h2) {
+	pnode pocz = *h;
+	int sz = size(*h);
+	for (int i=1; i<sz/2; i++)
+		(*h) = (*h)->next;
+	
+	(*h2) = (*h)->next;
 	(*h)->next = NULL;
-	*h = pocz;
+	(*h) = pocz;
 }
 
-void przeszczep(list *n1, list *n2) {
-	list pom = *n1;
-	(*n1) = pom->next;
+void przeszczep(pnode *n1, pnode *n2) {
+	pnode pom = *n1;
+	(*n1) = (*n1)->next;
 	pom->next = *n2;
 	(*n2) = pom;
 }
 
-list merge(list h, list l2) {
-	Node res_pocz;
-	list res = &res_pocz;
+pnode merge(pnode h, pnode l2) {
+	node res_pocz;
+	pnode res = &res_pocz;
 	res->next = NULL;
 	while (1) {
 		if (h == NULL) {
@@ -83,9 +69,9 @@ list merge(list h, list l2) {
 	return (res_pocz.next);
 }
 
-void MergeSort(list *h) {
+void MergeSort(pnode *h) {
 	if (size(*h) == 1) return;
-	list h2 = NULL;
+	pnode h2 = NULL;
 	split(h, &h2);
 	MergeSort(h);
 	MergeSort(&h2);
@@ -93,13 +79,12 @@ void MergeSort(list *h) {
 }
 
 int main () {
-	list head = NULL;
+	pnode head = NULL;
 	
 	push(&head, 5);
 	push(&head, 1);
 	push(&head, 6);
 	push(&head, 1);
-	push(&head, 9);
 
 	print(head);
 	MergeSort(&head);

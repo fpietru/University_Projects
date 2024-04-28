@@ -1,35 +1,33 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef struct Node {
+typedef struct node {
 	int wart;
-	struct Node *next;
-} Node, *list;
+	struct node *next;
+} node, *pnode;
 
-void push(list *h, int a) {
-	list u;
-	u = malloc(sizeof(Node));
+void push(pnode *h, int a) {
+	pnode u = malloc(sizeof(node));
 	u->wart = a;
 	u->next = *h;
 	*h = u;
 }
 
-void pop(list *h) {
-	list u;
+void pop(pnode *h) {
 	if (*h != NULL) {
-		u = *h;
+		pnode u = *h;
 		*h = (*h)->next;
 		free(u);
 	}
 }
 
-list find(list h, int a) {
+pnode find(pnode h, int a) {
 	while ((h!=NULL) && (h->wart!=a))
 		h = h->next;
 	return h;
 }
 
-void print(list h) {
+void print(pnode h) {
 	while (h != NULL) {
 		printf("%d ", h->wart);
 		h = h->next;
@@ -38,7 +36,7 @@ void print(list h) {
 }
 
 int main () {
-	list head = NULL;
+	pnode head = NULL;
 	
 	push(&head, 1);
 	push(&head, 2);
