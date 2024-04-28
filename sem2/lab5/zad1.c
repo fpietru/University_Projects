@@ -1,32 +1,30 @@
 /*
-    Zadanie: Napisać funkcję, która usuwa wszystkie powtórzenia z posortowanej listy
+    Zadanie: Napisać funkcję, która usuwa wszystkie powtórzenia z posortowanej pnodey
 */
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef struct Node {
+typedef struct node {
 	int wart;
-	struct Node *next;
-} Node, *list;
+	struct node *next;
+} node, *pnode;
 
-void push(list *h, int a) {
-	list u;
-	u = malloc(sizeof(Node));
+void push(pnode *h, int a) {
+	pnode u = malloc(sizeof(node));
 	u->wart = a;
 	u->next = *h;
 	*h = u;
 }
 
-void pop(list *h) {
-	list u;
+void pop(pnode *h) {
 	if (*h != NULL) {
-		u = *h;
+		pnode u = *h;
 		*h = (*h)->next;
 		free(u);
 	}
 }
 
-void print(list h) {
+void print(pnode h) {
 	while (h != NULL) {
 		printf("%d ", h->wart);
 		h = h->next;
@@ -34,14 +32,16 @@ void print(list h) {
 	printf("\n");
 }
 
-void wczytaj(list *h) {
+void zpliku(pnode *h) {
+	FILE *fin = fopen("./dane.txt", "r");
 	int a;
-	while (scanf("%d", &a) > 0)
+	while (fscanf(fin, "%d", &a) != EOF)
 		push(h, a);
+	fclose(fin);
 }
 
-void usunpowtorzenia(list h) {
-	list pom;
+void usunpowtorzenia(pnode h) {
+	pnode pom;
     while (h != NULL) {
         while (h->next != NULL && h->wart == (h->next)->wart) {
             pom = h->next;
@@ -53,9 +53,9 @@ void usunpowtorzenia(list h) {
 }
 
 int main () {
-	list head = NULL;
+	pnode head = NULL;
 	
-	wczytaj(&head);
+	zpliku(&head);
     print(head);
     usunpowtorzenia(head);
     print(head);

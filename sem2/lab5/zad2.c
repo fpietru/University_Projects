@@ -6,35 +6,27 @@
 
 typedef struct node {
     int klucz;
-    int ile;
-    int rozmiar;
     struct node *lewy, *prawy;
 } node, *pnode;
 
 pnode newnode(int k) {
     pnode v = malloc(sizeof(node));
     v->klucz = k;
-    v->ile = 1;
     v->lewy = v->prawy = NULL;
 }
 
 void insert(pnode *v, int k) {
-    if ((*v) == NULL) {
+    if ((*v) == NULL)
         (*v) = newnode(k);
-        return;
-    }
-    if (k == (*v)->klucz)
-        (*v)->ile++;
     else if (k < (*v)->klucz)
-        insert(&((*v)->lewy), k);
-    else
-        insert(&((*v)->prawy), k);
+        insert(&(((*v)->lewy)), k);
+    else insert(&(((*v)->prawy)), k);
 }
 
 void print(pnode v) {
     if (v == NULL) return;
     print(v->lewy);
-    printf("[%d, %d] ", v->klucz, v->ile);
+    printf("%d ", v->klucz);
     print(v->prawy);
 }
 
@@ -61,11 +53,30 @@ int wysokosc(pnode v) {
 void usun_lisc_parz(pnode *v) {
     if ((*v) == NULL) return;
     if ((*v)->lewy == NULL && (*v)->prawy == NULL && ((*v)->klucz % 2 == 0)) {
+        pnode p = (*v);
         (*v) = NULL;
+        free(p);
         return;
     }
     usun_lisc_parz(&((*v)->lewy));
     usun_lisc_parz(&((*v)->prawy));
+}
+
+void ileroznychRECU(pnode v, int *ile, int *poprz) {
+    if (v == NULL) return;
+    ileroznychRECU(v->lewy, ile, poprz);
+    if (v->klucz != (*poprz)) {
+        (*ile)++;
+        (*poprz) = v->klucz;
+    }
+    ileroznychRECU(v->prawy, ile, poprz);
+}
+
+int ileroznych(pnode v) {
+    int ile = 0;
+    int poprz = -1e9-7;
+    ileroznychRECU(v, &ile, &poprz);
+    return ile;
 }
 
 int main () {
@@ -76,6 +87,8 @@ int main () {
     print(root);
     printf("\nRozmiar = %d\n", rozmiar(root));
     printf("Wysokosc = %d\n", wysokosc(root));
+
+    printf("[%d]\n", ileroznych(root));
 
     usun_lisc_parz(&root);
 
