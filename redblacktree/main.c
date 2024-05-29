@@ -4,7 +4,7 @@
     -[2] Korzeń jest czarny
     -[3] Każdy liść jest czarny
     -[4] Jeśli node jest czerwony, to obaj jego synowie są czarni
-    -[5] Dla każdego node'a wszystkie ścieżki w jego poddrzewie do liści zawierają tyle samo czarnych wierzchołków
+    -[5] Dla każdego node'a wszystkie ścieżki wychodzące z niego do liści w jego poddrzewie zawierają tyle samo czarnych wierzchołków
 */
 #include <stdio.h>
 #include <stdlib.h>
@@ -39,16 +39,17 @@ pnode newnode(int klu, int kol) {
     return u;
 }
 
-void print(pnode v) {
+void print(pnode v, int lvl) {
     if (v == NIL) return;
-    print(v->lewy);
-    printf("%d [%d]\n", v->klucz, v->kolor);
-    print(v->prawy);
+    print(v->lewy, lvl+1);
+    for (int i=0; i<4*lvl; i++)
+        printf(" ");
+    printf("-> [%d %d]\n", v->klucz, v->kolor);
+    print(v->prawy, lvl+1);
 }
 
 void info() {
-    printf("Korzeniem jest %d\n", root->klucz);
-    print(root);
+    print(root, 0);
     printf("\n");
 }
 
@@ -82,7 +83,7 @@ void rotacja_w_prawo(pnode x) {
     x->p = y;
 }
 
-void napraw(pnode v) {
+void napraw_insert(pnode v) {
     while (v->p->kolor == RED) {
         if (v->p == v->p->p->lewy) { // jeśli ojciec v jest lewym synem swojego ojca
             pnode y = v->p->p->prawy; // y jest wujkiem v (prawym bratem ojca v)
@@ -139,25 +140,139 @@ void insert(pnode v, int klu) {
     else if (u->klucz < y->klucz)
         y->lewy = u;
     else y->prawy = u;
-    napraw(u);
+    napraw_insert(u);
+}
+
+void przeszczep(pnode v, pnode u) {
+    if (v->p == NIL)
+        root = u;
+    else if (v == v->p->lewy)
+        v->p->lewy = u;
+    else v->p->prawy = u;
+    u->p = v->p;
+}
+
+pnode minimum(pnode v) {
+    while (v->lewy != NIL)
+        v = v->lewy;
+    return v;
+}
+
+void napraw_delete(pnode x) {
+    while (x != root && x->kolor == BLACK) {
+        if (x == x->p->lewy) {
+            pnode w = x->p->prawy;
+            if (w->kolor == RED) {
+                w->kolor = BLACK;
+                x->p->kolor = RED;
+                rotacja_w_lewo(x->p);
+                w = x->p->prawy;
+            }
+            if (w->lewy->kolor == BLACK && w->prawy->kolor == BLACK) {
+                w->kolor = RED;
+                x = x->p;
+            }
+            else {
+                if (w->prawy->kolor == BLACK) {
+                    w->lewy->kolor = BLACK;
+                    w->kolor = RED;
+                    rotacja_w_prawo(w);
+                    w = x->p->prawy;
+                }
+                w->kolor = x->p->kolor;
+                w->p->kolor = BLACK;
+                w->prawy->kolor = BLACK;
+                rotacja_w_lewo(w);
+                x = root;
+            }
+        }
+        else {
+            pnode w = x->p->lewy;
+            if (w->kolor == RED) {
+                w->kolor = BLACK;
+                x->p->kolor = RED;
+                rotacja_w_prawo(x->p);
+                w = x->p->lewy;
+            }
+            if (w->prawy->kolor == BLACK && w->prawy->kolor == BLACK) {
+                w->kolor = RED;
+                x = x->p;
+            }
+            else {
+                if (w->lewy->kolor == BLACK) {
+                    w->prawy->kolor = BLACK;
+                    w->kolor = RED;
+                    rotacja_w_lewo(w);
+                    w = x->p->lewy;
+                }
+                w->kolor = x->p->kolor;
+                w->p->kolor = BLACK;
+                w->lewy->kolor = BLACK;
+                rotacja_w_prawo(w);
+                x = root;
+            }
+        }
+    }
+    x->kolor = BLACK;
+}
+
+void delete(pnode z) {
+    pnode x;
+    pnode y = z;
+    int y_original_kolor = y->kolor;
+    if (z->lewy == NIL) {
+        x = z->prawy;
+        przeszczep(z, z->prawy);
+    }
+    else if (z->prawy == NIL) {
+        x = z->lewy;
+        przeszczep(z, z->lewy);
+    }
+    else {
+        y = minimum(z->prawy);
+        y_original_kolor = y->kolor;
+        x = y->prawy;
+        if (y != z->prawy) {
+            przeszczep(y, y->prawy);
+            y->prawy = z->prawy;
+            y->prawy->p = y;
+        }
+        else x->p = y;
+        przeszczep(z, y);
+        y->lewy = z->lewy;
+        y->lewy->p = y;
+        y->kolor = z->kolor;
+    }
+    if (y_original_kolor == BLACK)
+        napraw_delete(x);
+    free(z);
+}
+
+pnode find(pnode v, int klu) {
+    if (v == NIL) return NIL;
+    if (v->klucz == klu) return v;
+    if (klu < v->klucz)
+        return find(v->lewy, klu);
+    else return find(v->prawy, klu);
 }
 
 int main () {
 
     init();
 
-    insert(root, 2);
-    info();
-
-    insert(root, 4);
-    info();
-    
-    insert(root, 6);
-    info();
-    
-    insert(root, 1);
-    info();
-
+    while (1) {
+        int op, klu;
+        scanf("%d %d", &op, &klu);
+        if (op == 1) {
+            insert(root, klu);
+        }
+        else {
+            pnode v = find(root, klu);
+            if (v != NIL)
+                delete(v);
+        }
+        info();
+    }
 
     return 0;
 }
