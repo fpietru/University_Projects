@@ -1,7 +1,7 @@
 /*
     Autor: Franciszek Pietrusiak
     Program do zabawy z biblioteką
-    W nieskończonej pętli udostępnia dwie operacja:
+    W nieskończonej pętli udostępnia następujące operacje:
         [1] - dodaj node'a o danym kluczu do drzewa
         [2] - usun node'a o danym kluczu z drzewa
         [3] - sprawdź, czy istnieje w drzewie node z danym kluczem
