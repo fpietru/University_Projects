@@ -10,7 +10,12 @@ int nwd(int a, int b) {
     return (b == 0 ? a : nwd(b, a%b));
 }
 
+int pozycja(int a, int b) {
+    if (a < b) swap(&a, &b);
 
+    
+
+}
 
 int main() {
 
