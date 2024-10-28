@@ -121,6 +121,8 @@ zbior_ary singleton(int a) {
 }
 
 bool nalezy(zbior_ary A, int b) {
+    if (czy_pusty(A))
+        return false;
     trojka x = nowa_trojka(b, b, modulo_q(b));
     unsigned st = 0, ed = A.rozmiar - 1;
     while (st < ed) {
@@ -260,9 +262,13 @@ zbior_ary roznica(zbior_ary A, zbior_ary B) {
                     
                 if (czy_zdegenerowana_trojka(a_prawa) == 0)
                     K.tablica[i] = a_prawa;
+                else {
+                    degeneruj_trojke(&K.tablica[i]);
+                    a = K.tablica[i];
+                }
+
             }
         }
-
         if ((i+1 < K.rozmiar) && (czy_zdegenerowana_trojka(a) || czy_mniejsza_trojka(a, b))) {
             i++;
         }
