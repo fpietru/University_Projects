@@ -1,3 +1,4 @@
+// Autor: Franciszek Pietrusiak
 #ifndef _ZBIOR_ARY_H_
 #define _ZBIOR_ARY_H_
 
@@ -13,9 +14,6 @@ typedef struct zbior_ary {
 	unsigned rozmiar;
 	trojka *tablica;
 } zbior_ary;
-
-void wypisz_zbior(zbior_ary A);
-void informacja(zbior_ary A);
 
 /* Najlepiej nie modyfikowac nic ponizej. */
 
