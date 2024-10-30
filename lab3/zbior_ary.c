@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
+#define NDEBUG // wylacza asserty
 #define max(a, b) ((a) >= (b) ? (a) : (b))
 #define min(a, b) ((a) <= (b) ? (a) : (b))
 static int GLOBAL_q;
@@ -34,6 +35,11 @@ static bool czy_zdegenerowana_trojka(trojka a) {
     return (a.poczatek > a.koniec);
 }
 
+
+// q = 5
+// [20, 25, 0] < [1, 6, 1]
+// [0, 30, 0] > [20, 25, 0]
+
 // true <=> a < b
 static bool czy_mniejsza_trojka(trojka a, trojka b) {
     if (a.reszta < b.reszta) {
@@ -61,7 +67,8 @@ static bool czy_jest_przeciecie(trojka a, trojka b) {
             swap_trojek(&a, &b);
         }
         bool nachodzi_z_lewej = (a.poczatek <= b.poczatek && b.poczatek <= a.koniec);
-        return (nachodzi_z_lewej || czy_zawarta_trojka(a, b));
+        bool obok_siebie = (a.koniec + GLOBAL_q == b.poczatek);
+        return (nachodzi_z_lewej || czy_zawarta_trojka(a, b) || obok_siebie);
     }
 }
 
@@ -100,7 +107,7 @@ bool nalezy(zbior_ary A, int b) {
     unsigned st = 0, ed = A.rozmiar - 1;
     while (st < ed) {
         unsigned md = (st + ed) / 2;
-        if (czy_jest_przeciecie(A.tablica[md], x)) {
+        if (czy_jest_przeciecie(A.tablica[md], x) && (A.tablica[md].poczatek <=  x.poczatek && x.koniec <= A.tablica[md].koniec)) {
             return true;
         } else if (czy_mniejsza_trojka(A.tablica[md], x)) {
             st = md + 1;
@@ -108,7 +115,7 @@ bool nalezy(zbior_ary A, int b) {
             ed = md;
         }
     }
-    return czy_jest_przeciecie(A.tablica[st], x);
+    return (czy_jest_przeciecie(A.tablica[st], x) && (A.tablica[st].poczatek <=  x.poczatek && x.koniec <= A.tablica[st].koniec));
 }
 
 static zbior_ary wywal_zdegenerowane(zbior_ary A) {
