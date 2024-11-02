@@ -1,3 +1,6 @@
+g++ -o gen gen.cpp
+g++ -o brut brut.cpp
+gcc -o testowanie testowanie.c zbior_ary.c
 i=0
 while true
 do
