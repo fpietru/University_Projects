@@ -1,4 +1,5 @@
 // Autor: Franciszek Pietrusiak
+// Code Reviewer: Jakub Wilczyński
 #include "zbior_ary.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -27,8 +28,8 @@ static void swap_trojek(trojka *a, trojka *b) {
     *b = tmp;
 }
 
-// zdegenerowana trojka to taka, ktorej poczatek jest wiekszy od konca
-// uzywam ich do reprezentacji podzbiorow pustych
+// Zdegenerowana trojka to taka, ktorej poczatek jest wiekszy od konca.
+// Uzywam ich do reprezentacji podzbiorow pustych
 static void degeneruj_trojke(trojka *a) {
     *a = (trojka){1, -1, 0};
 }
@@ -38,7 +39,8 @@ static bool czy_zdegenerowana_trojka(trojka a) {
 }
 
 // true <=> a < b
-// trojki sa sortowane w pierwszej kolejnosci po reszcie, potem po poczatku, a w ostatniej kolejnosci po koncu
+// trojki sa sortowane w pierwszej kolejnosci po reszcie,
+// potem po poczatku, a w ostatniej kolejnosci po koncu
 static bool czy_mniejsza_trojka(trojka a, trojka b) {
     if (a.reszta < b.reszta) {
         return true;
@@ -57,9 +59,12 @@ static bool czy_zawarta_trojka(trojka a, trojka b) {
     return (b.poczatek <= a.poczatek && a.koniec <= b.koniec);
 }
 
-
-// Definicja: wlasciwe przeciecie = istnieje element x ktory nalezy do trojki a oraz trojki b
-// Definicja: przeciecie = wlasciwe przeciecie LUB trojka a i trojka b sa "obok siebie" tzn. a.koniec + GLOBAL_Q == b.poczatek (lub na odwrot) 
+// Definicja:
+//     wlasciwe przeciecie = istnieje element x ktory nalezy do trojki a oraz trojki b
+// Definicja:
+//     przeciecie = wlasciwe przeciecie LUB
+//     trojka a i trojka b sa "obok siebie"
+//     tzn. a.koniec + GLOBAL_Q == b.poczatek (lub na odwrot) 
 static bool czy_jest_przeciecie(trojka a, trojka b) {
     if (a.reszta != b.reszta) {
         return false;
@@ -73,6 +78,13 @@ static bool czy_jest_przeciecie(trojka a, trojka b) {
     }
 }
 
+static bool czy_jest_wlasciwe_przeciecie(trojka a, trojka b) {
+    bool a_w_b = czy_zawarta_trojka(a, b);
+    bool b_w_a = czy_zawarta_trojka(b, a);
+    bool przeciecie = czy_jest_przeciecie(a, b);
+    return (przeciecie && (a_w_b || b_w_a));
+}
+
 static trojka scal_trojki(trojka a, trojka b) {
     assert(czy_jest_przeciecie(a, b));
     return nowa_trojka(min(a.poczatek, b.poczatek), max(a.koniec, b.koniec), a.reszta);
@@ -81,7 +93,7 @@ static trojka scal_trojki(trojka a, trojka b) {
 static zbior_ary nowy_zbior(unsigned rozm) {
     zbior_ary A;
     A.rozmiar = rozm;
-    A.tablica = (trojka*)malloc(rozm * sizeof(trojka));
+    A.tablica = (rozm == 0 ? NULL : (trojka*)malloc(rozm * sizeof(trojka)));
     return A;
 }
 
@@ -114,26 +126,26 @@ bool nalezy(zbior_ary A, int b) {
         return false;
     }
     trojka x = nowa_trojka(b, b, modulo_q(b));
-    unsigned st = 0, ed = A.rozmiar - 1;
-    while (st < ed) {
-        unsigned md = (st + ed) / 2;
-        if (czy_jest_przeciecie(A.tablica[md], x) && (A.tablica[md].poczatek <=  x.poczatek && x.koniec <= A.tablica[md].koniec)) {
+    unsigned l = 0, p = A.rozmiar - 1;
+    while (l < p) {
+        unsigned sr = (l + p) / 2;
+        if (czy_jest_wlasciwe_przeciecie(A.tablica[sr], x)) {
             return true;
-        } else if (czy_mniejsza_trojka(A.tablica[md], x)) {
-            st = md + 1;
+        } else if (czy_mniejsza_trojka(A.tablica[sr], x)) {
+            l = sr + 1;
         } else {
-            ed = md;
+            p = sr;
         }
     }
     // x nalezy do A <=> jest wlasciwe przeciecie
-    return (czy_jest_przeciecie(A.tablica[st], x) && (A.tablica[st].poczatek <=  x.poczatek && x.koniec <= A.tablica[st].koniec));
+    return (czy_jest_wlasciwe_przeciecie(A.tablica[l], x));
 }
 
 // Usuwam wszystkie zdegenerowane trojki z tablicy w zbiorze A
 static void wywal_zdegenerowane(zbior_ary *A) {
     unsigned ile_niezdegenerowanych = 0;
     for (unsigned i=0; i<A->rozmiar; i++) {
-        if (czy_zdegenerowana_trojka(A->tablica[i]) == 0) {
+        if (!czy_zdegenerowana_trojka(A->tablica[i])) {
             ile_niezdegenerowanych++;
         }
     }
@@ -149,7 +161,7 @@ static void wywal_zdegenerowane(zbior_ary *A) {
     zbior_ary B = nowy_zbior(ile_niezdegenerowanych);
     unsigned k = 0;
     for (unsigned i=0; i<A->rozmiar; i++) {
-        if (czy_zdegenerowana_trojka(A->tablica[i]) == 0) {
+        if (!czy_zdegenerowana_trojka(A->tablica[i])) {
             B.tablica[k++] = A->tablica[i];
         }
     }
@@ -165,10 +177,13 @@ unsigned ary(zbior_ary A) {
     if (A.rozmiar == 1) {
         return 1;
     }
+    // ostatnia = wszystkie przecinajace sie trojki scalone w jedna,
+    // ktora ma mozliwosc przeciecia sie z aktualnie rozpatrywana trojka 
     trojka ostatnia = A.tablica[0];
     unsigned res = A.rozmiar;
     for (unsigned i=1; i<A.rozmiar; i++) {
-        if (czy_jest_przeciecie(ostatnia, A.tablica[i])) { // jesli dwie kolejne trojki sie przecinaja to wystarczy jeden ciag ary. do ich opisu
+        // jesli dwie kolejne trojki sie przecinaja to wystarczy jeden ciag ary. do ich opisu
+        if (czy_jest_przeciecie(ostatnia, A.tablica[i])) {
             ostatnia = scal_trojki(ostatnia, A.tablica[i]);
             res--;
         }
@@ -184,7 +199,7 @@ unsigned moc(zbior_ary A) {
     unsigned res = 0;
     for (unsigned i=0; i<A.rozmiar; i++) {
         trojka a = A.tablica[i];
-        if (czy_zdegenerowana_trojka(a) == 0) {
+        if (!czy_zdegenerowana_trojka(a)) {
             unsigned long long odlegosc = (unsigned long long)abs(a.koniec - a.poczatek);
             unsigned long long ilosc = odlegosc / (unsigned long long)GLOBAL_q + 1;
             res += (unsigned)ilosc;
@@ -213,7 +228,7 @@ static void kompresja_zbioru(zbior_ary *A) {
             B.tablica[++k] = a;
         }
     }
-    // informacja(B);
+    
     zwolnij_pamiec(A);
     *A = B;
 }
@@ -266,21 +281,24 @@ zbior_ary roznica(zbior_ary A, zbior_ary B) {
         trojka a = K.tablica[i];
         trojka b = B.tablica[j];
         
-        if ((czy_zdegenerowana_trojka(a) == 0) && (czy_jest_przeciecie(a, b) == 1)) {
-            if (czy_zawarta_trojka(a, b)) { // jesli a \subseteq b to a \setminus b = \varnothing => trojka a staje sie zdegenerowana
+        if ((!czy_zdegenerowana_trojka(a)) && (czy_jest_przeciecie(a, b))) {
+            // jesli a \subseteq b to a \setminus b = \varnothing => trojka a staje sie zdegenerowana
+            if (czy_zawarta_trojka(a, b)) {
                 degeneruj_trojke(&K.tablica[i]);
                 a = K.tablica[i];
             } else {
-                trojka a_lewa = nowa_trojka(a.poczatek, b.poczatek - GLOBAL_q, a.reszta); // lewa polowa a po odjeciu b 
-                trojka a_prawa = nowa_trojka(b.koniec + GLOBAL_q, a.koniec, a.reszta); // prawa polowa a po odjeciu b
+                // lewa polowa a po odjeciu b
+                trojka a_lewa = nowa_trojka(a.poczatek, b.poczatek - GLOBAL_q, a.reszta);
+                // prawa polowa a po odjeciu b 
+                trojka a_prawa = nowa_trojka(b.koniec + GLOBAL_q, a.koniec, a.reszta);
 
                 // a_lewa docelowo trafia do tablicy w C
-                if (czy_zdegenerowana_trojka(a_lewa) == 0) {
+                if (!czy_zdegenerowana_trojka(a_lewa)) {
                     C.tablica[k++] = a_lewa;
                 }
 
                 // a_prawa docelowo zastepuje a w tablicy w K
-                if (czy_zdegenerowana_trojka(a_prawa) == 0) {
+                if (!czy_zdegenerowana_trojka(a_prawa)) {
                     K.tablica[i] = a_prawa;
                 } else {
                     degeneruj_trojke(&K.tablica[i]);

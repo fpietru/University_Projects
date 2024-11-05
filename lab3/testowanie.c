@@ -4,7 +4,7 @@
 #include "zbior_ary.h"
 
 void wypisz(zbior_ary A) {
-    for (int i=1; i<=300; i++)
+    for (int i=-300; i<=300; i++)
         if (nalezy(A, i))
             printf("%d ", i);
     printf("\n");

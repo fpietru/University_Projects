@@ -1,10 +1,39 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "zbior_ary.h"
+#include <assert.h>
 
 
 int main() {
-  zbior_ary *zbior = (zbior_ary *)malloc(1000000U * sizeof(zbior_ary));
+
+  zbior_ary A = ciag_arytmetyczny(2, 5, 12);
+  assert(moc(A) == 3);
+  assert(ary(A) == 1);
+  // B = {4, 9, 14, 19}
+  zbior_ary B = ciag_arytmetyczny(4, 5, 19);
+  // C = {1}
+  zbior_ary C = singleton(1);
+  // D = {1, 4, 9, 14, 19}
+  zbior_ary D = suma(B, C);
+  // E = {1, 2, 4, 7, 9, 12, 14, 19}
+  zbior_ary E = suma(D, A);
+  assert(moc(E) == 8);
+  // F = {14}
+  zbior_ary F = singleton(14);
+  // G = {1, 2, 4, 7, 9, 12, 19}
+  zbior_ary G = roznica(E, F);
+  assert(ary(G) == 4);
+  assert(nalezy(G, 4));
+  assert(!nalezy(G, 5));
+  // H = {4, 9, 19};
+  zbior_ary H = iloczyn(G, B);
+  assert(moc(H) == 3);
+  assert(ary(H) == 2);
+  // I = {}
+  zbior_ary I = iloczyn(H, A);
+  assert(moc(I) == 0);
+
+  // zbior_ary *zbior = (zbior_ary *)malloc(1000000U * sizeof(zbior_ary));
   /*zbior[0] = ciag_arytmetyczny(48, 2, 84); // {(48, 84, 0)}
   zbior[1] = singleton(13); // {(13, 13, 1)}
   printf("1) %u\n", moc(zbior[1])); // 1
@@ -116,6 +145,7 @@ SUM 5 6
 SIZE
  */
   
+  /*
   zbior[0] = ciag_arytmetyczny(4, 2, 12);
   informacja(zbior[0]);
   zbior[1] = ciag_arytmetyczny(-4, 2, -4);
@@ -136,10 +166,10 @@ SIZE
   informacja(zbior[8]);
   zbior[9] = suma(zbior[5], zbior[6]);
   informacja(zbior[9]);
+  */
 
 
-
-
+/*
   for (int k=0; k<=29; k++) {
     printf("%d [%d] (%d): ", k, moc(zbior[k]), ary(zbior[k]));
     for (int i=-100; i<=100; i++)
@@ -147,6 +177,6 @@ SIZE
         printf("%d ", i);
     printf("\n");
   }
-
+*/
   return 0;
 }
