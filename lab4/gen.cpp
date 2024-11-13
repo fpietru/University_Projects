@@ -8,14 +8,14 @@ int RAND(int a, int b) {
 int main (int argc, char* argv[]) {
     srand(stoi(argv[1]));
 
-    int n = RAND(1, 100);
+    int n = RAND(1, 5);
     int k = 3;
     cout << n << "\n";
-    int odl = RAND(0, 20);
+    int odl = RAND(0, 5);
 
     for (int i=1; i<=n; i++) {
         cout << RAND(1, k) << " " << odl << "\n";
-        odl += RAND(0, 20);
+        odl += RAND(0, 5);
     }
 
     return 0;

@@ -1,3 +1,7 @@
+/*
+    Autor: Franciszek Pietrusiak
+    Uwaga: To nie jest wersja ostateczna!!!
+*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -10,8 +14,7 @@
 int siec[LIMIT];
 int odleglosc[LIMIT];
 int najblizszy[2][LIMIT];
-int pierwsze[LIMIT];
-int ostatnie[LIMIT];
+int vis[LIMIT];
 int n;
 
 void oblicz_najblizsze_przed() {
@@ -57,6 +60,8 @@ int najblizsza_trojka() {
 
 int sprawdz(int pocz, int kon) {
     int wyn = INT_MIN;
+    if (siec[pocz] == siec[kon] || pocz == 0 || kon == 0)
+        return wyn;
     for (int i=pocz+1; i<=kon-1; i++) {
         if (siec[i] != siec[pocz] && siec[i] != siec[kon]) {
             int d1 = odleglosc[i] - odleglosc[pocz];
@@ -68,14 +73,52 @@ int sprawdz(int pocz, int kon) {
 }
 
 int najdalsza_trojka() {
-    for (int i=1; i<=n; i++)
-        if (pierwsze[siec[i]] == 0)
-            pierwsze[siec[i]] = i;
+    int A_pocz = 0, A_kon = 0;
+    int B_pocz = 0, B_kon = 0;
+    int C_pocz = 0, C_kon = 0;
+    for (int i=1; i<=n; i++) {
+        if (vis[siec[i]] == 0) {
+            vis[siec[i]] = 1;
+            if (A_pocz == 0) {
+                A_pocz = i;
+            } else if (B_pocz == 0) {
+                B_pocz = i;
+            } else if (C_pocz == 0) {
+                C_pocz = i;
+            }
+        }
+    }
+    for (int i=1; i<=n; i++) {
+        vis[i] = 0;
+    }
+    for (int i=n; i>=1; i--) {
+        if (vis[siec[i]] == 0) {
+            vis[siec[i]] = 1;
+            if (A_kon == 0) {
+                A_kon = i;
+            } else if (B_kon == 0) {
+                B_kon = i;
+            } else if (C_kon == 0) {
+                C_kon = i;
+            }
+        }
+    }
+    int wyn = INT_MIN;
 
-    for (int i=n; i>=n; i--)
-        if (ostatnie[siec[i]] == 0)
-            ostatnie[siec[i]] = i;
-    
+    /*printf("[%d %d]\n", A_pocz, A_kon);
+    printf("[%d %d]\n", B_pocz, B_kon);
+    printf("[%d %d]\n", C_pocz, C_kon); */
+
+    wyn = max(wyn, sprawdz(A_pocz, A_kon));
+    wyn = max(wyn, sprawdz(A_pocz, B_kon));
+    wyn = max(wyn, sprawdz(B_pocz, A_kon));
+    wyn = max(wyn, sprawdz(B_pocz, B_kon));
+    wyn = max(wyn, sprawdz(A_pocz, C_kon));
+    wyn = max(wyn, sprawdz(C_pocz, A_kon));
+    wyn = max(wyn, sprawdz(B_pocz, C_kon));
+    wyn = max(wyn, sprawdz(C_pocz, B_kon));
+    wyn = max(wyn, sprawdz(C_pocz, C_kon));
+    return wyn;
 }
 
 int main () {
