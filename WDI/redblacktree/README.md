@@ -1,0 +1,1 @@
+# Implementation of [Red-Black Tree](https://en.wikipedia.org/wiki/Red%E2%80%93black_tree) based on [Introduction to Algorithms (4th ed.)](https://mitpress.mit.edu/9780262046305/introduction-to-algorithms/)

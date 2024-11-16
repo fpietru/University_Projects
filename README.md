@@ -24,11 +24,13 @@ The projects are split into categories based on the classes they belong to:
 
 ---
 
-## Projects
+## Bigger Projects
 
 ### WDP (Wprowadzenie do Programowania)
+ - [Set Operation Library based on Partitioning Set into disjoint arithmetic sequences](/WDP/lab3/)
 
 ### WDI (Wprowadzenie do Informatyki)
+ - [Red-Black Tree Implementation](/WPI/redblacktree)
 
 ---
 
