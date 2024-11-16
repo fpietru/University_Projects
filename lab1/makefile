@@ -1,0 +1,1 @@
+CXXFLAGS=-o -std=c17 -Wall
