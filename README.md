@@ -21,6 +21,7 @@ This repository contains projects and exercises I completed as part of my univer
 The projects are split into categories based on the classes they belong to:
  - *Wprowadzenie do Programowania (Introduction to Programming)*
  - *Wprowadzenie do Informatyki (Introduction to Computer Science)*.
+ - *Programowanie obiektowe i C++ (MAT)*
 
 ---
 
@@ -47,6 +48,10 @@ University_Projects/
 │   ├── project1/
 │   ├── project2/
 │   └── ...
+├── POiCPP/
+│   ├── project1/
+│   ├── project2/
+│   └── ...
 └── README.md
 ```
 
@@ -58,23 +63,8 @@ Each subfolder contains project-specific files, including source code, documenta
 
 The projects in this repository were developed using:
 - **Languages**: C, C++, Bash
-- **Tools**: GCC, G++, VS Code
+- **Tools**: GCC, G++, VS Code, Make
 - **Version Control**: Git
-
----
-
-## Setup
-
-To clone this repository and explore the projects locally:
-1. Clone the repository:
-   ```bash
-   git clone git@github.com:fpietru/University_Projects.git
-   ```
-2. Navigate to the desired project directory:
-   ```bash
-   cd University_Projects/WDP/project1
-   ```
-3. Follow any setup instructions provided in the specific project's folder (if applicable).
 
 ---
 
