@@ -7,7 +7,8 @@ A collection of academic projects completed during my studies at MIM UW.
 - [About](#about)
 - [Projects](#projects)
   - [WDP (Wprowadzenie do Programowania)](#wdp-wprowadzenie-do-programowania)
-  - [WDI (Wprowadzenie-do-informatyki)](#wdi-wprowadzenie-do-informatyki)
+  - [WDI (Wprowadzenie do Informatyki)](#wdi-wprowadzenie-do-informatyki)
+  - [POiCPP (Programowanie obiektowe i C++)](#poicpp-programowanie-obiektowe-i-c)
 - [Structure](#structure)
 - [Technologies](#technologies)
 - [Setup](#setup)
@@ -32,6 +33,8 @@ The projects are split into categories based on the classes they belong to:
 
 ### WDI (Wprowadzenie do Informatyki)
  - [Red-Black Tree Implementation](/WDI/redblacktree)
+
+### POiCPP (Programowanie obiektowe i C++)
 
 ---
 
