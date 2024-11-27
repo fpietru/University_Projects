@@ -11,7 +11,6 @@ A collection of academic projects completed during my studies at MIM UW.
   - [POiCPP (Programowanie obiektowe i C++)](#poicpp-programowanie-obiektowe-i-c)
 - [Structure](#structure)
 - [Technologies](#technologies)
-- [Setup](#setup)
 - [License](#license)
 
 ---
