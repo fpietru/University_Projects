@@ -1,7 +1,6 @@
 /*
     Zadanie: "Origami"
     Autor: Franciszek Pietrusiak
-    Code Review: Jacek Gałęski
 */
 #include <stdlib.h>
 #include <stdio.h>
@@ -50,6 +49,8 @@ typedef struct kartka {
 double odl(punkt a, punkt b) {
     return sqrt(pow(a.x - b.x, 2.0) + pow(a.y - b.y, 2.0));
 }
+/*JG: tu mozna uzyć funckcji hypot z math.h zeby nie ograniczać się 
+    z wektorami tylko do obszaru pierwastek z maksymalnych zakresów double*/
 
 /*
     Funkcja, ktora okresla po ktorej stronie prostej
@@ -67,6 +68,10 @@ char strona(punkt a, punkt b, punkt c) {
     else if (fabs(iloczyn_wekorowy) < epsilon) return 'W';
     else return 'P';
 }
+/*JG: taki iloczyn wektorowy jest wrażliwy na normę v1 przykład:
+    a =(0, 0), b =(0.5**34, 0.55**34) to taki pasek co ma szerokosc większą niż 1
+    będzie miejscem na 'c' jako wpadający na linię 
+    */
 
 /*
     Funkcja, ktora zwraca odbicie punktu c wzgledem prostej przechodzacej
@@ -150,7 +155,15 @@ int ile_warstw(punkt P, int nr_kartki, kartka tablica_kartek[]) {
 // Funkcja, ktora wczytuje n kartek i wstawia je w tablice kartek
 void wczytaj_kartki(kartka tablica_kartek[], int n) {
     for (int i=1; i<=n; i++) {
-        kartka K = {0};
+        kartka K;
+/*JG: (TU u Ciebie to nie jest źle, wydawało mi się dziwne wpisywanie na niezainicjiowany
+struct więc zacząłem sprawdzać i szukać, okazało się ze w c++ blisko do undefined behavior)
+
+jak zostawiasz niezainicjowaną kartke 'kartka K;'
+to używanie '&K.p1.x' dla troche zmodyfikowanego struct w c++ byłoby undefined behavior,
+https://stackoverflow.com/questions/50028982/is-taking-the-address-of-a-member-of-an-uninitialized-object-well-defined
+    */
+        K.k = 0;
         assert(scanf(" %c", &K.postac));
         if (K.postac == 'P') {
             assert(scanf("%lf %lf %lf %lf", &K.p1.x, &K.p1.y, &K.p2.x, &K.p2.y));
@@ -162,6 +175,10 @@ void wczytaj_kartki(kartka tablica_kartek[], int n) {
         tablica_kartek[i] = K;
     }
 }
+/*JG: no ... tu zero litości dla czytelnika ale szczęśliwie jest
+    https://en.cppreference.com/w/c/language/operator_precedence 
+    ale czy to &(K.p1.x) jest lepiej ?
+    */
 
 // Funkcja, ktora zwraca odpowiedzi do q zapytan
 void odpowiedz_na_zapytania(kartka tablica_kartek[], int q) {
@@ -181,7 +198,10 @@ int main () {
     kartka *tablica_kartek = (kartka*)malloc((size_t)(n+1) * sizeof(kartka));
     wczytaj_kartki(tablica_kartek, n);    
     odpowiedz_na_zapytania(tablica_kartek, q);
-    free(tablica_kartek);
     
+/*JG: w tym kodzie wychodzisz i tyle, więc system zwolni pamięć, 
+    ale w internetach radzą, żeby zawsze zwalniać pamięć jak alokowałeś.
+    */
+
     return 0;
 }
