@@ -1,0 +1,1 @@
+CFLAGS=-o -Wall -Wextra -Wunused -Wpedantic
