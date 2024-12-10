@@ -1,3 +1,7 @@
+/*
+    Zadanie: "Kolejki"
+    Autor: Franciszek Pietrusiak
+*/
 #include "kol.h"
 #include <stdlib.h>
 #include <iostream>
@@ -6,6 +10,7 @@
 #include <algorithm>
 
 struct okienko {
+    // kazde okienko ma wskaznik na poczatek i koniec kolejki
     interesant *pocz, *kon;
 };
 std::vector<okienko> wektor_okienek;
@@ -16,8 +21,8 @@ void otwarcie_urzedu(int m) {
     liczba_okienek = m;
     for (int i=0; i<m; i++) {
         okienko *o = (okienko*)malloc(sizeof(okienko));
-        o->pocz = NULL;
-        o->kon = NULL;
+        // poczatkowo kolejka jest pusta
+        o->pocz = NULL; o->kon = NULL;
         wektor_okienek.push_back(*o);
     }
 }
@@ -26,10 +31,15 @@ int numerek(interesant *i) {
     return i->numer;
 }
 
+// przypisuje wartosci interesantowi
 void ustaw_wartosci(interesant *i, int k) {
     i->po_lewo = NULL;
     i->po_prawo = NULL;
     i->przy_okienku = k;
+}
+
+bool puste(okienko *o) {
+    return (o->pocz == NULL && o->kon == NULL);
 }
 
 void wypisz_interesanta(interesant *i) {
@@ -61,7 +71,7 @@ void dodaj_na_koniec(interesant *i, int k) {
     o->kon = i;
 }
 
-void wytnij(interesant *i) {
+interesant* wytnij(interesant *i) {
     interesant *l = i->po_lewo;
     interesant *p = i->po_prawo;
     if (l != NULL) l->po_prawo = p;
@@ -76,25 +86,24 @@ void wytnij(interesant *i) {
         else o->kon = p;
     }
     ustaw_wartosci(i, -1);
+    return i;
 }
 
 interesant* usun_z_poczatku(int k) {
     okienko *o = &wektor_okienek[k];
-    interesant *nast;
-    if (o->pocz == NULL) {
+    interesant *nast = NULL;
+    if (puste(o)) {
         return NULL;
     } else if (o->pocz == o->kon) {
-        o->pocz = NULL;
-        o->kon = NULL;
-    } else if (o->pocz->po_lewo == NULL) {
+        return wytnij(o->pocz);
+    } else if (o->pocz->po_prawo != NULL) {
         nast = o->pocz->po_prawo;
     } else {
-        nast = o->pocz->po_lewo;     
+        nast = o->pocz->po_lewo;
     }
-    assert(nast != NULL);
-    wytnij(o->pocz);
+    interesant *wynik = wytnij(o->pocz);
     o->pocz = nast;
-    return o->pocz;
+    return wynik;
 }
 
 interesant* nowy_interesant(int k) {
@@ -109,31 +118,36 @@ interesant* obsluz(int k) {
 }
 
 void zmiana_okienka(interesant *i, int k) {
-    wytnij(i);
+    assert(wytnij(i) != NULL);
     dodaj_na_koniec(i, k);
 }
 
 void zamkniecie_okienka(int k1, int k2) {
     okienko *o1 = &wektor_okienek[k1];
     okienko *o2 = &wektor_okienek[k2];
-    if (o1->pocz == NULL && o1->kon == NULL)
+    if (puste(o1))
         return;
-    if (o2->kon->po_prawo == NULL) {
-        o2->kon->po_prawo = o1->pocz;
-        if (o1->pocz->po_lewo == NULL) {
-            o1->pocz->po_lewo = o2->kon;
+    if (puste(o2)) {
+        o2->pocz = o1->pocz;
+        o2->kon = o1->kon;
+    } else if (o2->pocz != NULL) {
+        if (o2->kon->po_prawo == NULL) {
+            o2->kon->po_prawo = o1->pocz;
+            if (o1->pocz->po_lewo == NULL) {
+                o1->pocz->po_lewo = o2->kon;
+            } else {
+                o1->pocz->po_prawo = o2->kon;  
+            }
         } else {
-            o1->pocz->po_prawo = o2->kon;  
+            o2->kon->po_lewo = o1->pocz;
+            if (o1->pocz->po_lewo == NULL) {
+                o1->pocz->po_lewo = o2->kon;
+            } else {
+                o1->pocz->po_prawo = o2->kon;
+            }
         }
-    } else {
-        o2->kon->po_lewo = o1->pocz;
-        if (o1->pocz->po_lewo == NULL) {
-            o1->pocz->po_lewo = o2->kon;
-        } else {
-            o1->pocz->po_prawo = o2->kon;
-        }
+        o2->kon = o1->kon;
     }
-    o2->kon = o1->kon;
     o1->pocz = NULL;
     o1->kon = NULL;
 }
@@ -164,32 +178,39 @@ std::vector<interesant*> przejscie_po_kolejce(interesant *i1, interesant *i2) {
 }
 
 std::vector<interesant*> fast_track(interesant *i1, interesant *i2) {
-    okienko *specjalne = (okienko*)malloc(sizeof(okienko));
-    specjalne->pocz = i1;
-    specjalne->kon = i1;
-    while (specjalne->pocz != i2 && specjalne->kon != i2) {
-        interesant *nast1 = specjalne->pocz->po_lewo;
-        interesant *nast2 = specjalne->kon->po_prawo;
-        if (nast1 != NULL) specjalne->pocz = nast1;
-        if (nast2 != NULL) specjalne->kon = nast2;
+    okienko *s = (okienko*)malloc(sizeof(okienko));
+    okienko *o = &wektor_okienek[i1->przy_okienku];
+    s->pocz = i1;
+    s->kon = i1;
+    while (s->pocz != i2 && s->kon != i2) {
+        interesant *nast1 = s->pocz->po_lewo;
+        interesant *nast2 = s->kon->po_prawo;
+        if (nast1 != NULL) s->pocz = nast1;
+        if (nast2 != NULL) s->kon = nast2;
     }
     interesant *l, *p;
-    if (specjalne->pocz == i2) {
-        specjalne->kon = i1;
-        l = i2->po_lewo;
-        p = i1->po_prawo;
-        std::swap(specjalne->pocz, specjalne->kon);
-    }
-    else {
-        specjalne->pocz = i1;
-        l = i1->po_lewo;
-        p = i2->po_prawo;
+    if (s->pocz == i2) {
+        s->kon = i1;
+        std::swap(s->pocz, s->kon);
+        l = s->kon->po_lewo;
+        p = s->pocz->po_prawo;
+        s->kon->po_lewo = NULL;
+        s->pocz->po_prawo = NULL;
+        if (o->kon == s->kon) o->kon = p;
+        if (o->pocz == s->pocz) o->pocz = l;
+    } else {
+        s->pocz = i1;
+        l = s->pocz->po_lewo;
+        p = s->kon->po_prawo;
+        s->kon->po_prawo = NULL;
+        s->pocz->po_lewo = NULL;
+        if (o->kon == s->kon) o->kon = l;
+        if (o->pocz == s->pocz) o->pocz = p;
     }
     if (l != NULL) l->po_prawo = p;
     if (p != NULL) p->po_lewo = l;
-    specjalne->pocz->po_lewo = NULL;
-    specjalne->kon->po_prawo = NULL;
-    return przejscie_po_kolejce(specjalne->pocz, specjalne->kon);
+
+    return przejscie_po_kolejce(s->pocz, s->kon);
 }
 
 void naczelnik(int k) {
@@ -219,6 +240,6 @@ void wypisz_okienka() {
             assert(it != NULL);
             std::cout << it->numer << " ";
         }
-        std::cout << "\n\n";
+        std::cout << "\n";
     }
 }
