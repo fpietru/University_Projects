@@ -38,10 +38,12 @@ void ustaw_wartosci(interesant *i, int k) {
     i->przy_okienku = k;
 }
 
+// sprawdza czy okienko jest puste
 bool puste(okienko *o) {
     return (o->pocz == NULL && o->kon == NULL);
 }
 
+// funkcja do debuggu
 void wypisz_interesanta(interesant *i) {
     std::cout << i->numer << "\n";
     std::cout << "L: ";
@@ -54,10 +56,11 @@ void wypisz_interesanta(interesant *i) {
     else std::cout << numerek(i->po_prawo) << "\n\n"; 
 }
 
+// dodaje interesanta i na koniec kolejki przy okienku k
 void dodaj_na_koniec(interesant *i, int k) {
     okienko *o = &wektor_okienek[k];
     ustaw_wartosci(i, k);
-    if (o->kon == NULL) {
+    if (puste(o)) {
         o->pocz = i;
         o->kon = i;
         return;
@@ -71,6 +74,7 @@ void dodaj_na_koniec(interesant *i, int k) {
     o->kon = i;
 }
 
+// wycina i z jego kolejki i laczy jego obu sasiadow ze soba
 interesant* wytnij(interesant *i) {
     interesant *l = i->po_lewo;
     interesant *p = i->po_prawo;
@@ -89,6 +93,8 @@ interesant* wytnij(interesant *i) {
     return i;
 }
 
+// usuwa pierwszego interesanta z kolejki oraz zwraca go na wynik
+// przy okazji zmienia poczatek kolejki do ktorej nalezal
 interesant* usun_z_poczatku(int k) {
     okienko *o = &wektor_okienek[k];
     interesant *nast = NULL;
@@ -118,19 +124,28 @@ interesant* obsluz(int k) {
 }
 
 void zmiana_okienka(interesant *i, int k) {
+    std::cout << "ZMIANA OKIENKA\n";
+    if (i->przy_okienku == k) return;
     assert(wytnij(i) != NULL);
     dodaj_na_koniec(i, k);
 }
 
+// kolejka przy okienku nr. k2 wchlania kolejke
+// ktora stala przy okienku nr. k1.
+// nie zmienia jej kolejnosci.
 void zamkniecie_okienka(int k1, int k2) {
     okienko *o1 = &wektor_okienek[k1];
     okienko *o2 = &wektor_okienek[k2];
     if (puste(o1))
         return;
-    if (puste(o2)) {
+    
+    if (puste(o2)) { // jak o2 puste, to bedzie calym o1
         o2->pocz = o1->pocz;
         o2->kon = o1->kon;
-    } else if (o2->pocz != NULL) {
+    } else {
+        // jak nie jest puste to koniec o2 lacze z poczatkiem o1
+        // trzeba rozpatrzec oba przypadki kolejnosci w o2
+        // 1) kolejnosc od lewej do prawej
         if (o2->kon->po_prawo == NULL) {
             o2->kon->po_prawo = o1->pocz;
             if (o1->pocz->po_lewo == NULL) {
@@ -138,7 +153,7 @@ void zamkniecie_okienka(int k1, int k2) {
             } else {
                 o1->pocz->po_prawo = o2->kon;  
             }
-        } else {
+        } else { // 2) kolejnosc od prawej do lewej
             o2->kon->po_lewo = o1->pocz;
             if (o1->pocz->po_lewo == NULL) {
                 o1->pocz->po_lewo = o2->kon;
@@ -148,15 +163,19 @@ void zamkniecie_okienka(int k1, int k2) {
         }
         o2->kon = o1->kon;
     }
+    // czyszcze kolejke o1
     o1->pocz = NULL;
     o1->kon = NULL;
 }
 
+// przejscie po interesantach w kolejce w kolejnosci od i1 do i2 wlacznie
+// uwaga: zakladam, ze po prawo lub po lewo od i1 wystepuje NULL
+// wtedy poruszam sie w kierunku przeciwnym do NULL'a
 std::vector<interesant*> przejscie_po_kolejce(interesant *i1, interesant *i2) {
     std::vector<interesant*> wynik;
     interesant *it = i1;
     if (it == NULL) return wynik;
-    interesant *nast = NULL;
+    interesant *nast = NULL; 
     if (it->po_prawo != NULL)
         nast = it->po_prawo;
     else nast = it->po_lewo;
@@ -177,11 +196,16 @@ std::vector<interesant*> przejscie_po_kolejce(interesant *i1, interesant *i2) {
     return wynik;
 }
 
+// wycinam fragment od i1 do i2 z kolejki w ktorej sie znajduja
+// ewentualnie zmieniam pocz/kon tej kolejki
 std::vector<interesant*> fast_track(interesant *i1, interesant *i2) {
+    if (i1 == i2) return {wytnij(i1)};
     okienko *s = (okienko*)malloc(sizeof(okienko));
     okienko *o = &wektor_okienek[i1->przy_okienku];
     s->pocz = i1;
     s->kon = i1;
+    // bede rozszerzal sie s w obu kierunkach dopoki jeden koniec
+    // nie bedzie i2
     while (s->pocz != i2 && s->kon != i2) {
         interesant *nast1 = s->pocz->po_lewo;
         interesant *nast2 = s->kon->po_prawo;
@@ -189,6 +213,12 @@ std::vector<interesant*> fast_track(interesant *i1, interesant *i2) {
         if (nast2 != NULL) s->kon = nast2;
     }
     interesant *l, *p;
+    // pozostalo obciac s do [i1, i2] lub [i2, i1]
+    // ,a nastepnie scalic ze soba najbliszych interesantow przy obu koncach
+    // przez to ze do rozpatrzenia sa podobne przypadki, kod wyglada podobnie
+    // ale NIE jest duplikowany
+    // przypadki do rozpatrzenia:
+    // 1) jesli i2 stoi na lewo od i1:
     if (s->pocz == i2) {
         s->kon = i1;
         std::swap(s->pocz, s->kon);
@@ -198,7 +228,7 @@ std::vector<interesant*> fast_track(interesant *i1, interesant *i2) {
         s->pocz->po_prawo = NULL;
         if (o->kon == s->kon) o->kon = p;
         if (o->pocz == s->pocz) o->pocz = l;
-    } else {
+    } else { // w przeciwnym wypadku:
         s->pocz = i1;
         l = s->pocz->po_lewo;
         p = s->kon->po_prawo;
@@ -213,11 +243,15 @@ std::vector<interesant*> fast_track(interesant *i1, interesant *i2) {
     return przejscie_po_kolejce(s->pocz, s->kon);
 }
 
+// odwracam kolejnosc w kolejce przy okienku nr. k
 void naczelnik(int k) {
     okienko *o = &wektor_okienek[k];
     std::swap(o->pocz, o->kon);
 }
 
+// zwracam wszystkich interesantow:
+// najpierw po nr. okienka
+// potem po kolejnosci w kolejce w ktorej stoi
 std::vector<interesant*> zamkniecie_urzedu() {
     std::vector<interesant*> wynik;
     for (int i=0; i<liczba_okienek; i++) {
@@ -228,18 +262,23 @@ std::vector<interesant*> zamkniecie_urzedu() {
     return wynik;
 }
 
+std::string numer_str(interesant *i) {
+    if (i == NULL) return "NULL";
+    return std::to_string(i->numer);
+}
+
+// funkcja do debuggu
 void wypisz_okienka() {
+    std::cout << "----------------------------\n";
     for (int i=0; i<liczba_okienek; i++) {
         okienko o = wektor_okienek[i];
         std::cout << "Okienko nr." << i << ":\n";
-        std::cout << "pocz = ";
-        std::cout << (o.pocz == NULL ? "NULL" : std::to_string(numerek(o.pocz))) << "\n";
-        std::cout << "kon = ";
-        std::cout << (o.kon == NULL ? "NULL" : std::to_string(numerek(o.kon))) << "\n";
+        std::cout << "pocz = " << numer_str(o.pocz) << " kon = " << numer_str(o.kon) << " [\n";
         for (auto it : przejscie_po_kolejce(o.pocz, o.kon)) {
             assert(it != NULL);
-            std::cout << it->numer << " ";
+            std::cout << "( "<< numer_str(it) << ", L=" << numer_str(it->po_lewo) << ", P=" << numer_str(it->po_prawo) << ", O=" << it->przy_okienku << ")\n";
         }
-        std::cout << "\n";
+        std::cout << "]\n\n";
     }
+    std::cout << "----------------------------\n";
 }

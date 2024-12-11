@@ -23,7 +23,7 @@ struct interesant {
  */
 void otwarcie_urzedu(int m);
 
-// TODO: wyrzucic
+// funkcje do debuggu
 void wypisz_interesanta(interesant *i);
 void wypisz_okienka();
 
