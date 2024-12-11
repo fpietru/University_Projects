@@ -12,6 +12,7 @@
 
 struct interesant {
     int numer;
+    int przy_okienku;
     struct interesant *po_lewo, *po_prawo;
 };
 

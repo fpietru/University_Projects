@@ -10,19 +10,53 @@
 #include <algorithm>
 
 struct okienko {
-    // kazde okienko ma wskaznik na poczatek i koniec kolejki
     interesant *pocz, *kon;
 };
 std::vector<okienko> wektor_okienek;
 int liczba_okienek;
 int liczba_interesantow;
 
+interesant* stworz_interesanta(int x) {
+    interesant *i = (interesant*)malloc(sizeof(interesant));
+    i->numer = x;
+    i->po_lewo = NULL;
+    i->po_prawo = NULL;
+    return i;
+}
+
+// zakladam, ze i1 jest na lewo od i2
+void polacz_interesantow(interesant *i1, interesant *i2) {
+    i1->po_prawo = i2;
+    i2->po_lewo = i1;
+}
+
+// wstaw interesanta b po miedzy interesanta a, c
+void wstaw(interesant *a, interesant *b, interesant *c) {
+    polacz_interesantow(a, b);
+    polacz_interesantow(b, c);
+}
+
+void wytnij(interesant *i) {
+    polacz_interesantow(i->po_lewo, i->po_prawo);
+    i->po_lewo = i->po_prawo = NULL;
+}
+
+/*
+    L = kolejnosc od lewej do prawej
+    P = kolejnosc od prawej do lewej
+*/
+char kolejnosc(okienko *o) {
+    return ((o->pocz->po_lewo == NULL) ? 'L' : 'P');
+}
+
 void otwarcie_urzedu(int m) {
     liczba_okienek = m;
     for (int i=0; i<m; i++) {
         okienko *o = (okienko*)malloc(sizeof(okienko));
-        // poczatkowo kolejka jest pusta
-        o->pocz = NULL; o->kon = NULL;
+        // poczatkowo kolejka jest pusta, sa w niej tylko wartownicy pocz i kon
+        o->pocz = stworz_interesanta(-1);
+        o->kon = stworz_interesanta(-1);
+        polacz_interesantow(o->pocz, o->kon);
         wektor_okienek.push_back(*o);
     }
 }
@@ -31,15 +65,8 @@ int numerek(interesant *i) {
     return i->numer;
 }
 
-// przypisuje wartosci interesantowi
-void ustaw_wartosci(interesant *i, int k) {
-    i->po_lewo = NULL;
-    i->po_prawo = NULL;
-    i->przy_okienku = k;
-}
-
 bool puste(okienko *o) {
-    return (o->pocz == NULL && o->kon == NULL);
+    return (o->pocz->po_prawo == o->kon);
 }
 
 void wypisz_interesanta(interesant *i) {
@@ -56,59 +83,33 @@ void wypisz_interesanta(interesant *i) {
 
 void dodaj_na_koniec(interesant *i, int k) {
     okienko *o = &wektor_okienek[k];
-    ustaw_wartosci(i, k);
-    if (o->kon == NULL) {
-        o->pocz = i;
-        o->kon = i;
+    if (puste(o)) {
+        wstaw(o->pocz, i, o->kon);
         return;
-    } else if (o->kon->po_prawo == NULL) {
-        i->po_lewo = o->kon;
-        o->kon->po_prawo = i;
-    } else {
-        i->po_prawo = o->kon;
-        o->kon->po_lewo = i;
     }
-    o->kon = i;
-}
-
-interesant* wytnij(interesant *i) {
-    interesant *l = i->po_lewo;
-    interesant *p = i->po_prawo;
-    if (l != NULL) l->po_prawo = p;
-    if (p != NULL) p->po_lewo = l;
-    okienko *o = &wektor_okienek[i->przy_okienku];
-    if (o->pocz == i) {
-        if (l != NULL) o->pocz = l;
-        else o->pocz = p;
+    if (kolejnosc(o) == 'L') {
+        polacz_interesantow(i, o->kon);
+    } else { // kolejnosc(o) == 'P'
+        polacz_interesantow(o->kon, i);
     }
-    if (o->kon == i) {
-        if (l != NULL) o->kon = l;
-        else o->kon = p;
-    }
-    ustaw_wartosci(i, -1);
-    return i;
 }
 
 interesant* usun_z_poczatku(int k) {
     okienko *o = &wektor_okienek[k];
-    interesant *nast = NULL;
+    interesant *i = NULL;
     if (puste(o)) {
         return NULL;
-    } else if (o->pocz == o->kon) {
-        return wytnij(o->pocz);
-    } else if (o->pocz->po_prawo != NULL) {
-        nast = o->pocz->po_prawo;
+    } else if (kolejnosc(o) == 'L') {
+        i = o->pocz->po_prawo;
     } else {
-        nast = o->pocz->po_lewo;
+        i = o->pocz->po_lewo;
     }
-    interesant *wynik = wytnij(o->pocz);
-    o->pocz = nast;
-    return wynik;
+    wytnij(i);
+    return i;
 }
 
 interesant* nowy_interesant(int k) {
-    interesant *nowy = (interesant*)malloc(sizeof(interesant));
-    nowy->numer = liczba_interesantow++;
+    interesant *nowy = stworz_interesanta(liczba_interesantow++);
     dodaj_na_koniec(nowy, k);
     return nowy;
 }
@@ -118,7 +119,7 @@ interesant* obsluz(int k) {
 }
 
 void zmiana_okienka(interesant *i, int k) {
-    assert(wytnij(i) != NULL);
+    wytnij(i);
     dodaj_na_koniec(i, k);
 }
 
@@ -130,24 +131,40 @@ void zamkniecie_okienka(int k1, int k2) {
     if (puste(o2)) {
         o2->pocz = o1->pocz;
         o2->kon = o1->kon;
-    } else if (o2->pocz != NULL) {
-        if (o2->kon->po_prawo == NULL) {
-            o2->kon->po_prawo = o1->pocz;
-            if (o1->pocz->po_lewo == NULL) {
-                o1->pocz->po_lewo = o2->kon;
-            } else {
-                o1->pocz->po_prawo = o2->kon;  
-            }
-        } else {
-            o2->kon->po_lewo = o1->pocz;
-            if (o1->pocz->po_lewo == NULL) {
-                o1->pocz->po_lewo = o2->kon;
-            } else {
-                o1->pocz->po_prawo = o2->kon;
-            }
-        }
-        o2->kon = o1->kon;
+        
+        return;
     }
+    if (kolejnosc(o1) == 'L' && kolejnosc(o2) == 'L') {
+        
+    }
+    if (kolejnosc(o1) == 'L' && kolejnosc(o2) == 'P') {
+
+    }
+    if (kolejnosc(o1) == 'P' && kolejnosc(o2) == 'L') {
+
+    }
+    if (kolejnosc(o1) == 'P' && kolejnosc(o2) == 'P') {
+
+    }
+
+
+    if (kolejnosc(o2) == 'L') {
+        o2->kon->po_prawo = o1->pocz;
+        if (kolejnosc(o1) == 'L') {
+            o1->pocz->po_lewo = o2->kon;
+        } else {
+            o1->pocz->po_prawo = o2->kon;  
+        }
+    } else {
+        o2->kon->po_lewo = o1->pocz;
+        if (o1->pocz->po_lewo == NULL) {
+            o1->pocz->po_lewo = o2->kon;
+        } else {
+            o1->pocz->po_prawo = o2->kon;
+        }
+    }
+    
+    o2->kon = o1->kon;
     o1->pocz = NULL;
     o1->kon = NULL;
 }

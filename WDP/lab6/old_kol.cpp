@@ -1,11 +1,17 @@
+/*
+    Zadanie: "Kolejki"
+    Autor: Franciszek Pietrusiak
+*/
 #include "kol.h"
 #include <stdlib.h>
 #include <iostream>
 #include <vector>
+#include <assert.h>
+#include <algorithm>
 
 struct okienko {
-    interesant *pierwszy, *ostatni;
-    bool kierunek;
+    // kazde okienko ma wskaznik na poczatek i koniec kolejki
+    interesant *pocz, *kon;
 };
 std::vector<okienko> wektor_okienek;
 int liczba_okienek;
@@ -15,15 +21,25 @@ void otwarcie_urzedu(int m) {
     liczba_okienek = m;
     for (int i=0; i<m; i++) {
         okienko *o = (okienko*)malloc(sizeof(okienko));
-        o->pierwszy = NULL;
-        o->ostatni = NULL;
-        o->kierunek = 0;
+        // poczatkowo kolejka jest pusta
+        o->pocz = NULL; o->kon = NULL;
         wektor_okienek.push_back(*o);
     }
 }
 
 int numerek(interesant *i) {
     return i->numer;
+}
+
+// przypisuje wartosci interesantowi
+void ustaw_wartosci(interesant *i, int k) {
+    i->po_lewo = NULL;
+    i->po_prawo = NULL;
+    i->przy_okienku = k;
+}
+
+bool puste(okienko *o) {
+    return (o->pocz == NULL && o->kon == NULL);
 }
 
 void wypisz_interesanta(interesant *i) {
@@ -35,59 +51,58 @@ void wypisz_interesanta(interesant *i) {
     std::cout << "P: ";
     if (i->po_prawo == NULL)
         std::cout << "NULL\n";
-    else std::cout << numerek(i->po_prawo) << "\n"; 
+    else std::cout << numerek(i->po_prawo) << "\n\n"; 
 }
 
 void dodaj_na_koniec(interesant *i, int k) {
     okienko *o = &wektor_okienek[k];
-    i->po_lewo = NULL;
-    i->po_prawo = NULL;
-    i->przy_okienku = k;
-    if (o->ostatni == NULL) {
-        o->pierwszy = i;
-        o->ostatni = i;
+    ustaw_wartosci(i, k);
+    if (o->kon == NULL) {
+        o->pocz = i;
+        o->kon = i;
         return;
-    }
-    if (o->kierunek == 0) {
-        (o->ostatni)->po_prawo = i;
-        i->po_lewo = o->ostatni;
+    } else if (o->kon->po_prawo == NULL) {
+        i->po_lewo = o->kon;
+        o->kon->po_prawo = i;
     } else {
-        (o->ostatni)->po_lewo = i;
-        i->po_prawo = o->ostatni;
+        i->po_prawo = o->kon;
+        o->kon->po_lewo = i;
     }
-    o->ostatni = i;
+    o->kon = i;
+}
+
+interesant* wytnij(interesant *i) {
+    interesant *l = i->po_lewo;
+    interesant *p = i->po_prawo;
+    if (l != NULL) l->po_prawo = p;
+    if (p != NULL) p->po_lewo = l;
+    okienko *o = &wektor_okienek[i->przy_okienku];
+    if (o->pocz == i) {
+        if (l != NULL) o->pocz = l;
+        else o->pocz = p;
+    }
+    if (o->kon == i) {
+        if (l != NULL) o->kon = l;
+        else o->kon = p;
+    }
+    ustaw_wartosci(i, -1);
+    return i;
 }
 
 interesant* usun_z_poczatku(int k) {
     okienko *o = &wektor_okienek[k];
-    if (o->pierwszy == NULL) {
+    interesant *nast = NULL;
+    if (puste(o)) {
         return NULL;
-    }
-    interesant *wynik;
-    if (o->kierunek == 0) {
-        interesant *i = o->pierwszy;
-        interesant *nast = i->po_prawo;
-        i->po_prawo = NULL;
-        o->pierwszy = nast;
-        if (nast != NULL) {
-            nast->po_lewo = NULL;
-        } else {
-            o->ostatni = NULL;
-        }
-        wynik = i;
+    } else if (o->pocz == o->kon) {
+        return wytnij(o->pocz);
+    } else if (o->pocz->po_prawo != NULL) {
+        nast = o->pocz->po_prawo;
     } else {
-        interesant *i = o->pierwszy;
-        interesant *nast = i->po_lewo;
-        i->po_lewo = NULL;
-        o->pierwszy = nast;
-        if (nast != NULL) {
-            nast->po_prawo = NULL;
-        } else {
-            o->ostatni = NULL;
-        }
-        wynik = i;
+        nast = o->pocz->po_lewo;
     }
-    wynik->przy_okienku = -1;
+    interesant *wynik = wytnij(o->pocz);
+    o->pocz = nast;
     return wynik;
 }
 
@@ -103,54 +118,128 @@ interesant* obsluz(int k) {
 }
 
 void zmiana_okienka(interesant *i, int k) {
-    interesant *l = i->po_lewo;
-    interesant *p = i->po_prawo;
-    if (l != NULL) {
-        l->po_prawo = p;
-    }
-    if (p != NULL) {
-        p->po_lewo = l;
-    }
-    okienko *o = &wektor_okienek[i->przy_okienku];
-    if (o->pierwszy == i) {
-        if (o->kierunek == 0)
-            o->pierwszy = p;
-        else o->pierwszy = l;
-    }
-    if (o->ostatni == i) {
-        if (o->kierunek == 0)
-            o->ostatni = l;
-        else o->ostatni = p;
-    }
+    assert(wytnij(i) != NULL);
     dodaj_na_koniec(i, k);
 }
 
 void zamkniecie_okienka(int k1, int k2) {
     okienko *o1 = &wektor_okienek[k1];
     okienko *o2 = &wektor_okienek[k2];
-    if (o2->kierunek == 0) {
-
-    } else {
-
+    if (puste(o1))
+        return;
+    if (puste(o2)) {
+        o2->pocz = o1->pocz;
+        o2->kon = o1->kon;
+    } else if (o2->pocz != NULL) {
+        if (o2->kon->po_prawo == NULL) {
+            o2->kon->po_prawo = o1->pocz;
+            if (o1->pocz->po_lewo == NULL) {
+                o1->pocz->po_lewo = o2->kon;
+            } else {
+                o1->pocz->po_prawo = o2->kon;  
+            }
+        } else {
+            o2->kon->po_lewo = o1->pocz;
+            if (o1->pocz->po_lewo == NULL) {
+                o1->pocz->po_lewo = o2->kon;
+            } else {
+                o1->pocz->po_prawo = o2->kon;
+            }
+        }
+        o2->kon = o1->kon;
     }
+    o1->pocz = NULL;
+    o1->kon = NULL;
+}
+
+std::vector<interesant*> przejscie_po_kolejce(interesant *i1, interesant *i2) {
+    std::vector<interesant*> wynik;
+    interesant *it = i1;
+    if (it == NULL) return wynik;
+    interesant *nast = NULL;
+    if (it->po_prawo != NULL)
+        nast = it->po_prawo;
+    else nast = it->po_lewo;
+    while (it != NULL) {
+        wynik.push_back(it);
+        if (it == i2) {
+            break;
+        }
+        interesant *nast2 = NULL;
+        if (nast != NULL) {
+            if (nast->po_prawo != it)
+                nast2 = nast->po_prawo;
+            else nast2 = nast->po_lewo;
+        }
+        it = nast;
+        nast = nast2;
+    }
+    return wynik;
+}
+
+std::vector<interesant*> fast_track(interesant *i1, interesant *i2) {
+    okienko *s = (okienko*)malloc(sizeof(okienko));
+    okienko *o = &wektor_okienek[i1->przy_okienku];
+    s->pocz = i1;
+    s->kon = i1;
+    while (s->pocz != i2 && s->kon != i2) {
+        interesant *nast1 = s->pocz->po_lewo;
+        interesant *nast2 = s->kon->po_prawo;
+        if (nast1 != NULL) s->pocz = nast1;
+        if (nast2 != NULL) s->kon = nast2;
+    }
+    interesant *l, *p;
+    if (s->pocz == i2) {
+        s->kon = i1;
+        std::swap(s->pocz, s->kon);
+        l = s->kon->po_lewo;
+        p = s->pocz->po_prawo;
+        s->kon->po_lewo = NULL;
+        s->pocz->po_prawo = NULL;
+        if (o->kon == s->kon) o->kon = p;
+        if (o->pocz == s->pocz) o->pocz = l;
+    } else {
+        s->pocz = i1;
+        l = s->pocz->po_lewo;
+        p = s->kon->po_prawo;
+        s->kon->po_prawo = NULL;
+        s->pocz->po_lewo = NULL;
+        if (o->kon == s->kon) o->kon = l;
+        if (o->pocz == s->pocz) o->pocz = p;
+    }
+    if (l != NULL) l->po_prawo = p;
+    if (p != NULL) p->po_lewo = l;
+
+    return przejscie_po_kolejce(s->pocz, s->kon);
+}
+
+void naczelnik(int k) {
+    okienko *o = &wektor_okienek[k];
+    std::swap(o->pocz, o->kon);
+}
+
+std::vector<interesant*> zamkniecie_urzedu() {
+    std::vector<interesant*> wynik;
+    for (int i=0; i<liczba_okienek; i++) {
+        okienko *o = &wektor_okienek[i];
+        std::vector<interesant*> kolejka = przejscie_po_kolejce(o->pocz, o->kon);
+        wynik.insert(wynik.end(), kolejka.begin(), kolejka.end());
+    }
+    return wynik;
 }
 
 void wypisz_okienka() {
     for (int i=0; i<liczba_okienek; i++) {
         okienko o = wektor_okienek[i];
         std::cout << "Okienko nr." << i << ":\n";
-        std::cout << "Pierwszy = ";
-        std::cout << (o.pierwszy == NULL ? "NULL" : std::to_string(numerek(o.pierwszy))) << "\n";
-        std::cout << "Ostatni = ";
-        std::cout << (o.ostatni == NULL ? "NULL" : std::to_string(numerek(o.ostatni))) << "\n";
-        interesant *it = o.pierwszy;
-        while (it != NULL) {
-            std::cout << numerek(it) << " ";
-            //wypisz_interesanta(it);
-            if (o.kierunek == 0)
-                it = it->po_prawo;
-            else it = it->po_lewo;
+        std::cout << "pocz = ";
+        std::cout << (o.pocz == NULL ? "NULL" : std::to_string(numerek(o.pocz))) << "\n";
+        std::cout << "kon = ";
+        std::cout << (o.kon == NULL ? "NULL" : std::to_string(numerek(o.kon))) << "\n";
+        for (auto it : przejscie_po_kolejce(o.pocz, o.kon)) {
+            assert(it != NULL);
+            std::cout << it->numer << " ";
         }
-        std::cout << "\n\n";
+        std::cout << "\n";
     }
 }
