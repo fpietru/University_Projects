@@ -65,7 +65,6 @@ int numerek(interesant *i) {
     return i->numer;
 }
 
-// sprawdza czy okienko jest puste
 bool puste(okienko *o) {
     return (o->pocz->po_prawo == o->kon);
 }
