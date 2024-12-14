@@ -13,6 +13,7 @@ using namespace std;
 
 struct Okienko {
     interesant *pocz, *kon;
+    ~Okienko() = default;
 };
 vector<Okienko> wektor_okienek;
 int liczba_okienek;
@@ -171,10 +172,9 @@ void otwarcie_urzedu(int m) {
         Okienko *o = (Okienko*)malloc(sizeof(Okienko));
         o->pocz = stworz_interesanta(-1);
         o->kon = stworz_interesanta(-1);
-        // o->pocz->po_prawo = o->kon;
-        // o->kon->po_lewo = o->pocz;
         polacz(o->pocz, o->kon);
         wektor_okienek.push_back(*o);
+        free(o);
     }
 }
 
@@ -260,6 +260,14 @@ vector<interesant*> zamkniecie_urzedu() {
         vector<interesant*> kolejka = przejscie_po_kolejce(o->pocz, o->kon);
         wynik.insert(wynik.end(), kolejka.begin(), kolejka.end());
     }
+
+    // zwolnienie pamieci!
+    for (int i=0; i<liczba_okienek; i++) {
+        Okienko *o = &wektor_okienek[i];
+        free(o->pocz); free(o->kon);
+    }
+    wektor_okienek.clear();
+
     return wynik;
 }
 
