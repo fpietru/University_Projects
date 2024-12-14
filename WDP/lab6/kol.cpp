@@ -11,9 +11,6 @@
 
 using namespace std;
 
-// L = z lewej do prawej
-// P = z prawej do lewej
-enum Kierunek {L, P};
 struct Okienko {
     interesant *pocz, *kon;
 };
@@ -35,9 +32,12 @@ int numerek(interesant *i) {
 }
 
 bool puste(Okienko *o) {
-    return (o->pocz->po_prawo == o->kon);
+    bool op1 = (o->pocz->po_prawo == o->kon); 
+    bool op2 = (o->pocz->po_lewo == o->kon);
+    return (op1 || op2);
 }
 
+// do debuggu
 ostream& operator<<(ostream& os, const interesant* i) {
     os << "[" << i->numer << "] (";
     os << numerek(i->po_lewo) << ", ";
@@ -45,9 +45,9 @@ ostream& operator<<(ostream& os, const interesant* i) {
     return os;
 }
 
+// laczy interesantow a, b ze soba
 void polacz(interesant *a, interesant *b) {
     if (!a && !b) return;
-    // cout << "(" << a << " " << b << ")  --";
     assert(!a->po_lewo || !a->po_prawo);
     assert(!b->po_prawo || !b->po_lewo);
     if (!a->po_prawo && !b->po_lewo)
@@ -58,7 +58,6 @@ void polacz(interesant *a, interesant *b) {
         a->po_prawo = b, b->po_prawo = a;
     else if (!a->po_lewo && !b->po_lewo)
         a->po_lewo = b, b->po_lewo = a;
-    // cout << "-->  (" << a << " " << b << ")\n";
 }
 
 void L_rozlacz(interesant *i) {
@@ -69,6 +68,7 @@ void P_rozlacz(interesant *i) {
     i->po_prawo = NULL;
 }
 
+// rozlacza i od jego obu sasiedow (o ile istnieja)
 void rozlacz(interesant *i) {
     interesant *a = i->po_lewo;
     interesant *b = i->po_prawo;
@@ -80,6 +80,7 @@ void rozlacz(interesant *i) {
     P_rozlacz(i);
 }
 
+// rozlacza a,b mniedzy soba
 void rozlacz_dwa(interesant *a, interesant *b) {
     assert(a); assert(b);
     if (a->po_lewo == b) L_rozlacz(a);
@@ -99,13 +100,10 @@ void wytnij(interesant *i) {
 
 // wstaw interesanta b po miedzy interesanta a, c
 void wstaw(interesant *a, interesant *b, interesant *c) {
+    assert(a); assert(c);
     rozlacz_dwa(a, c);
     polacz(a, b);
     polacz(b, c);
-}
-
-Kierunek jaki_kierunek(Okienko *o) {
-    return ((o->pocz->po_lewo == NULL) ? L : P);
 }
 
 void oproznij_okienko(Okienko *o) {
@@ -114,35 +112,28 @@ void oproznij_okienko(Okienko *o) {
     polacz(o->pocz, o->kon);
 }
 
-interesant* nastepny(interesant *i, Okienko *o) {
-    if (jaki_kierunek(o) == L) return i->po_prawo;
-    else return i->po_lewo;
-}
-
-interesant* wczesniejszy(interesant *i, Okienko *o) {
-    if (jaki_kierunek(o) == L) return i->po_lewo;
-    else return i->po_prawo;
-}
-
 interesant* pierwszy(Okienko *o) {
     if (puste(o)) return NULL;
-    return nastepny(o->pocz, o);
+    if (o->pocz->po_lewo != NULL)
+        return o->pocz->po_lewo;
+    return o->pocz->po_prawo;
 }
 
 interesant* ostatni(Okienko *o) {
     if (puste(o)) return NULL;
-    return wczesniejszy(o->kon, o);
+    if (o->kon->po_lewo != NULL)
+        return o->kon->po_lewo;
+    return o->kon->po_prawo;
 }
 
 // dodaje interesanta i na koniec kolejki przy okienku k
 void dodaj_na_koniec(interesant *i, int k) {
+    assert(i);
     Okienko *o = &wektor_okienek[k];
-    if (puste(o)) { // jesli kolejka pusta
+    if (puste(o)) {
         wstaw(o->pocz, i, o->kon);
-    } else if (jaki_kierunek(o) == L) { // jesli nie, to sprawdzam kierunek
-        wstaw(wczesniejszy(o->kon, o), i, o->kon);
     } else {
-        wstaw(o->kon, i, wczesniejszy(o->kon, o));
+        wstaw(ostatni(o), i, o->kon);
     }
 }
 
@@ -151,8 +142,9 @@ void dodaj_na_koniec(interesant *i, int k) {
 interesant* usun_z_poczatku(int k) {
     Okienko *o = &wektor_okienek[k];
     interesant *i = NULL;
+    // cout << o->pocz << " " << o->kon << "\n";
     if (!puste(o)) {
-        i = nastepny(o->pocz, o);
+        i = pierwszy(o);
         wytnij(i);
     }
     return i;
@@ -188,8 +180,7 @@ void otwarcie_urzedu(int m) {
 
 void naczelnik(int k) {
     Okienko *o = &wektor_okienek[k];
-    if (puste(o) == false)
-        swap(o->pocz, o->kon);
+    swap(o->pocz, o->kon);
 }
 
 // kolejka przy okienku nr. k1 bez zmiany kolejnosci
@@ -203,18 +194,20 @@ void zamkniecie_okienka(int k1, int k2) {
     oproznij_okienko(o1);
 }
 
-void nast(interesant **i, interesant **w) {
-    if (i == NULL) return;
+// przesuwa i na swojego nastepnika
+// p = poprzednik i 
+void nast(interesant **i, interesant **p) {
+    assert(i);
     interesant *ni = NULL;
-    if ((*i)->po_lewo != (*w)) ni = (*i)->po_lewo;
+    if ((*i)->po_lewo != (*p)) ni = (*i)->po_lewo;
     else ni = (*i)->po_prawo;
-    (*w) = (*i);
-    (*i) = ni;
+    if (ni != NULL) {
+        (*p) = (*i);
+        (*i) = ni;
+    }
 }
 
 // przejscie po interesantach w kolejce w kolejnosci od i1 do i2 wlacznie
-// uwaga: zakladam, ze po prawo lub po lewo od i1 wystepuje NULL
-// wtedy poruszam sie w kierunku przeciwnym do NULL'a
 vector<interesant*> przejscie_po_kolejce(interesant *i1, interesant *i2) {
     vector<interesant*> wynik;
     interesant *it = i1;
@@ -240,7 +233,6 @@ vector<interesant*> fast_track(interesant *a, interesant *b) {
         interesant *it2 = a, *w2 = a->po_lewo;
         vector<interesant*> v1 = {a}, v2 = {a};
         do {
-            // cout << it1 << " " << it2 << "\n";
             nast(&it1, &w1), nast(&it2, &w2);
             v1.push_back(it1);
             v2.push_back(it2);
@@ -253,9 +245,8 @@ vector<interesant*> fast_track(interesant *a, interesant *b) {
             v2.clear();
         }
     }
-    for (auto i : wyn) {
+    for (auto i : wyn)
         wytnij(i);
-    }
     return wyn;
 }
 
@@ -272,12 +263,13 @@ vector<interesant*> zamkniecie_urzedu() {
     return wynik;
 }
 
+// funkcja do debugu
 string numer_str(interesant *i) {
     if (i == NULL) return "NULL";
     return to_string(i->numer);
 }
 
-// funkcja do debuggu
+// funkcja do debugu
 void wypisz_okienka() {
     cout << "----------------------------\n";
     for (int i=0; i<liczba_okienek; i++) {

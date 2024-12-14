@@ -22,10 +22,6 @@ struct interesant {
  */
 void otwarcie_urzedu(int m);
 
-// funkcje do debuggu
-void wypisz_interesanta(interesant *i);
-void wypisz_okienka();
-
 /**
  * @brief Do urzędu przychodzi nowy interesant
  *
