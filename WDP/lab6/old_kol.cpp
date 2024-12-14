@@ -27,6 +27,71 @@ void otwarcie_urzedu(int m) {
     }
 }
 
+
+/*
+
+
+void zamkniecie_okienka(int k1, int k2) {
+    Okienko *o1 = &wektor_okienek[k1];
+    Okienko *o2 = &wektor_okienek[k2];
+    Kierunek kier1 = jaki_kierunek(o1);
+    Kierunek kier2 = jaki_kierunek(o2);
+    if (puste(o1)) return;
+    else if (puste(o2)) { // jak o2 puste, to bedzie calym o1
+        swap(o1->pocz, o2->pocz);
+        swap(o1->kon, o2->kon);
+    } else { // obie kolejki niepuste
+        if (kier1 == L && kier2 == L) {
+            polacz(ostatni(o2), pierwszy(o1));
+        } if (kier1 == L && kier2 == P) {
+            pierwszy(o1)->po_lewo = ostatni(o2);
+            ostatni(o2)->po_lewo = pierwszy(o1);
+        } if (kier1 == P && kier2 == L) {
+            pierwszy(o1)->po_prawo = ostatni(o2);
+            ostatni(o2)->po_prawo = pierwszy(o1);
+        } if (kier1 == P && kier2 == P) {
+            polacz(pierwszy(o1), ostatni(o2));
+        }
+        swap(o1->kon, o2->kon);
+    }
+    oproznij_okienko(o1);
+}
+
+
+
+
+
+
+// zakladam, ze i1 jest na lewo od i2
+void polacz(interesant *i1, interesant *i2) {
+    if (i1 != NULL) i1->po_prawo = i2;
+    if (i2 != NULL) i2->po_lewo = i1;
+}
+
+
+    if (i1->po_prawo == NULL) {
+        i1->po_prawo = i2;
+        if (i2->po_lewo == NULL)
+            i2->po_lewo = i1;
+        else if (i2->po_prawo == NULL)
+            i2->po_prawo = i1;
+        else {
+            cout << "error: nie mozna polaczyc " << i2->numer << "\n"; 
+            exit(1);
+        }
+    }
+    else if (i1->po_lewo == NULL) {
+        i1->po_lewo = i2;
+        if (i2->po_prawo == NULL)
+            i2->po_prawo = i1;
+        else if (i2->po_lewo == NULL)
+    }
+
+
+
+*/
+
+
 int numerek(interesant *i) {
     return i->numer;
 }

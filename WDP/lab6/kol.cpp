@@ -9,10 +9,15 @@
 #include <assert.h>
 #include <algorithm>
 
-struct okienko {
+using namespace std;
+
+// L = z lewej do prawej
+// P = z prawej do lewej
+enum Kierunek {L, P};
+struct Okienko {
     interesant *pocz, *kon;
 };
-std::vector<okienko> wektor_okienek;
+vector<Okienko> wektor_okienek;
 int liczba_okienek;
 int liczba_interesantow;
 
@@ -24,91 +29,132 @@ interesant* stworz_interesanta(int x) {
     return i;
 }
 
-// zakladam, ze i1 jest na lewo od i2
-void polacz_interesantow(interesant *i1, interesant *i2) {
-    i1->po_prawo = i2;
-    i2->po_lewo = i1;
+int numerek(interesant *i) {
+    if (i == NULL) return -2;
+    return i->numer;
+}
+
+bool puste(Okienko *o) {
+    return (o->pocz->po_prawo == o->kon);
+}
+
+ostream& operator<<(ostream& os, const interesant* i) {
+    os << "[" << i->numer << "] (";
+    os << numerek(i->po_lewo) << ", ";
+    os << numerek(i->po_prawo) << ")";
+    return os;
+}
+
+void polacz(interesant *a, interesant *b) {
+    if (!a && !b) return;
+    // cout << "(" << a << " " << b << ")  --";
+    assert(!a->po_lewo || !a->po_prawo);
+    assert(!b->po_prawo || !b->po_lewo);
+    if (!a->po_prawo && !b->po_lewo)
+        a->po_prawo = b, b->po_lewo = a;
+    else if (!a->po_lewo && !b->po_prawo)
+        a->po_lewo = b, b->po_prawo = a;
+    else if (!a->po_prawo && !b->po_prawo)
+        a->po_prawo = b, b->po_prawo = a;
+    else if (!a->po_lewo && !b->po_lewo)
+        a->po_lewo = b, b->po_lewo = a;
+    // cout << "-->  (" << a << " " << b << ")\n";
+}
+
+void L_rozlacz(interesant *i) {
+    i->po_lewo = NULL; 
+}
+
+void P_rozlacz(interesant *i) {
+    i->po_prawo = NULL;
+}
+
+void rozlacz(interesant *i) {
+    interesant *a = i->po_lewo;
+    interesant *b = i->po_prawo;
+    if (a && a->po_lewo == i) L_rozlacz(a);
+    if (a && a->po_prawo == i) P_rozlacz(a);
+    if (b && b->po_lewo == i) L_rozlacz(b);
+    if (b && b->po_prawo == i) P_rozlacz(b);
+    L_rozlacz(i);
+    P_rozlacz(i);
+}
+
+void rozlacz_dwa(interesant *a, interesant *b) {
+    assert(a); assert(b);
+    if (a->po_lewo == b) L_rozlacz(a);
+    if (a->po_prawo == b) P_rozlacz(a);
+    if (b->po_lewo == a) L_rozlacz(b);
+    if (b->po_prawo == a) P_rozlacz(b);
+}
+
+// wytnij interesanta i i polacz jego obu sasiedow ze soba
+void wytnij(interesant *i) {
+    if (!i) return;
+    interesant *sl = i->po_lewo;
+    interesant *sp = i->po_prawo;
+    rozlacz(i);
+    polacz(sl, sp);
 }
 
 // wstaw interesanta b po miedzy interesanta a, c
 void wstaw(interesant *a, interesant *b, interesant *c) {
-    polacz_interesantow(a, b);
-    polacz_interesantow(b, c);
+    rozlacz_dwa(a, c);
+    polacz(a, b);
+    polacz(b, c);
 }
 
-void wytnij(interesant *i) {
-    polacz_interesantow(i->po_lewo, i->po_prawo);
-    i->po_lewo = i->po_prawo = NULL;
+Kierunek jaki_kierunek(Okienko *o) {
+    return ((o->pocz->po_lewo == NULL) ? L : P);
 }
 
-/*
-    L = kolejnosc od lewej do prawej
-    P = kolejnosc od prawej do lewej
-*/
-char kolejnosc(okienko *o) {
-    return ((o->pocz->po_lewo == NULL) ? 'L' : 'P');
+void oproznij_okienko(Okienko *o) {
+    rozlacz(o->pocz);
+    rozlacz(o->kon);
+    polacz(o->pocz, o->kon);
 }
 
-void otwarcie_urzedu(int m) {
-    liczba_okienek = m;
-    for (int i=0; i<m; i++) {
-        okienko *o = (okienko*)malloc(sizeof(okienko));
-        // poczatkowo kolejka jest pusta, sa w niej tylko wartownicy pocz i kon
-        o->pocz = stworz_interesanta(-1);
-        o->kon = stworz_interesanta(-1);
-        polacz_interesantow(o->pocz, o->kon);
-        wektor_okienek.push_back(*o);
-    }
+interesant* nastepny(interesant *i, Okienko *o) {
+    if (jaki_kierunek(o) == L) return i->po_prawo;
+    else return i->po_lewo;
 }
 
-int numerek(interesant *i) {
-    return i->numer;
+interesant* wczesniejszy(interesant *i, Okienko *o) {
+    if (jaki_kierunek(o) == L) return i->po_lewo;
+    else return i->po_prawo;
 }
 
-bool puste(okienko *o) {
-    return (o->pocz->po_prawo == o->kon);
+interesant* pierwszy(Okienko *o) {
+    if (puste(o)) return NULL;
+    return nastepny(o->pocz, o);
 }
 
-// funkcja do debuggu
-void wypisz_interesanta(interesant *i) {
-    std::cout << i->numer << "\n";
-    std::cout << "L: ";
-    if (i->po_lewo == NULL)
-        std::cout << "NULL\n";
-    else std::cout << numerek(i->po_lewo) << "\n";
-    std::cout << "P: ";
-    if (i->po_prawo == NULL)
-        std::cout << "NULL\n";
-    else std::cout << numerek(i->po_prawo) << "\n\n"; 
+interesant* ostatni(Okienko *o) {
+    if (puste(o)) return NULL;
+    return wczesniejszy(o->kon, o);
 }
 
 // dodaje interesanta i na koniec kolejki przy okienku k
 void dodaj_na_koniec(interesant *i, int k) {
-    okienko *o = &wektor_okienek[k];
-    if (puste(o)) {
+    Okienko *o = &wektor_okienek[k];
+    if (puste(o)) { // jesli kolejka pusta
         wstaw(o->pocz, i, o->kon);
-        return;
-    }
-    if (kolejnosc(o) == 'L') {
-        polacz_interesantow(i, o->kon);
-    } else { // kolejnosc(o) == 'P'
-        polacz_interesantow(o->kon, i);
+    } else if (jaki_kierunek(o) == L) { // jesli nie, to sprawdzam kierunek
+        wstaw(wczesniejszy(o->kon, o), i, o->kon);
+    } else {
+        wstaw(o->kon, i, wczesniejszy(o->kon, o));
     }
 }
 
 // usuwa pierwszego interesanta z kolejki oraz zwraca go na wynik
 // przy okazji zmienia poczatek kolejki do ktorej nalezal
 interesant* usun_z_poczatku(int k) {
-    okienko *o = &wektor_okienek[k];
+    Okienko *o = &wektor_okienek[k];
     interesant *i = NULL;
-    if (puste(o)) {
-        return NULL;
-    } else if (kolejnosc(o) == 'L') {
-        i = o->pocz->po_prawo;
-    } else {
-        i = o->pocz->po_lewo;
+    if (!puste(o)) {
+        i = nastepny(o->pocz, o);
+        wytnij(i);
     }
-    wytnij(i);
     return i;
 }
 
@@ -127,167 +173,121 @@ void zmiana_okienka(interesant *i, int k) {
     dodaj_na_koniec(i, k);
 }
 
-// kolejka przy okienku nr. k2 wchlania kolejke
-// ktora stala przy okienku nr. k1.
-// nie zmienia jej kolejnosci.
+void otwarcie_urzedu(int m) {
+    liczba_okienek = m;
+    for (int k=0; k<m; k++) {
+        Okienko *o = (Okienko*)malloc(sizeof(Okienko));
+        o->pocz = stworz_interesanta(-1);
+        o->kon = stworz_interesanta(-1);
+        // o->pocz->po_prawo = o->kon;
+        // o->kon->po_lewo = o->pocz;
+        polacz(o->pocz, o->kon);
+        wektor_okienek.push_back(*o);
+    }
+}
+
+void naczelnik(int k) {
+    Okienko *o = &wektor_okienek[k];
+    if (puste(o) == false)
+        swap(o->pocz, o->kon);
+}
+
+// kolejka przy okienku nr. k1 bez zmiany kolejnosci
+// przechodzi do okienka nr. k2 
 void zamkniecie_okienka(int k1, int k2) {
-    okienko *o1 = &wektor_okienek[k1];
-    okienko *o2 = &wektor_okienek[k2];
-    if (puste(o1))
-        return;
-    
-    if (puste(o2)) { // jak o2 puste, to bedzie calym o1
-        o2->pocz = o1->pocz;
-        o2->kon = o1->kon;
-        
-        return;
-    }
-    if (kolejnosc(o1) == 'L' && kolejnosc(o2) == 'L') {
-        
-    }
-    if (kolejnosc(o1) == 'L' && kolejnosc(o2) == 'P') {
+    Okienko *o1 = &wektor_okienek[k1];
+    Okienko *o2 = &wektor_okienek[k2];
+    polacz(o2->kon, o1->pocz);
+    wytnij(o2->kon); wytnij(o1->pocz);
+    swap(o1->kon, o2->kon);
+    oproznij_okienko(o1);
+}
 
-    }
-    if (kolejnosc(o1) == 'P' && kolejnosc(o2) == 'L') {
-
-    }
-    if (kolejnosc(o1) == 'P' && kolejnosc(o2) == 'P') {
-
-    }
-
-
-    if (kolejnosc(o2) == 'L') {
-        o2->kon->po_prawo = o1->pocz;
-        if (kolejnosc(o1) == 'L') {
-            o1->pocz->po_lewo = o2->kon;
-        } else {
-            o1->pocz->po_prawo = o2->kon;  
-        }
-    } else {
-        o2->kon->po_lewo = o1->pocz;
-        if (o1->pocz->po_lewo == NULL) {
-            o1->pocz->po_lewo = o2->kon;
-        } else {
-            o1->pocz->po_prawo = o2->kon;
-        }
-    }
-    
-    o2->kon = o1->kon;
-    o1->pocz = NULL;
-    o1->kon = NULL;
+void nast(interesant **i, interesant **w) {
+    if (i == NULL) return;
+    interesant *ni = NULL;
+    if ((*i)->po_lewo != (*w)) ni = (*i)->po_lewo;
+    else ni = (*i)->po_prawo;
+    (*w) = (*i);
+    (*i) = ni;
 }
 
 // przejscie po interesantach w kolejce w kolejnosci od i1 do i2 wlacznie
 // uwaga: zakladam, ze po prawo lub po lewo od i1 wystepuje NULL
 // wtedy poruszam sie w kierunku przeciwnym do NULL'a
-std::vector<interesant*> przejscie_po_kolejce(interesant *i1, interesant *i2) {
-    std::vector<interesant*> wynik;
+vector<interesant*> przejscie_po_kolejce(interesant *i1, interesant *i2) {
+    vector<interesant*> wynik;
     interesant *it = i1;
-    if (it == NULL) return wynik;
-    interesant *nast = NULL; 
-    if (it->po_prawo != NULL)
-        nast = it->po_prawo;
-    else nast = it->po_lewo;
+    interesant *w = NULL;
     while (it != NULL) {
-        wynik.push_back(it);
+        if (it->numer != -1)
+            wynik.push_back(it);
         if (it == i2) {
             break;
         }
-        interesant *nast2 = NULL;
-        if (nast != NULL) {
-            if (nast->po_prawo != it)
-                nast2 = nast->po_prawo;
-            else nast2 = nast->po_lewo;
-        }
-        it = nast;
-        nast = nast2;
+        nast(&it, &w);
     }
     return wynik;
 }
 
-// wycinam fragment od i1 do i2 z kolejki w ktorej sie znajduja
-// ewentualnie zmieniam pocz/kon tej kolejki
-std::vector<interesant*> fast_track(interesant *i1, interesant *i2) {
-    if (i1 == i2) return {wytnij(i1)};
-    okienko *s = (okienko*)malloc(sizeof(okienko));
-    okienko *o = &wektor_okienek[i1->przy_okienku];
-    s->pocz = i1;
-    s->kon = i1;
-    // bede rozszerzal sie s w obu kierunkach dopoki jeden koniec
-    // nie bedzie i2
-    while (s->pocz != i2 && s->kon != i2) {
-        interesant *nast1 = s->pocz->po_lewo;
-        interesant *nast2 = s->kon->po_prawo;
-        if (nast1 != NULL) s->pocz = nast1;
-        if (nast2 != NULL) s->kon = nast2;
+// wycinam fragment od a do b wlacznie z kolejki
+vector<interesant*> fast_track(interesant *a, interesant *b) {
+    vector<interesant*> wyn;
+    if (a == b) {
+        wyn.push_back(a);
+    } else {
+        interesant *it1 = a, *w1 = a->po_prawo;
+        interesant *it2 = a, *w2 = a->po_lewo;
+        vector<interesant*> v1 = {a}, v2 = {a};
+        do {
+            // cout << it1 << " " << it2 << "\n";
+            nast(&it1, &w1), nast(&it2, &w2);
+            v1.push_back(it1);
+            v2.push_back(it2);
+        } while (it1 != b && it2 != b);
+        if (it2 == b) {
+            wyn = v2;
+            v1.clear();
+        } else { // it1 == b
+            wyn = v1;
+            v2.clear();
+        }
     }
-    interesant *l, *p;
-    // pozostalo obciac s do [i1, i2] lub [i2, i1]
-    // ,a nastepnie scalic ze soba najbliszych interesantow przy obu koncach
-    // przez to ze do rozpatrzenia sa podobne przypadki, kod wyglada podobnie
-    // ale NIE jest duplikowany
-    // przypadki do rozpatrzenia:
-    // 1) jesli i2 stoi na lewo od i1:
-    if (s->pocz == i2) {
-        s->kon = i1;
-        std::swap(s->pocz, s->kon);
-        l = s->kon->po_lewo;
-        p = s->pocz->po_prawo;
-        s->kon->po_lewo = NULL;
-        s->pocz->po_prawo = NULL;
-        if (o->kon == s->kon) o->kon = p;
-        if (o->pocz == s->pocz) o->pocz = l;
-    } else { // w przeciwnym wypadku:
-        s->pocz = i1;
-        l = s->pocz->po_lewo;
-        p = s->kon->po_prawo;
-        s->kon->po_prawo = NULL;
-        s->pocz->po_lewo = NULL;
-        if (o->kon == s->kon) o->kon = l;
-        if (o->pocz == s->pocz) o->pocz = p;
+    for (auto i : wyn) {
+        wytnij(i);
     }
-    if (l != NULL) l->po_prawo = p;
-    if (p != NULL) p->po_lewo = l;
-
-    return przejscie_po_kolejce(s->pocz, s->kon);
-}
-
-// odwracam kolejnosc w kolejce przy okienku nr. k
-void naczelnik(int k) {
-    okienko *o = &wektor_okienek[k];
-    std::swap(o->pocz, o->kon);
+    return wyn;
 }
 
 // zwracam wszystkich interesantow:
 // najpierw po nr. okienka
 // potem po kolejnosci w kolejce w ktorej stoi
-std::vector<interesant*> zamkniecie_urzedu() {
-    std::vector<interesant*> wynik;
+vector<interesant*> zamkniecie_urzedu() {
+    vector<interesant*> wynik;
     for (int i=0; i<liczba_okienek; i++) {
-        okienko *o = &wektor_okienek[i];
-        std::vector<interesant*> kolejka = przejscie_po_kolejce(o->pocz, o->kon);
+        Okienko *o = &wektor_okienek[i];
+        vector<interesant*> kolejka = przejscie_po_kolejce(o->pocz, o->kon);
         wynik.insert(wynik.end(), kolejka.begin(), kolejka.end());
     }
     return wynik;
 }
 
-std::string numer_str(interesant *i) {
+string numer_str(interesant *i) {
     if (i == NULL) return "NULL";
-    return std::to_string(i->numer);
+    return to_string(i->numer);
 }
 
 // funkcja do debuggu
 void wypisz_okienka() {
-    std::cout << "----------------------------\n";
+    cout << "----------------------------\n";
     for (int i=0; i<liczba_okienek; i++) {
-        okienko o = wektor_okienek[i];
-        std::cout << "Okienko nr." << i << ":\n";
-        std::cout << "pocz = " << numer_str(o.pocz) << " kon = " << numer_str(o.kon) << " [\n";
+        Okienko o = wektor_okienek[i];
+        cout << "Okienko nr." << i << ":\n";
         for (auto it : przejscie_po_kolejce(o.pocz, o.kon)) {
             assert(it != NULL);
-            std::cout << "( "<< numer_str(it) << ", L=" << numer_str(it->po_lewo) << ", P=" << numer_str(it->po_prawo) << ", O=" << it->przy_okienku << ")\n";
+            cout << "( "<< numer_str(it) << ", L=" << numer_str(it->po_lewo) << ", P=" << numer_str(it->po_prawo) << ")\n";
         }
-        std::cout << "]\n\n";
+        cout << "]\n\n";
     }
-    std::cout << "----------------------------\n";
+    cout << "----------------------------\n";
 }
