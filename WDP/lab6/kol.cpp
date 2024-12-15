@@ -1,6 +1,7 @@
 /*
     Zadanie: "Kolejki"
     Autor: Franciszek Pietrusiak
+    Code Review: Szymon Nowak
 */
 #include "kol.h"
 #include <stdlib.h>
@@ -8,6 +9,7 @@
 #include <vector>
 #include <assert.h>
 #include <algorithm>
+#define NDEBUG
 
 using namespace std;
 
@@ -18,6 +20,9 @@ struct Okienko {
 vector<Okienko> wektor_okienek;
 int liczba_okienek;
 int liczba_interesantow;
+
+
+// *=======[funkcje pomocnicze]=======*
 
 interesant* stworz_interesanta(int x) {
     interesant *i = (interesant*)malloc(sizeof(interesant));
@@ -30,20 +35,6 @@ interesant* stworz_interesanta(int x) {
 int numerek(interesant *i) {
     if (i == NULL) return -2;
     return i->numer;
-}
-
-bool puste(Okienko *o) {
-    bool op1 = (o->pocz->po_prawo == o->kon); 
-    bool op2 = (o->pocz->po_lewo == o->kon);
-    return (op1 || op2);
-}
-
-// do debuggu
-ostream& operator<<(ostream& os, const interesant* i) {
-    os << "[" << i->numer << "] (";
-    os << numerek(i->po_lewo) << ", ";
-    os << numerek(i->po_prawo) << ")";
-    return os;
 }
 
 // laczy interesantow a, b ze soba
@@ -107,6 +98,45 @@ void wstaw(interesant *a, interesant *b, interesant *c) {
     polacz(b, c);
 }
 
+// przesuwa i na swojego nastepnika
+// p = poprzednik i 
+void nast(interesant **i, interesant **p) {
+    assert(i);
+    interesant *ni = NULL;
+    if ((*i)->po_lewo != (*p)) ni = (*i)->po_lewo;
+    else ni = (*i)->po_prawo;
+    if (ni != NULL) {
+        (*p) = (*i);
+        (*i) = ni;
+    }
+}
+
+// przejscie po interesantach w kolejce w kolejnosci od i1 do i2 wlacznie
+vector<interesant*> przejscie_po_kolejce(interesant *i1, interesant *i2) {
+    vector<interesant*> wynik;
+    interesant *it = i1;
+    interesant *w = NULL;
+    while (it != NULL) {
+        if (it->numer != -1)
+            wynik.push_back(it);
+        if (it == i2) {
+            break;
+        }
+        nast(&it, &w);
+    }
+    return wynik;
+}
+
+bool puste(Okienko *o) {
+    bool op1 = (o->pocz->po_prawo == o->kon); 
+    bool op2 = (o->pocz->po_lewo == o->kon);
+    return (op1 || op2);
+}
+
+void odwroc(Okienko *o) {
+    swap(o->pocz, o->kon);
+}
+
 void oproznij_okienko(Okienko *o) {
     rozlacz(o->pocz);
     rozlacz(o->kon);
@@ -151,6 +181,9 @@ interesant* usun_z_poczatku(int k) {
     return i;
 }
 
+// *==================================*
+// *=======[funkcje do zadania]=======*
+
 interesant* nowy_interesant(int k) {
     interesant *nowy = stworz_interesanta(liczba_interesantow++);
     dodaj_na_koniec(nowy, k);
@@ -180,7 +213,7 @@ void otwarcie_urzedu(int m) {
 
 void naczelnik(int k) {
     Okienko *o = &wektor_okienek[k];
-    swap(o->pocz, o->kon);
+    odwroc(o);
 }
 
 // kolejka przy okienku nr. k1 bez zmiany kolejnosci
@@ -192,35 +225,6 @@ void zamkniecie_okienka(int k1, int k2) {
     wytnij(o2->kon); wytnij(o1->pocz);
     swap(o1->kon, o2->kon);
     oproznij_okienko(o1);
-}
-
-// przesuwa i na swojego nastepnika
-// p = poprzednik i 
-void nast(interesant **i, interesant **p) {
-    assert(i);
-    interesant *ni = NULL;
-    if ((*i)->po_lewo != (*p)) ni = (*i)->po_lewo;
-    else ni = (*i)->po_prawo;
-    if (ni != NULL) {
-        (*p) = (*i);
-        (*i) = ni;
-    }
-}
-
-// przejscie po interesantach w kolejce w kolejnosci od i1 do i2 wlacznie
-vector<interesant*> przejscie_po_kolejce(interesant *i1, interesant *i2) {
-    vector<interesant*> wynik;
-    interesant *it = i1;
-    interesant *w = NULL;
-    while (it != NULL) {
-        if (it->numer != -1)
-            wynik.push_back(it);
-        if (it == i2) {
-            break;
-        }
-        nast(&it, &w);
-    }
-    return wynik;
 }
 
 // wycinam fragment od a do b wlacznie z kolejki
@@ -271,23 +275,4 @@ vector<interesant*> zamkniecie_urzedu() {
     return wynik;
 }
 
-// funkcja do debugu
-string numer_str(interesant *i) {
-    if (i == NULL) return "NULL";
-    return to_string(i->numer);
-}
-
-// funkcja do debugu
-void wypisz_okienka() {
-    cout << "----------------------------\n";
-    for (int i=0; i<liczba_okienek; i++) {
-        Okienko o = wektor_okienek[i];
-        cout << "Okienko nr." << i << ":\n";
-        for (auto it : przejscie_po_kolejce(o.pocz, o.kon)) {
-            assert(it != NULL);
-            cout << "( "<< numer_str(it) << ", L=" << numer_str(it->po_lewo) << ", P=" << numer_str(it->po_prawo) << ")\n";
-        }
-        cout << "]\n\n";
-    }
-    cout << "----------------------------\n";
-}
+// *==================================*

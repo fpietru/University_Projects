@@ -1,4 +1,8 @@
 -std=c++17
+-pedantic
+-Wall
+-Wextra
+-Wformat-security
 -Wduplicated-cond
 -Wfloat-equal
 -Wshadow
