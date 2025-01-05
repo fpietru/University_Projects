@@ -6,7 +6,7 @@ A collection of academic projects completed during my studies at MIM UW.
 
 - [About](#about)
 - [Projects](#projects)
-  - [WDP (Wprowadzenie do Programowania)](#wdp-wprowadzenie-do-programowania)
+  - [WDP (Wprowadzenie do Programowania*)](#wdp-wprowadzenie-do-programowania)
   - [WDI (Wprowadzenie do Informatyki)](#wdi-wprowadzenie-do-informatyki)
   - [POiCPP (Programowanie obiektowe i C++)](#poicpp-programowanie-obiektowe-i-c)
 - [Structure](#structure)
@@ -19,7 +19,7 @@ A collection of academic projects completed during my studies at MIM UW.
 
 This repository contains projects and exercises I completed as part of my university coursework.
 The projects are split into categories based on the classes they belong to:
- - *Wprowadzenie do Programowania (Introduction to Programming)*
+ - *Wprowadzenie do Programowania (gwiazdka) (Introduction to Programming (extended))*
  - *Wprowadzenie do Informatyki (Introduction to Computer Science)*.
  - *Programowanie obiektowe i C++ (MAT)*
 
@@ -28,7 +28,10 @@ The projects are split into categories based on the classes they belong to:
 ## Bigger Projects
 
 ### WDP (Wprowadzenie do Programowania)
- - [Set Operation Library based on Partitioning Set into disjoint arithmetic sequences](/WDP/lab3/)
+ - [Efficient Set Operation Library based on Partitioning Set into disjoint arithmetic sequences](/WDP/lab3/)
+ - [Origami-like paper folding problem](/WDP/lab5/)
+ - [Double-linked lists library](/WDP/lab6/)
+ - [Persistent Segment Tree on Pointers](/WDP/lab7/)
 
 ### WDI (Wprowadzenie do Informatyki)
  - [Red-Black Tree Implementation](/WDI/redblacktree)
@@ -43,16 +46,16 @@ The repository is organized as follows:
 ```
 University_Projects/
 ├── WDP/
-│   ├── project1/
-│   ├── project2/
+│   ├── lab1/
+│   ├── lab2/
 │   └── ...
 ├── WDI/
-│   ├── project1/
-│   ├── project2/
+│   ├── lab1/
+│   ├── lab2/
 │   └── ...
 ├── POiCPP/
-│   ├── project1/
-│   ├── project2/
+│   ├── lab1/
+│   ├── lab2/
 │   └── ...
 └── README.md
 ```
@@ -65,7 +68,7 @@ Each subfolder contains project-specific files, including source code, documenta
 
 The projects in this repository were developed using:
 - **Languages**: C, C++, Bash
-- **Tools**: GCC, G++, VS Code, Make
+- **Tools**: GCC, G++, VS Code, Make, Valgrind
 - **Version Control**: Git
 
 ---
