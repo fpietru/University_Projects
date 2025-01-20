@@ -32,6 +32,7 @@ The projects are split into categories based on the classes they belong to:
  - [Origami-like paper folding problem](/WDP/lab5/)
  - [Double-linked lists library](/WDP/lab6/)
  - [Persistent Segment Tree on Pointers](/WDP/lab7/)
+ - [n Jug Water Pouring Problem](/WDP/lab8/)
 
 ### WDI (Wprowadzenie do Informatyki)
  - [Red-Black Tree Implementation](/WDI/redblacktree)
