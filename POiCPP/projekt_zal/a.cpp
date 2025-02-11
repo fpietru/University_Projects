@@ -226,26 +226,14 @@ void info(const sp<Wyrazenie>& w) {
 
 int main () {
 
-    sp<Wyrazenie> z1 = ms<Zmienna>('b', "C+o yhn hsi h usin");
-    sp<Wyrazenie> z2 = ms<Zmienna>('x', "+ rPto?Ti steqeto!");
+    sp<Wyrazenie> s1 = ms<Stala>("C+o yhn hsi h usin");
+    sp<Wyrazenie> s2 = ms<Stala>("+ rPto?Ti steqeto!");
+    sp<Wyrazenie> z1 = ms<Zmienna>('z');
 
-    sp<Wyrazenie> w1 = ms<Przeplot>(z1, z2);
+    info(z1);
+
+    sp<Wyrazenie> w1 = ms<Przeplot>(s1, z1);
     info(w1);
-
-    sp<Wyrazenie> s1 = ms<Stala>("***                                 ");
-    sp<Wyrazenie> w2 = ms<Mask>(w1, s1);
-    info(w2);
-
-    sp<Wyrazenie> s2 = ms<Stala>("......*******                       ");
-    sp<Wyrazenie> w3 = ms<Mask>(w1, s2);
-    info(w3);
-
-    sp<Wyrazenie> s3 = ms<Stala>("..");
-    sp<Wyrazenie> w4 = ms<Licz>(s3);
-
-    sp<Wyrazenie> w5 = ms<Scal>(w3, w4);
-    sp<Wyrazenie> w6 = ms<Scal>(w5, w2);
-    info(w6);
 
     return 0;
 }
