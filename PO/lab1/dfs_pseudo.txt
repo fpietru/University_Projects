@@ -1,0 +1,20 @@
+public Main {
+	public dfs(Graf<String> g) {
+		Stos<String> s = new StosTablicowy<>();
+		String root = Random.arrayElem(g.wierzchołki());
+		Map<String, Boolean> odwiedzone = ...;
+		s.push(root);
+		odwiedzone.set(root, true);
+		
+		while (!s.isEmpty) {
+			String v = s.pop();
+			// System.out.println(v);
+			for (String w : g.sąsiedzi(v)) {
+				if (!odwiedzone.get(w)) {
+					s.push(w);
+					odwiedzone.set(w, true);	
+				}
+			}
+		}
+	}
+}

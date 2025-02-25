@@ -1,0 +1,19 @@
+public Pojazd(float v) {
+	super();
+	this.prędkość = v;
+}
+
+public PojazdNaziemny(String marka, String model, float v) {
+	super(v);
+	this.marka = marka;
+	this.model = model;
+}
+
+// plik Samochod.java
+
+public class Samochod extends PojazdNaziemny {
+	public Samochod(String marka, String model, float v, String kolor) {
+		super(marka, model, v);
+		this.kolorKaroserii = kolor;
+	}
+}
