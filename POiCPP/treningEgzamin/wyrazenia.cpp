@@ -46,7 +46,7 @@ public:
 class Plus : public Operator {
 public:
     Plus(const up<Wyrazenie>& _lewy, const up<Wyrazenie>& _prawy)
-        : Operator(_lewy->kopia(), _prawy->kopia()) {}
+        : Operator(_lewy, _prawy) {}
 
     void drukuj_nazwe() override { cout << "+"; }
     double wartosc(double x) override { return lewy->wartosc(x) + prawy->wartosc(x); }
@@ -61,7 +61,7 @@ public:
 class Razy : public Operator {
 public:
     Razy(const up<Wyrazenie>& _lewy, const up<Wyrazenie>& _prawy)
-        : Operator(_lewy->kopia(), _prawy->kopia()) {}
+        : Operator(_lewy, _prawy) {}
 
     void drukuj_nazwe() override { cout << "*"; }
     double wartosc(double x) override { return lewy->wartosc(x) * prawy->wartosc(x); }
