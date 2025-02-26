@@ -1,0 +1,12 @@
+ok. 7 spotkań
+15 ptk za ćwiczenia
+
+2 projekty:
+    1. projekt:
+        Mathematica, rozwiązanie określonych typów równań plus graficzne przedstawienie tych równań
+    2. projekt:
+        Znaleźć model z (fizyka, biologia, ekonomia, ...) i zaimplementować rozwiązanie samemu.
+        Przedstawić na forum problem i swoje rozwiązanie.
+
+TODO:
+ - ogarnąć Mathematica

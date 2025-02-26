@@ -1,0 +1,75 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 13.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[      1873,         65]
+NotebookOptionsPosition[      1382,         48]
+NotebookOutlinePosition[      1796,         64]
+CellTagsIndexPosition[      1753,         61]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+
+Cell[CellGroupData[{
+Cell[BoxData[
+ RowBox[{"DSolve", "[", 
+  RowBox[{
+   RowBox[{
+    RowBox[{
+     RowBox[{"p", "'"}], "[", "x", "]"}], "==", 
+    RowBox[{"k", "*", 
+     RowBox[{"p", "[", "x", "]"}]}]}], ",", 
+   RowBox[{"p", "[", "x", "]"}], ",", "x"}], "]"}]], "Input",
+ CellChangeTimes->{{3.9495484690264907`*^9, 3.9495485312224693`*^9}},
+ CellLabel->"In[16]:=",ExpressionUUID->"48e78413-4de2-4c96-82b4-4deff8bba9ce"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{"{", 
+   RowBox[{
+    RowBox[{"p", "[", "x", "]"}], "\[Rule]", 
+    RowBox[{
+     SuperscriptBox["\[ExponentialE]", 
+      RowBox[{"k", " ", "x"}]], " ", 
+     TemplateBox[{"1"},
+      "C"]}]}], "}"}], "}"}]], "Output",
+ CellChangeTimes->{3.9495485329248247`*^9},
+ CellLabel->"Out[16]=",ExpressionUUID->"c948576f-6ff9-4fad-8f73-8f5c4093b25e"]
+}, Open  ]]
+},
+WindowSize->{569.25, 609.75},
+WindowMargins->{{353.25, Automatic}, {53.25, Automatic}},
+FrontEndVersion->"13.0 for Microsoft Windows (64-bit) (February 4, 2022)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"da3eb321-828e-4455-9867-e5a3e7e05332"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[CellGroupData[{
+Cell[580, 22, 402, 10, 43, "Input",ExpressionUUID->"48e78413-4de2-4c96-82b4-4deff8bba9ce"],
+Cell[985, 34, 381, 11, 37, "Output",ExpressionUUID->"c948576f-6ff9-4fad-8f73-8f5c4093b25e"]
+}, Open  ]]
+}
+]
+*)
+
+(* End of internal cache information *)
+
