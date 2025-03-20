@@ -1,0 +1,9 @@
+Tu jest opisany problem z kolejnością podawania linkerowi bibliotek do linkowania:
+https://stackoverflow.com/questions/45135/why-does-the-order-in-which-libraries-are-linked-sometimes-cause-errors-in-gcc
+
+Aby uruchomić program zlinkowany dynamicznie, trzeba ustawić ścieżkę poszukiwania bibliotek:
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:.
+
+W niektórych dystrybucjach Linuksa statyczna wersja libc nie jest zainstalowana domyślne.
+
+https://tldp.org/HOWTO/Program-Library-HOWTO/introduction.html
