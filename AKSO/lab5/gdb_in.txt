@@ -1,0 +1,24 @@
+echo Analiza dzialania funkcji sieve_init \n
+break 15
+run
+set logging file gdb_out.txt
+set logging overwrite
+set logging on
+
+print i
+print *s@n
+continue
+
+print i
+print *s@n
+continue
+
+print i
+print *s@n
+continue
+
+print i
+print *s@n
+
+set logging off
+quit

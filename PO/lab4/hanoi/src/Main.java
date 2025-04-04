@@ -38,8 +38,8 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        int n = 3;
-        String[] pegs = new String[]{"A", "II", "III", "four"};
+        int n = 2;
+        String[] pegs = new String[]{"A", "A", "III", "four"};
         hanoi(n, pegs);
     }
 }
