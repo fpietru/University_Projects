@@ -1,11 +1,11 @@
 package wyrazenia;
 
 public abstract class Wyrazenie {
-    public Wyrazenie(){};
+    public Wyrazenie(){}
     public abstract double wartosc(double x);
     public abstract Wyrazenie pochodna();
     public abstract String wypisz();
-    protected int priorytet(){
+    protected int priorytet() {
         return Integer.MAX_VALUE;
     }
     public double calkaOzn(double a, double b) {
@@ -23,5 +23,17 @@ public abstract class Wyrazenie {
             lewy = prawy;
         }
         return res;
+    }
+
+    public Wyrazenie dodaj(Wyrazenie w) {
+        return w.dodajOdwr(this);
+    }
+    protected Wyrazenie dodajOdwr(Wyrazenie w) {
+        return new Suma(w, this);
+    }
+
+    @Override
+    public String toString() {
+        return wypisz();
     }
 }
