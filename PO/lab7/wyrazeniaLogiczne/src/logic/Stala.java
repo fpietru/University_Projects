@@ -8,7 +8,7 @@ public class Stala extends Wyrazenie {
     }
 
     @Override
-    public boolean wartosc() {
+    public boolean wartosc(boolean x) {
         return wartosc;
     }
 

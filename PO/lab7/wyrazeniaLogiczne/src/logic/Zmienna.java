@@ -1,21 +1,15 @@
 package logic;
 
 public class Zmienna extends Wyrazenie {
-    private boolean wartosc;
-    private String symbol;
-
-    public Zmienna(boolean wartosc, String symbol) {
-        this.wartosc = wartosc;
-        this.symbol = symbol;
-    }
+    public Zmienna() {}
 
     @Override
-    public boolean wartosc() {
-        return wartosc;
+    public boolean wartosc(boolean x) {
+        return x;
     }
 
     @Override
     public String toString() {
-        return symbol;
+        return "x";
     }
 }
