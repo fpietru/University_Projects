@@ -1,6 +1,6 @@
 section .bss
 	align 8
-	T: resq 8000
+	T: resq 8192
 
 section .text
 global nsqrt
