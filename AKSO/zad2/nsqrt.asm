@@ -23,6 +23,12 @@ global nsqrt
 
 
 nsqrt:
+	push rbx
+	push r12
+	push r13
+	push r14
+	push r15
+
 	; r8 - s := dlugosc tablicy Q
 	mov r8, rdx
 	shr r8, 6 ; s = n >> 6
@@ -38,7 +44,6 @@ nsqrt:
 	cmp r8, r10
 	jns .clean_Q_loop
 
-	push rbx
 	; iteracyjnie wyliczanie Q
 	mov rbx, 1 ; rbx - j = 1
 .main_loop:
@@ -78,7 +83,7 @@ nsqrt:
 	lea rcx, [r10 + r13]
 	mov qword [r11 + rcx*8], rax
 
-	; if (r != && i+l+1 < ss)
+	; if (r != 0 && i+l+1 < ss)
 	test r14, r14
 	jz .skip
 
@@ -96,7 +101,7 @@ nsqrt:
 	shr rax, cl
 	lea rcx, [r10 + r13]
 	inc rcx
-	or [rdi + rcx*8], rax
+	or [r11 + rcx*8], rax
 .skip:
 	dec r10
 	jns .r_shift_loop
@@ -123,11 +128,12 @@ nsqrt:
 .add_bit_T_loop:
 	mov r13, [r11 + r10*8]
 	add [r11 + r10*8], r14
-	jo .break_add_bit_T_loop
+	cmp [r11 + r10*8], r13
+	jae .break_add_bit_T_loop
 	mov r14, 1
 	inc r10
 	cmp r9, r10
-	jns .add_bit_T_loop
+	jb .add_bit_T_loop
 .break_add_bit_T_loop:
 
 .compare:
@@ -165,33 +171,39 @@ nsqrt:
 .add_bit_Q_loop:
 	mov r13, [rdi + r10*8]
 	add [rdi + r10*8], r14
-	jo .break_add_bit_Q_loop
+	cmp [rdi + r10*8], r13
+	jae .break_add_bit_Q_loop
 	mov r14, 1
 	inc r10
 	cmp r8, r10
-	jns .add_bit_Q_loop
+	jb .add_bit_Q_loop
 .break_add_bit_Q_loop:
 
 .sub_X_T:
+	; r14 - borrow
+	xor r14, r14
 	; i = 0
 	xor r10, r10
 .sub_X_T_loop:
 	mov r12, [rsi + r10*8]
-	sbb r12, 0
+	sub r12, r14
 	mov r13, [r11 + r10*8]
-	sbb r12, r13
+	sub r12, r13
+	adc r14, 0
 	mov [rsi + r10*8], r12
 	inc r10
 	cmp r9, r10
 	jns .sub_X_T_loop
-
 
 .continue_main_loop:
 	inc rbx
 	cmp rbx, rdx
 	jbe .main_loop
 
-
+	pop r15
+	pop r14
+	pop r13
+	pop r12
 	pop rbx
 	ret
 
