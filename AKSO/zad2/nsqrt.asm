@@ -1,16 +1,14 @@
 section .bss
 	align 8
-	T: resq 8192
+	T: resq 8000 ; z zal 64 <= n <= 256000
 
 section .text
 global nsqrt
 
-; Argumenty:
+; Rejestry:
 ; rdi - wskaznik do tablicy Q
 ; rsi - wskaznik do tablicy X
 ; rdx - wartosc n
-
-; Rejestry
 ; rbx - adres tablicy T
 ; r8 - s := dlugosc tablicy Q
 ; r9 - ss := dlugosc tablicy X, T
@@ -20,7 +18,8 @@ global nsqrt
 ; r13 - l := zmienna lokalna
 ; r14 - r := zmienna lokalna
 ; r15 - x := zmienna lokalna
-
+; rax - y := zmienna lokalna
+; rcx - z := zmienna lokalna
 
 nsqrt:
 	push rbx
@@ -35,29 +34,29 @@ nsqrt:
 	lea rbx, [rel T] ; rbx := adres tablicy T
 
 	; czyszczenie Q
-	mov r10, 0 ; r10 - i = 0
-.clean_Q_loop: ; for (i=0; i<s; i++)
-	mov qword [rdi + r10 * 8], 0 ; Q[i] = 0
+	mov r10, 0                 ; r10 - i = 0
+.clean_Q_loop:                     ; for (i=0; i<s; i++)
+	mov qword [rdi + r10*8], 0 ; Q[i] = 0
 	inc r10
 	cmp r10, r8
 	jb .clean_Q_loop
 
 	; iteracyjnie wyliczanie Q
-	mov r11, 1 ; r11 - j = 1
-.main_loop: ; for (j=1; j<=n; j++)
+	mov r11, 1                 ; r11 - j = 1
+.main_loop:                        ; for (j=1; j<=n; j++)
 	; czyszczenie T
-	mov r10, 0 ; r10 - i = 0
-.clean_T_loop: ; for (i=0; i<ss; i++)
-	mov qword [rbx + r10 * 8], 0 ; T[i] = 0
+	mov r10, 0                 ; r10 - i = 0
+.clean_T_loop:                     ; for (i=0; i<ss; i++)
+	mov qword [rbx + r10*8], 0 ; T[i] = 0
 	inc r10
 	cmp r10, r9
-    jb .clean_T_loop
+	jb .clean_T_loop
 
 .r_shift: ; T += 2^(n-j+1)*Q
 	; r12 - k := n-j+1
 	mov r12, rdx ; k = n
 	sub r12, r11 ; k -= j
-	add r12, 1   ; k += 1
+	inc r12      ; k++
 
 	; r13 - l := k / 64 = k >> 6
 	mov r13, r12 ; l = k
@@ -74,32 +73,32 @@ nsqrt:
 	; r15 - x := Q[i]
 	mov r15, qword [rdi + r10*8]
 
-	; T[i+l] = x << r
-	mov rax, r15
-	mov cl, r14b
-	shl rax, cl
-	lea rcx, [r10 + r13]
-	mov qword [rbx + rcx*8], rax
+	; T[i+l] = y = x << r
+	mov rax, r15                 ; y = x
+	mov cl, r14b                 ; z = r
+	shl rax, cl                  ; x <<= z
+	lea rcx, [r10 + r13]         ; z = i + l
+	mov qword [rbx + rcx*8], rax ; T[z] = x
 
 	; if (r != 0 && i+l+1 < ss)
 	test r14, r14
-	jz .skip
+	jz .skip                     ; if (r == 0)
 
-	; rax - i+l+1
-	mov rax, r10
-	add rax, r13
-	inc rax
+	; rax - y = i+l+1
+	mov rax, r10                 ; y = i
+	add rax, r13                 ; y += l
+	inc rax                      ; y++
 	cmp rax, r9
-	jae .skip
+	jae .skip                    ; if (y >= ss)
 
 	; T[i+l+1] |= Q[i] >> (64 - r)
-	mov rax, r15
-	mov cl, 64
-	sub cl, r14b
-	shr rax, cl
-	lea rcx, [r10 + r13]
-	inc rcx
-	or [r11 + rcx*8], rax
+	mov rax, r15                 ; y = x = Q[i]
+	mov cl, 64                   ; z = 64
+	sub cl, r14b                 ; z -= r
+	shr rax, cl                  ; y >>= z
+	lea rcx, [r10 + r13]         ; z = i + l
+	inc rcx                      ; z++
+	or [rbx + rcx*8], rax        ; T[z] |= y
 .skip:
 	dec r10
 	jns .r_shift_loop
@@ -107,91 +106,88 @@ nsqrt:
 
 .add_bit_T: ; T += 4^(n-j)
 	; k = 2*(n-j)
-	mov r12, rdx
-	sub r12, r11
-	shl r12, 1
+	mov r12, rdx                 ; k = n
+	sub r12, r11                 ; k -= j
+	shl r12, 1                   ; k <<= 2
 
 	; l = k % 64
-	mov r13, r12
-	and r13, 63
+	mov r13, r12                 ; l = k
+	and r13, 63                  ; l &= 63
 
 	; r = 2^l
-	mov r14, 1
+	mov r14, 1                   ; r = 1
 	mov cl, r13b
-	shl r14, cl
+	shl r14, cl                  ; r <<= l
 
-	; for(i=k/64; i<ss; i++)
-	mov r10, r12
-	shr r10, 6
-.add_bit_T_loop:
-	mov r13, [rbx + r10*8]
-	add [rbx + r10*8], r14
+	mov r10, r12                 ; i = k
+	shr r10, 6                   ; i >>= 6
+.add_bit_T_loop: ; for (i=k/64; i<ss; i++)
+	mov r13, [rbx + r10*8]       ; l = T[i]
+	add [rbx + r10*8], r14       ; T[i] += r
 	cmp [rbx + r10*8], r13
-	jae .break_add_bit_T_loop
-	mov r14, 1
+	jae .break_add_bit_T_loop    ; if (T[i] >= r)
+	mov r14, 1                   ; r = 1
 	inc r10
 	cmp r9, r10
 	jb .add_bit_T_loop
 .break_add_bit_T_loop:
 
 .compare:
-	; i = ss-1
-	mov r10, r9
-	dec r10
+	mov r10, r9                  ; i = ss
+	dec r10                      ; i--
 .compare_loop:
 	; X[i] ? T[i]
-	mov r12, [rsi + r10*8]
-	mov r13, [rbx + r10*8]
+	mov r12, [rsi + r10*8]       ; k = X[i]
+	mov r13, [rbx + r10*8]       ; l = T[i]
 	cmp r12, r13
-	ja .break_compare_loop ; X[i] > T[i]
-	jb .continue_main_loop ; X[i] < T[i]
+	ja .break_compare_loop       ; if (k > l)
+	jb .continue_main_loop       ; if (k < l)
 	dec r10
 	jns .compare_loop
 .break_compare_loop:
 
 .add_bit_Q:
 	; k = n-j
-	mov r12, rdx
-	sub r12, r11
+	mov r12, rdx                 ; k = n
+	sub r12, r11                 ; k -= r11
 
 	; l = k % 64
-	mov r13, r12
-	and r13, 63
+	mov r13, r12                 ; l = k
+	and r13, 63                  ; l &= 63
 
 	; r = 2^l
 	mov r14, 1
 	mov cl, r13b
 	shl r14, cl
 
-	; i = n / 64
+	; i = k / 64
 	mov r10, r12
 	shr r10, 6
 .add_bit_Q_loop:
-	mov r13, [rdi + r10*8]
-	add [rdi + r10*8], r14
+	mov r13, [rdi + r10*8]       ; l = Q[i]
+	add [rdi + r10*8], r14       ; Q[i] += r
 	cmp [rdi + r10*8], r13
-	jae .break_add_bit_Q_loop
-	mov r14, 1
+	jae .break_add_bit_Q_loop    ; if (Q[i] >= l)
+	mov r14, 1                   ; r = 1
 	inc r10
-	cmp r8, r10
+	cmp r10, r8
 	jb .add_bit_Q_loop
 .break_add_bit_Q_loop:
 
 .sub_X_T:
-	; r14 - borrow
-	xor r14, r14
-	; i = 0
-	xor r10, r10
+	xor r14, r14                 ; r = 0
+	xor r10, r10                 ; i = 0
 .sub_X_T_loop:
-	mov r12, [rsi + r10*8]
-	sub r12, r14
-	mov r13, [rbx + r10*8]
-	sub r12, r13
-	adc r14, 0
-	mov [rsi + r10*8], r12
+	mov r12, [rsi + r10*8]       ; k = X[i]
+	sub r12, r14                 ; k -= r
+	mov r13, [rbx + r10*8]       ; l = T[i]
+	cmp r12, r13
+	setb r14b
+	sub r12, r13                 ; k -= l
+	mov [rsi + r10*8], r12       ; X[i] = k
 	inc r10
-	cmp r9, r10
-	jns .sub_X_T_loop
+	cmp r10, r9
+	jb .sub_X_T_loop
 
 .continue_main_loop:
 	inc r11
