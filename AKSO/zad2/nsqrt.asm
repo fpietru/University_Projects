@@ -11,15 +11,15 @@ global nsqrt
 ; rdx - wartosc n
 
 ; Rejestry
+; rbx - adres tablicy T
 ; r8 - s := dlugosc tablicy Q
 ; r9 - ss := dlugosc tablicy X, T
 ; r10 - i := iterator
-; r11 - adres tablicy T
+; r11 - j := iterator
 ; r12 - k := zmienna lokalna
 ; r13 - l := zmienna lokalna
 ; r14 - r := zmienna lokalna
 ; r15 - x := zmienna lokalna
-; rbx - j := iterator
 
 
 nsqrt:
@@ -29,45 +29,43 @@ nsqrt:
 	push r14
 	push r15
 
-	; r8 - s := dlugosc tablicy Q
-	mov r8, rdx
-	shr r8, 6 ; s = n >> 6
-	; r9 - ss := dlugosc tablicy X, T
-	lea r9, [r8 + r8] ; ss = 2 * s
-	lea r11, [rel T] ; r11 := adres tablicy T
+	mov r8, rdx ; r8 - s := dlugosc tablicy Q
+	shr r8, 6 ; s = n / 64 = n >> 6
+	lea r9, [r8 + r8] ; r9 - ss = 2 * s := dlugosc tablicy X, T
+	lea rbx, [rel T] ; rbx := adres tablicy T
 
 	; czyszczenie Q
 	mov r10, 0 ; r10 - i = 0
-.clean_Q_loop:
-	mov qword [rdi + r10 * 8], 0
+.clean_Q_loop: ; for (i=0; i<s; i++)
+	mov qword [rdi + r10 * 8], 0 ; Q[i] = 0
 	inc r10
-	cmp r8, r10
-	jns .clean_Q_loop
+	cmp r10, r8
+	jb .clean_Q_loop
 
 	; iteracyjnie wyliczanie Q
-	mov rbx, 1 ; rbx - j = 1
-.main_loop:
+	mov r11, 1 ; r11 - j = 1
+.main_loop: ; for (j=1; j<=n; j++)
 	; czyszczenie T
 	mov r10, 0 ; r10 - i = 0
-.clean_T_loop:
-	mov qword [r11 + r10 * 8], 0
+.clean_T_loop: ; for (i=0; i<ss; i++)
+	mov qword [rbx + r10 * 8], 0 ; T[i] = 0
 	inc r10
-	cmp r9, r10
-    	jns .clean_T_loop
+	cmp r10, r9
+    jb .clean_T_loop
 
 .r_shift: ; T += 2^(n-j+1)*Q
 	; r12 - k := n-j+1
-	mov r12, rdx
-	sub r12, rbx
-	add r12, 1
+	mov r12, rdx ; k = n
+	sub r12, r11 ; k -= j
+	add r12, 1   ; k += 1
 
 	; r13 - l := k / 64 = k >> 6
-	mov r13, r12
-	shr r13, 6
+	mov r13, r12 ; l = k
+	shr r13, 6   ; l >>= 6
 
 	; r14 - r := k % 6 = k & 63
-	mov r14, r12
-	and r14, 63
+	mov r14, r12 ; r = k
+	and r14, 63  ; r &= 63
 
 	; i = s-1
 	mov r10, r8
@@ -81,7 +79,7 @@ nsqrt:
 	mov cl, r14b
 	shl rax, cl
 	lea rcx, [r10 + r13]
-	mov qword [r11 + rcx*8], rax
+	mov qword [rbx + rcx*8], rax
 
 	; if (r != 0 && i+l+1 < ss)
 	test r14, r14
@@ -110,7 +108,7 @@ nsqrt:
 .add_bit_T: ; T += 4^(n-j)
 	; k = 2*(n-j)
 	mov r12, rdx
-	sub r12, rbx
+	sub r12, r11
 	shl r12, 1
 
 	; l = k % 64
@@ -126,9 +124,9 @@ nsqrt:
 	mov r10, r12
 	shr r10, 6
 .add_bit_T_loop:
-	mov r13, [r11 + r10*8]
-	add [r11 + r10*8], r14
-	cmp [r11 + r10*8], r13
+	mov r13, [rbx + r10*8]
+	add [rbx + r10*8], r14
+	cmp [rbx + r10*8], r13
 	jae .break_add_bit_T_loop
 	mov r14, 1
 	inc r10
@@ -143,7 +141,7 @@ nsqrt:
 .compare_loop:
 	; X[i] ? T[i]
 	mov r12, [rsi + r10*8]
-	mov r13, [r11 + r10*8]
+	mov r13, [rbx + r10*8]
 	cmp r12, r13
 	ja .break_compare_loop ; X[i] > T[i]
 	jb .continue_main_loop ; X[i] < T[i]
@@ -154,7 +152,7 @@ nsqrt:
 .add_bit_Q:
 	; k = n-j
 	mov r12, rdx
-	sub r12, rbx
+	sub r12, r11
 
 	; l = k % 64
 	mov r13, r12
@@ -187,7 +185,7 @@ nsqrt:
 .sub_X_T_loop:
 	mov r12, [rsi + r10*8]
 	sub r12, r14
-	mov r13, [r11 + r10*8]
+	mov r13, [rbx + r10*8]
 	sub r12, r13
 	adc r14, 0
 	mov [rsi + r10*8], r12
@@ -196,8 +194,8 @@ nsqrt:
 	jns .sub_X_T_loop
 
 .continue_main_loop:
-	inc rbx
-	cmp rbx, rdx
+	inc r11
+	cmp r11, rdx
 	jbe .main_loop
 
 	pop r15
@@ -206,6 +204,3 @@ nsqrt:
 	pop r12
 	pop rbx
 	ret
-
-
-
