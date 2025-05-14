@@ -1,6 +1,8 @@
+; Autor: Franciszek Pietrusiak
+; Implementuje sugerowany algorytm
 section .bss
 	align 8
-	T: resq 8000 ; z zal 64 <= n <= 256000
+	T: resq 8000                 ; z zal 64 <= n <= 256000
 
 section .text
 global nsqrt
