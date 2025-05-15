@@ -51,8 +51,5 @@ Module.symvers
 Mkfile.old
 dkms.conf
 
-# Makefiles
-makefile
-
 # vscode
 .vscode/
