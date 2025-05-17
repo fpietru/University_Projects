@@ -1,5 +1,12 @@
 ; Autor: Franciszek Pietrusiak
-; Implementuje sugerowany algorytm
+; Implementuje Sugerowany Algorytm
+
+; TODO
+; nie dziala, pomieszanie rax, rbx
+; - niech rax trzyma wskaznik do tablicy T
+;   dzieki temu rbx wolny, moze nie bedzie trzeba go uzywac
+;   i nie bedzie push/pop
+
 section .bss
 	align 8
 	T: resq 8000                 ; z zal 64 <= n <= 256000
@@ -11,7 +18,7 @@ global nsqrt
 ; rdi - wskaznik do tablicy Q
 ; rsi - wskaznik do tablicy X
 ; rdx - wartosc n
-; rbx - adres tablicy T
+; rax - adres tablicy T
 ; r8 - s := dlugosc tablicy Q
 ; r9 - ss := dlugosc tablicy X, T
 ; r10 - i := iterator
@@ -42,7 +49,7 @@ nsqrt:
 	mov r8, rdx                  ; r8 - s := dlugosc tablicy Q
 	shr r8, 6                    ; s = n / 64 = n >> 6
 	lea r9, [r8 + r8]            ; r9 - ss = 2 * s := dlugosc tablicy X, T
-	lea rbx, [rel T]             ; rbx := adres tablicy T
+	lea rax, [rel T]             ; rax := adres tablicy T
 
 	clean rdi, r8                ; czyszczenie Q
 
@@ -59,7 +66,7 @@ nsqrt:
 	mov r13, r12                 ; l = k
 	shr r13, 6                   ; l >>= 6
 
-	clean rbx, r9                ; czyszczenie T
+	clean rax, r9                ; czyszczenie T
 
 .r_shift:                            ; T += 2^(n-j+1)*Q
 
@@ -77,7 +84,7 @@ nsqrt:
 	mov cl, r14b                 ; z = r
 	shl rax, cl                  ; x <<= z
 	lea rcx, [r10 + r13]         ; z = i + l
-	mov qword [rbx + rcx*8], rax ; T[z] = x
+	mov qword [rax + rcx*8], rax ; T[z] = x
 
 	                             ; if (r != 0 && i+l+1 < ss)
 	test r14, r14
@@ -97,7 +104,7 @@ nsqrt:
 	shr rax, cl                  ; y >>= z
 	lea rcx, [r10 + r13]         ; z = i + l
 	inc rcx                      ; z++
-	or [rbx + rcx*8], rax        ; T[z] |= y
+	or [rax + rcx*8], rax        ; T[z] |= y
 .skip:
 	dec r10
 	jns .r_shift_loop
@@ -121,9 +128,9 @@ nsqrt:
 	mov r10, r12                 ; i = k
 	shr r10, 6                   ; i >>= 6
 .add_bit_T_loop:                     ; for (i=k/64; i<ss; i++)
-	mov r13, [rbx + r10*8]       ; l = T[i]
-	add [rbx + r10*8], r14       ; T[i] += r
-	cmp [rbx + r10*8], r13
+	mov r13, [rax + r10*8]       ; l = T[i]
+	add [rax + r10*8], r14       ; T[i] += r
+	cmp [rax + r10*8], r13
 	jae .break_add_bit_T_loop    ; if (T[i] >= r)
 	mov r14, 1                   ; r = 1
 	inc r10
@@ -137,7 +144,7 @@ nsqrt:
 .compare_loop:
 	                             ; X[i] ? T[i]
 	mov r12, [rsi + r10*8]       ; k = X[i]
-	mov r13, [rbx + r10*8]       ; l = T[i]
+	mov r13, [rax + r10*8]       ; l = T[i]
 	cmp r12, r13
 	ja .break_compare_loop       ; if (k > l)
 	jb .continue_main_loop       ; if (k < l)
@@ -178,7 +185,7 @@ nsqrt:
 .sub_X_T_loop:
 	mov r12, [rsi + r10*8]       ; k = X[i]
 	sub r12, r14                 ; k -= r
-	mov r13, [rbx + r10*8]       ; l = T[i]
+	mov r13, [rax + r10*8]       ; l = T[i]
 	cmp r12, r13
 	setb r14b
 	sub r12, r13                 ; k -= l
