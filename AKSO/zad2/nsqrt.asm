@@ -167,7 +167,7 @@ nsqrt:
 	jmp .add_bit
 
 .sub_X_T:                            ; X -= T 
-	xor r14, r14                 ; r14 - porzyczenie przy odejmowaniu
+	xor r14, r14                 ; r14 - pozyczenie przy odejmowaniu
 	xor r10, r10
 .sub_X_T_loop:
 	mov r12, [rsi + r10*8]
