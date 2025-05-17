@@ -11,10 +11,10 @@ section .text
 global nsqrt
 
 ; Rejestry:
-; rdi - wskaznik do tablicy Q
-; rsi - wskaznik do tablicy X
-; rdx - wartosc n
-; rbx - adres tablicy T
+; rdi := wskaznik do tablicy Q
+; rsi := wskaznik do tablicy X
+; rdx := wartosc n
+; rbx := adres tablicy T
 ; r8 - s := dlugosc tablicy Q
 ; r9 - ss := dlugosc tablicy X, T
 ; r10 - i := iterator
@@ -22,7 +22,7 @@ global nsqrt
 ; r12 - k := zmienna pomocnicza
 ; r13 - l := zmienna pomocnicza
 ; r14 - r := zmienna pomocnicza
-; r15 := zmienna pomocnicza
+; r15 := flaga sterujaca
 ; rcx := zmienna pomocnicza
 
 %define ADD_BIT_Q_NO  0
@@ -157,7 +157,9 @@ nsqrt:
 	dec r10
 	jns .compare_loop
 
-.break_compare_loop:                 ; Q += 2^(n-j)
+.break_compare_loop:
+	
+                                     ; Q += 2^(n-j)
 	mov r12, rdx
 	sub r12, r11
 	mov rcx, rdi
