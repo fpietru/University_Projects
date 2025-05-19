@@ -5,7 +5,7 @@ import wyjatki.ZlyIndeks;
 import wyjatki.ZlyObszar;
 
 public class Skalar extends Tablica {
-    double wartosc;
+    private double wartosc;
 
     public Skalar(double wartosc) {
         super(0);
@@ -13,47 +13,88 @@ public class Skalar extends Tablica {
     }
 
     @Override
-    public Tablica suma(Tablica t) {
-        if (wymiar < t.wymiar()) {
-            return t.suma(this);
-        }
-        return new Skalar(wartosc + t.daj());
+    public Skalar suma(Skalar s) {
+        return new Skalar(wartosc + s.daj());
     }
 
     @Override
-    public void dodaj(Tablica t) {
-        sprawdzWymiar(t);
-        wartosc += t.daj();
+    public Wektor suma(Wektor w) {
+        return w.suma(this);
     }
 
     @Override
-    public Tablica iloczyn(Tablica t) {
-        if (wymiar < t.wymiar()) {
-            return t.iloczyn(this);
-        }
-        return new Skalar(wartosc * t.daj());
+    public Macierz suma(Macierz m) {
+        return m.suma(this);
     }
 
     @Override
-    public void przemnoz(Tablica t) {
-        sprawdzWymiar(t);
-        wartosc *= t.daj();
+    public void dodaj(Skalar s) {
+        wartosc += s.daj();
     }
 
     @Override
-    public Tablica negacja() {
+    public void dodaj(Wektor w) {
+        throw new ZlyWymiar("Wynik (skalar + wektor) nie jest skalarem.");
+    }
+
+    @Override
+    public void dodaj(Macierz m) {
+        throw new ZlyWymiar("Wynik (skalar + macierz) nie jest skalarem.");
+    }
+
+    @Override
+    public Skalar iloczyn(Skalar s) {
+        return new Skalar(wartosc * s.daj());
+    }
+
+    @Override
+    public Wektor iloczyn(Wektor w) {
+        return w.iloczyn(this);
+    }
+
+    @Override
+    public Macierz iloczyn(Macierz m) {
+        return m.iloczyn(this);
+    }
+
+    @Override
+    public void przemnoz(Skalar s) {
+        wartosc *= s.daj();
+    }
+
+    @Override
+    public void przemnoz(Wektor w) {
+        throw new ZlyWymiar("Wynik (skalar * wektor) nie jest skalarem.");
+    }
+
+    @Override
+    public void przemnoz(Macierz m) {
+        throw new ZlyWymiar("Wynik (skalar * macierz) nie jest skalarem.");
+    }
+
+    @Override
+    public Skalar negacja() {
         return new Skalar(-wartosc);
     }
 
     @Override
     public void zaneguj() {
-        wartosc *= -1;
+        wartosc *= -1.0;
     }
 
     @Override
-    public void przypisz(Tablica t) {
-        sprawdzWymiar(t);
-        wartosc = t.daj();
+    public void przypisz(Skalar s) {
+        wartosc = s.daj();
+    }
+
+    @Override
+    public void przypisz(Wektor w) {
+        throw new ZlyWymiar("Nie mozna przypisac wektora skalarowi.");
+    }
+
+    @Override
+    public void przypisz(Macierz m) {
+        throw new ZlyWymiar("Nie mozna przypisac macierzy skalarowi.");
     }
 
     @Override
@@ -69,7 +110,7 @@ public class Skalar extends Tablica {
     }
 
     @Override
-    public Tablica wycinek(int... obszar) {
+    public Skalar wycinek(int... obszar) {
         sprawdzObszar(obszar);
         return this;
     }
@@ -95,31 +136,33 @@ public class Skalar extends Tablica {
     }
 
     @Override
-    public Tablica kopia() {
+    public Skalar kopia() {
         return new Skalar(wartosc);
     }
 
     @Override
     public void transponuj() {}
 
-    @Override
-    protected void sprawdzWymiar(Tablica t) {
-        if (t.wymiar != 0) {
-            throw new ZlyWymiar("Argument musi byc skalarem");
-        }
-    }
 
     @Override
     protected void sprawdzIndeks(int... indeks) {
-        if (indeks.length > 0) {
+        if (indeks.length != 0) {
             throw new ZlyIndeks("Skalar przyjmuje tylko pusty indeks");
         }
     }
 
     @Override
     protected void sprawdzObszar(int... obszar) {
-        if (obszar.length > 0) {
-            throw new ZlyObszar("Skalar przyjmuje tylko pusty obszar");
+        if (obszar.length != 0) {
+            throw new ZlyObszar("Skalar przyjmuje zero argumentow");
         }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Skalar)) return false;
+        Skalar s = (Skalar) obj;
+        return (daj() == s.daj());
     }
 }

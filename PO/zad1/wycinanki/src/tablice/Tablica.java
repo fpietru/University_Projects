@@ -9,15 +9,25 @@ public abstract class Tablica {
     }
 
     // Operacje Arytmetyczne
-    public abstract Tablica suma(Tablica t);
-    public abstract void dodaj(Tablica t);
-    public abstract Tablica iloczyn(Tablica t);
-    public abstract void przemnoz(Tablica t);
+    public abstract Tablica suma(Skalar s);
+    public abstract Tablica suma(Wektor w);
+    public abstract Tablica suma(Macierz m);
+    public abstract void dodaj(Skalar s);
+    public abstract void dodaj(Wektor w);
+    public abstract void dodaj(Macierz m);
+    public abstract Tablica iloczyn(Skalar s);
+    public abstract Tablica iloczyn(Wektor w);
+    public abstract Tablica iloczyn(Macierz m);
+    public abstract void przemnoz(Skalar s);
+    public abstract void przemnoz(Wektor w);
+    public abstract void przemnoz(Macierz m);
     public abstract Tablica negacja();
     public abstract void zaneguj();
 
     // Przypisania
-    public abstract void przypisz(Tablica t);
+    public abstract void przypisz(Skalar s);
+    public abstract void przypisz(Wektor w);
+    public abstract void przypisz(Macierz m);
 
     // Gettery i Settery
     public abstract double daj(int... indeks);
@@ -37,7 +47,6 @@ public abstract class Tablica {
     public abstract void transponuj();
 
     // Zglaszanie Wyjatkow
-    protected abstract void sprawdzWymiar(Tablica t);
     protected abstract void sprawdzIndeks(int... indeks);
     protected abstract void sprawdzObszar(int... obszar);
 }
