@@ -243,14 +243,20 @@ static int connections(void) {
     ASSERT(ma_set_state(a[i], &i) == 0);
     ASSERT(ma_connect(a[0], 4 * i, a[i], 0, 4) == 0);
   }
+  // ma_show(a[0]);
   y = ma_get_output(a[0]);
   CHECK(32, y[0], 0);
+  // ma_show(a[0]);
   ASSERT(ma_set_input(a[0], &x) == 0);
+  // ma_show(a[0]);
   ASSERT(ma_step(a, 1) == 0);
+  // ma_show(a[0]);
   CHECK(32, y[0], 0x43210);
+  // ma_show(a[0]);
   ASSERT(ma_connect(a[0], 17, a[4], 1, 2) == 0);
   ASSERT(ma_connect(a[0], 20, a[1], 0, 4) == 0);
   ASSERT(ma_connect(a[0], 12, a[1], 0, 4) == 0);
+  // ma_show(a[0]);
   ASSERT(ma_disconnect(a[0], 1, 2) == 0);
   ASSERT(ma_set_input(a[0], &x) == 0);
   ASSERT(ma_step(a, 1) == 0);

@@ -1,0 +1,26 @@
+warnings/1
+two/out
+connections/134 
+undetermined/out
+delete/123
+params/139
+malicious/out
+pipeline/139
+cycle/123
+alloc/123
+memory/out
+weak/139
+disconnect/139 
+
+
+
+Legenda:
+1   - błędny wynik działania funkcji implementowanej biblioteki,
+123 - błąd przy uruchamianiu pod valgrindem,
+124 - przekroczenie limitu czasu
+    (1 sekunda na test poprawności, 60 sekund dla valgrinda),
+    pętlenie się programu,
+134 - niespełniona asercja, uszkodzenie struktury bloków pamięci na stercie,
+    podwójne zwolnienie tego samego bloku pamięci, niepoprawny wskaźnik w funkcji free,
+136 - błąd arytmetyki, dzielenie przez zero,
+139 - naruszenie ochrony pamięci.

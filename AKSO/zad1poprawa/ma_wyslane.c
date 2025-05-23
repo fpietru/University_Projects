@@ -184,7 +184,7 @@ moore_t *ma_create_full(size_t n, size_t m, size_t s, transition_function_t t,
 // Identity function for simple automaton
 static void identity(uint64_t *output, uint64_t const *state, size_t m, size_t s) {
   assert(s == m);
-  // printf("adres output =%p adress state = %p\n", output, state);
+  printf("adres output =%p adress state = %p\n", output, state);
   memcpy(output, state, m * sizeof(uint64_t));
 }
 

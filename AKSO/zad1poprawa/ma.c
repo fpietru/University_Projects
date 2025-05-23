@@ -61,6 +61,7 @@ node_t *new_node() {
 // Add a new node to the front of the linked-list
 static void push(node_t **head, moore_t *to, size_t portTo, size_t portFrom) {
   node_t *nNode = new_node();
+  if (nNode == NULL) return;
   nNode->connection.to = to;
   nNode->connection.portTo = portTo;
   nNode->connection.portFrom = portFrom;
@@ -70,12 +71,14 @@ static void push(node_t **head, moore_t *to, size_t portTo, size_t portFrom) {
 
 // Remove a node from the list by port value from specific automaton
 static void remove_by_port(node_t **head, const moore_t *who, const size_t port) {
+  if (*head == NULL) return;
   node_t *curr = *head, *prev = NULL;
   while (curr != NULL) {
     assert(curr->connection.to);
     if (curr->connection.to == who && curr->connection.portTo == port) {
       node_t *next = curr->next;
       free(curr);
+      curr = NULL;
       if (prev == NULL) {
         *head = next;
       } else {
@@ -84,7 +87,8 @@ static void remove_by_port(node_t **head, const moore_t *who, const size_t port)
       }
     }
     prev = curr;
-    curr = curr->next;
+    if (curr != NULL)
+      curr = curr->next;
   }
 }
 
@@ -135,6 +139,13 @@ moore_t *ma_create_full(size_t n, size_t m, size_t s, transition_function_t t,
     errno = EINVAL;
     return NULL;
   }
+  if (n > SIZE_MAX / sizeof(connection_t) ||
+    BLOCK(s) + 1 > SIZE_MAX / sizeof(uint64_t) ||
+    BLOCK(n) + 1 > SIZE_MAX / sizeof(uint64_t) ||
+    BLOCK(m) + 1 > SIZE_MAX / sizeof(uint64_t)) {
+    errno = ENOMEM;
+    return NULL;
+    }
   moore_t *a = malloc(sizeof(moore_t));
   if (!a) {
     errno = ENOMEM;
@@ -183,13 +194,13 @@ moore_t *ma_create_full(size_t n, size_t m, size_t s, transition_function_t t,
 
 // Identity function for simple automaton
 static void identity(uint64_t *output, uint64_t const *state, size_t m, size_t s) {
-  assert(s == m);
-  // printf("adres output =%p adress state = %p\n", output, state);
-  memcpy(output, state, m * sizeof(uint64_t));
+  assert(m == s);
+  size_t outptSize = BLOCK(m) + 1;
+  memcpy(output, state, outptSize * sizeof(uint64_t));
 }
 
 moore_t *ma_create_simple(size_t n, size_t s, transition_function_t t) {
-  if (!n || !s || !t) {
+  if (!s || !t) {
     errno = EINVAL;
     return NULL;
   }
@@ -211,7 +222,7 @@ moore_t *ma_create_simple(size_t n, size_t s, transition_function_t t) {
 }
 
 void ma_delete(moore_t *a) {
-  assert(a);
+  if (a == NULL) return;
 
   // Free Inputs
   ma_disconnect(a, 0, a->n);
@@ -238,27 +249,30 @@ void ma_delete(moore_t *a) {
 }
 
 int ma_connect(moore_t *a_in, size_t in, moore_t *a_out, size_t out, size_t num) {
-  int inRange1 = (in + num - 1 <= a_in->n);
-  int inRange2 = (out + num - 1 <= a_out->m);
-  if (!a_in || !a_out || num == 0 || !inRange1 || !inRange2) {
+  if (!a_in || !a_out || num == 0 || num > a_in->n || num > a_out->m ||
+    in >= a_in->n || out >= a_out->m ||  (in + num > a_in->n) || (out + num > a_out->m)) {
     errno = EINVAL;
     return -1;
   }
+  int res = 0;
   for (size_t i = in, j = out; i <= in + num - 1; i++, j++) {
     if (a_in->inputConnections[i].to != NULL) {
-      ma_disconnect(a_in, i, 1);
+       if (ma_disconnect(a_in, i, 1) != 0) {
+         res = -1;
+       }
     }
     change_connection(&a_in->inputConnections[i], a_out, j, i);
     push(&a_out->outputConnections, a_in, i, j);
   }
-  return 0;
+  return res;
 }
 
 int ma_disconnect(moore_t *a_in, size_t in, size_t num) {
-  if (!a_in || num == 0 || (in + num - 1 > a_in->n)) {
+  if (!a_in || num == 0 || in >= a_in->n || num > a_in->n || (in + num > a_in->n)) {
     errno = EINVAL;
     return -1;
   }
+
   for (size_t i = in; i <= in + num - 1; i++) {
     moore_t *a_out = a_in->inputConnections[i].to;
     if (a_out != NULL) {
@@ -315,7 +329,7 @@ int ma_set_state(moore_t *a, uint64_t const *state) {
   for (size_t i = 0; i < a->stateSize; i++) {
     a->state[i] = state[i];
   }
-  a->y(a->outpt, a->state, a->m, a->s);
+  a->y(a->outpt, a->state, a->outptSize, a->stateSize);
   return 0;
 }
 
