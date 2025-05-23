@@ -1,25 +1,22 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -Wno-implicit-fallthrough -std=gnu17 -fPIC -O2
-LDFLAGS = -shared -Wl,--wrap=malloc -Wl,--wrap=calloc -Wl,--wrap=realloc \
-          -Wl,--wrap=reallocarray -Wl,--wrap=free -Wl,--wrap=strdup -Wl,--wrap=strndup
+LDFLAGS = -shared -Wl,--wrap=malloc -Wl,--wrap=calloc -Wl,--wrap=realloc -Wl,--wrap=reallocarray -Wl,--wrap=free -Wl,--wrap=strdup -Wl,--wrap=strndup
+SOURCES = ma.c memory_tests.c
+OBJECTS = $(SOURCES:.c=.o)
+TARGET = libma.so
 
-SRC = ma.c memory_tests.c
-OBJ = ma.o memory_tests.o
-LIB = libma.so
+.PHONY: all clean test example
 
-.PHONY: all clean
+all: $(TARGET)
 
-all: $(LIB)
-
-$(LIB): $(OBJ)
+$(TARGET): $(OBJECTS)
 	$(CC) $(LDFLAGS) -o $@ $^
 
-ma.o: ma.c ma.h
-	$(CC) $(CFLAGS) -c ma.c -o ma.o
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
-memory_tests.o: memory_tests.c memory_tests.h
-	$(CC) $(CFLAGS) -c memory_tests.c -o memory_tests.o
+example: all ma_example.c
+	$(CC) $(CFLAGS) ma_example.c -lma -L. -Wl,-rpath=. -o example
 
 clean:
-	rm -f $(OBJ) $(LIB)
-
+	rm -f *.o *.so example
