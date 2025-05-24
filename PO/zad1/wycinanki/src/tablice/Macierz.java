@@ -236,7 +236,7 @@ public class Macierz extends Tablica {
         for (int i=0; i<liczbaWierszy(); i++) {
             stringBuilder.append("[");
             for (int j=0; j<liczbaKolumn(); j++) {
-                stringBuilder.append(wartosci[i][j]);
+                stringBuilder.append(daj(i, j));
                 if (j != liczbaKolumn() - 1) {
                     stringBuilder.append(", ");
                 }
@@ -255,7 +255,7 @@ public class Macierz extends Tablica {
         double[][] kopiaWartosci = new double[liczbaWierszy()][liczbaKolumn()];
         for (int i=0; i<liczbaWierszy(); i++) {
             for (int j=0; j<liczbaKolumn(); j++)
-                kopiaWartosci[i][j] = wartosci[i][j];
+                kopiaWartosci[i][j] = daj(i, j);
         }
         return new Macierz(kopiaWartosci);
     }

@@ -6,6 +6,7 @@ import wyjatki.ZlyObszar;
 
 public class Skalar extends Tablica {
     private double wartosc;
+
     public Skalar(double wartosc) {
         super(0);
         this.wartosc = wartosc;

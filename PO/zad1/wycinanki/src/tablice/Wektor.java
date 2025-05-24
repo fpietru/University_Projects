@@ -32,8 +32,8 @@ public class Wektor extends Tablica {
         sprawdzWektor(w);
         Wektor wynik = kopia();
         for (int i=0; i<wynik.liczba_elementow(); i++) {
-            double wart = wynik.daj(i) + w.daj(i);
-            wynik.ustaw(wart, i);
+            double wartosc = wynik.daj(i) + w.daj(i);
+            wynik.ustaw(wartosc, i);
         }
         return wynik;
     }
@@ -45,16 +45,18 @@ public class Wektor extends Tablica {
 
     @Override
     public void dodaj(Skalar s) {
-        for (int i=0; i<wartosci.length; i++) {
-            wartosci[i] += s.daj();
+        for (int i=0; i<liczba_elementow(); i++) {
+            double wartosc = daj(i) + s.daj();
+            ustaw(wartosc, i);
         }
     }
 
     @Override
     public void dodaj(Wektor w) {
         sprawdzWektor(w);
-        for (int i=0; i<wartosci.length; i++) {
-            wartosci[i] += w.daj(i);
+        for (int i=0; i<liczba_elementow(); i++) {
+            double wartosc = daj(i) + w.daj(i);
+            ustaw(wartosc, i);
         }
     }
 
@@ -62,7 +64,6 @@ public class Wektor extends Tablica {
     public void dodaj(Macierz m) {
         m.dodaj(this);
     }
-
 
     @Override
     public Wektor iloczyn(Skalar s) {
@@ -79,7 +80,7 @@ public class Wektor extends Tablica {
         if (liczba_elementow() != w.liczba_elementow()) {
             throw new ZlyKsztalt("Rozna liczba elementow");
         }
-        if (orientacja == w.orientacja()) { // iloczyn skalarny
+        if (orientacja() == w.orientacja()) { // iloczyn skalarny
             double wynik = 0;
             for (int i=0; i<liczba_elementow(); i++) {
                 wynik += daj(i) * w.daj(i);
@@ -88,7 +89,7 @@ public class Wektor extends Tablica {
         } else { // iloczyn wektorowy
             int n = liczba_elementow();
             double[][] wynik;
-            if (orientacja) {
+            if (orientacja()) {
                 wynik = new double[][]{{0}};
                 for (int i=0; i<n; i++) {
                     wynik[0][0] += daj(i) * w.daj(i);
@@ -107,7 +108,7 @@ public class Wektor extends Tablica {
 
     @Override
     public Wektor iloczyn(Macierz m) {
-        if (!orientacja) {
+        if (!orientacja()) {
             throw new ZlyKsztalt("Wynik nie bedzie wektorem.");
         }
         int liczbaWierszy = m.ksztalt()[0];
@@ -128,8 +129,9 @@ public class Wektor extends Tablica {
 
     @Override
     public void przemnoz(Skalar s) {
-        for (int i=0; i<wartosci.length; i++) {
-            wartosci[i] *= s.daj();
+        for (int i=0; i<liczba_elementow(); i++) {
+            double wartosc = daj(i) * s.daj();
+            ustaw(wartosc, i);
         }
     }
 
@@ -145,22 +147,24 @@ public class Wektor extends Tablica {
 
     @Override
     public Wektor negacja() {
-        Wektor wyn = kopia();
-        wyn.zaneguj();
-        return wyn;
+        Wektor wynik = kopia();
+        wynik.zaneguj();
+        return wynik;
     }
 
     @Override
     public void zaneguj() {
-        for (int i=0; i<wartosci.length; i++) {
-            wartosci[i] *= -1.0;
+        for (int i=0; i<liczba_elementow(); i++) {
+            double wartosc = daj(i) * -1.0;
+            ustaw(wartosc, i);
         }
     }
 
     @Override
     public void przypisz(Skalar s) {
-        for (int i=0; i<wartosci.length; i++) {
-            wartosci[i] = s.daj();
+        for (int i=0; i<liczba_elementow(); i++) {
+            double wartosc = s.daj();
+            ustaw(wartosc, i);
         }
     }
 
@@ -169,7 +173,7 @@ public class Wektor extends Tablica {
         if (liczba_elementow() != w.liczba_elementow()) {
             throw new ZlyKsztalt("Rozna liczba elementow.");
         }
-        wartosci = w.wartosci;
+        wartosci = w.wartosci.clone();
         orientacja = w.orientacja;
     }
 
@@ -209,7 +213,7 @@ public class Wektor extends Tablica {
 
     @Override
     public int[] ksztalt() {
-        return new int[]{wartosci.length};
+        return new int[]{liczba_elementow()};
     }
 
     public boolean orientacja() {
@@ -219,14 +223,14 @@ public class Wektor extends Tablica {
     @Override
     protected String wypisz() {
         StringBuilder stringBuilder = new StringBuilder("[");
-        for (int i=0; i<wartosci.length; i++) {
-            stringBuilder.append(wartosci[i]);
-            if (i != wartosci.length-1) {
+        for (int i=0; i<liczba_elementow(); i++) {
+            stringBuilder.append(daj(i));
+            if (i != liczba_elementow()-1) {
                 stringBuilder.append(", ");
             }
         }
         stringBuilder.append("]");
-        if (!orientacja) {
+        if (!orientacja()) {
             stringBuilder.append("^T");
         }
         return stringBuilder.toString();
@@ -236,9 +240,9 @@ public class Wektor extends Tablica {
     public Wektor kopia() {
         double[] kopiaWartosci = new double[liczba_elementow()];
         for (int i=0; i<liczba_elementow(); i++) {
-            kopiaWartosci[i] = wartosci[i];
+            kopiaWartosci[i] = daj(i);
         }
-        return new Wektor(kopiaWartosci, orientacja);
+        return new Wektor(kopiaWartosci, orientacja());
     }
 
     @Override
@@ -247,7 +251,7 @@ public class Wektor extends Tablica {
     }
 
     private boolean pozaZakresem(int indeks) {
-        return (0 > indeks || indeks >= wartosci.length);
+        return (0 > indeks || indeks >= liczba_elementow());
     }
 
     @Override
@@ -275,7 +279,7 @@ public class Wektor extends Tablica {
     }
 
     private void sprawdzWektor(Wektor w) {
-        if (orientacja != w.orientacja()) {
+        if (orientacja() != w.orientacja()) {
             throw new ZlyKsztalt("Rozna orientacja wektorow");
         }
         if (liczba_elementow() != w.liczba_elementow()) {
@@ -291,7 +295,7 @@ public class Wektor extends Tablica {
         if (liczba_elementow() != w.liczba_elementow()) {
             return false;
         }
-        if (orientacja != w.orientacja()) {
+        if (orientacja() != w.orientacja()) {
             return false;
         }
         for (int i=0; i<liczba_elementow(); i++) {
