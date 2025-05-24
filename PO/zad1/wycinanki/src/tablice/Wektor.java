@@ -11,6 +11,8 @@ public class Wektor extends Tablica {
 
     public Wektor(double[] wartosci, boolean orientacja) {
         super(1);
+        double[][] macierzWartosci = new double[1][wartosci.length];
+        System.arraycopy(wartosci, 0, macierzWartosci[0], 0, wartosci.length);
         this.wartosci = wartosci;
         this.orientacja = orientacja;
     }

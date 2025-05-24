@@ -6,7 +6,6 @@ import wyjatki.ZlyObszar;
 
 public class Skalar extends Tablica {
     private double wartosc;
-
     public Skalar(double wartosc) {
         super(0);
         this.wartosc = wartosc;
@@ -14,7 +13,7 @@ public class Skalar extends Tablica {
 
     @Override
     public Skalar suma(Skalar s) {
-        return new Skalar(wartosc + s.daj());
+        return new Skalar(daj() + s.daj());
     }
 
     @Override
@@ -29,7 +28,7 @@ public class Skalar extends Tablica {
 
     @Override
     public void dodaj(Skalar s) {
-        wartosc += s.daj();
+        ustaw(daj() + s.daj());
     }
 
     @Override
@@ -44,7 +43,7 @@ public class Skalar extends Tablica {
 
     @Override
     public Skalar iloczyn(Skalar s) {
-        return new Skalar(wartosc * s.daj());
+        return new Skalar(daj() * s.daj());
     }
 
     @Override
@@ -59,7 +58,7 @@ public class Skalar extends Tablica {
 
     @Override
     public void przemnoz(Skalar s) {
-        wartosc *= s.daj();
+        ustaw(daj() * s.daj());
     }
 
     @Override
@@ -74,17 +73,17 @@ public class Skalar extends Tablica {
 
     @Override
     public Skalar negacja() {
-        return new Skalar(-wartosc);
+        return new Skalar(-daj());
     }
 
     @Override
     public void zaneguj() {
-        wartosc *= -1.0;
+        ustaw(daj() * -1.0);
     }
 
     @Override
     public void przypisz(Skalar s) {
-        wartosc = s.daj();
+        ustaw(s.daj());
     }
 
     @Override
@@ -132,17 +131,16 @@ public class Skalar extends Tablica {
 
     @Override
     protected String wypisz() {
-        return "[" + wartosc + "]";
+        return "[" + daj() + "]";
     }
 
     @Override
     public Skalar kopia() {
-        return new Skalar(wartosc);
+        return new Skalar(daj());
     }
 
     @Override
     public void transponuj() {}
-
 
     @Override
     protected void sprawdzIndeks(int... indeks) {
@@ -161,8 +159,7 @@ public class Skalar extends Tablica {
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
-        if (!(obj instanceof Skalar)) return false;
-        Skalar s = (Skalar) obj;
+        if (!(obj instanceof Skalar s)) return false;
         return (daj() == s.daj());
     }
 }
