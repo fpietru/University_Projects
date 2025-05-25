@@ -1,20 +1,41 @@
+/*
+    Autor: Franciszek Pietrusiak
+*/
 package tablice;
 
-import wyjatki.ZlyIndeks;
-import wyjatki.ZlyObszar;
-import wyjatki.ZlyKsztalt;
-import wyjatki.ZlyWymiar;
+import tablice.wyjatki.*;
 
 public class Wektor extends Tablica {
+
+    // czyt. tablice.Macierz
+    private static class Wskaznik {
+        public Wektor wektor;
+        public int id;
+
+        public Wskaznik(Wektor wektor, int id) {
+            this.wektor = wektor;
+            this.id = id;
+        }
+    }
+
     private double[] wartosci;
     private boolean orientacja; // false = pionowy, true = poziomy
+    private int[] id;
+    private Wskaznik[] wskazniki;
+
 
     public Wektor(double[] wartosci, boolean orientacja) {
         super(1);
-        double[][] macierzWartosci = new double[1][wartosci.length];
-        System.arraycopy(wartosci, 0, macierzWartosci[0], 0, wartosci.length);
         this.wartosci = wartosci;
         this.orientacja = orientacja;
+        // czyt. tablice.Macierz
+        int licznik = 0;
+        id = new int[liczba_elementow()];
+        wskazniki = new Wskaznik[liczba_elementow()];
+        for (int i=0; i<liczba_elementow(); i++) {
+            id[i] = licznik++;
+            wskazniki[i] = new Wskaznik(this, id[i]);
+        }
     }
 
     @Override
@@ -62,7 +83,7 @@ public class Wektor extends Tablica {
 
     @Override
     public void dodaj(Macierz m) {
-        m.dodaj(this);
+        throw new NiezgodnoscRozmiarow("Wynik (wektor + macierz) nie jest wektorem.");
     }
 
     @Override
@@ -78,7 +99,7 @@ public class Wektor extends Tablica {
     @Override
     public Tablica iloczyn(Wektor w) {
         if (liczba_elementow() != w.liczba_elementow()) {
-            throw new ZlyKsztalt("Rozna liczba elementow");
+            throw new NiezgodnoscRozmiarow("Rozna liczba elementow");
         }
         if (orientacja() == w.orientacja()) { // iloczyn skalarny
             double wynik = 0;
@@ -109,12 +130,12 @@ public class Wektor extends Tablica {
     @Override
     public Wektor iloczyn(Macierz m) {
         if (!orientacja()) {
-            throw new ZlyKsztalt("Wynik nie bedzie wektorem.");
+            throw new NiezgodnoscRozmiarow("Wynik nie bedzie wektorem.");
         }
         int liczbaWierszy = m.ksztalt()[0];
         int liczbaKolumn = m.ksztalt()[1];
         if (liczba_elementow() != liczbaWierszy) {
-            throw new ZlyKsztalt("Nie mozna pomnozyc przz macierz tego ksztaltu.");
+            throw new NiezgodnoscRozmiarow("Nie mozna pomnozyc przz macierz tego ksztaltu.");
         }
         Wektor wynik = new Wektor(new double[liczbaKolumn], true);
         for (int j=0; j<liczbaKolumn; j++) {
@@ -137,12 +158,12 @@ public class Wektor extends Tablica {
 
     @Override
     public void przemnoz(Wektor w) {
-        throw new ZlyWymiar("Wynikiem mnozenia dwoch wektorow nie jest wektor.");
+        throw new NiezgodnoscRozmiarow("Wynikiem mnozenia dwoch wektorow nie jest wektor.");
     }
 
     @Override
     public void przemnoz(Macierz m) {
-        throw new ZlyWymiar("Wynikiem (wektor * macierz) nie jest jest wektor.");
+        throw new NiezgodnoscRozmiarow("Wynikiem (wektor * macierz) nie jest jest wektor.");
     }
 
     @Override
@@ -171,7 +192,7 @@ public class Wektor extends Tablica {
     @Override
     public void przypisz(Wektor w) {
         if (liczba_elementow() != w.liczba_elementow()) {
-            throw new ZlyKsztalt("Rozna liczba elementow.");
+            throw new NiezgodnoscRozmiarow("Rozna liczba elementow.");
         }
         wartosci = w.wartosci.clone();
         orientacja = w.orientacja;
@@ -179,26 +200,61 @@ public class Wektor extends Tablica {
 
     @Override
     public void przypisz(Macierz m) {
-        throw new ZlyWymiar("Nie można przypisac macierzy do wektora.");
+        throw new NiezgodnoscRozmiarow("Nie można przypisac macierzy do wektora.");
     }
 
     @Override
     public double daj(int... indeks) {
         sprawdzIndeks(indeks);
-        return wartosci[indeks[0]];
+        Wektor nastepny = wskazniki[indeks[0]].wektor;
+        if (nastepny == this) {
+            return wartosci[indeks[0]];
+        }
+        // czyt. tablice.Macierz
+        int szukaneId = wskazniki[indeks[0]].id;
+        int[] pozycja = nastepny.znajdzPozycje(szukaneId);
+        return nastepny.daj(pozycja[0]);
     }
 
     @Override
     public void ustaw(double wartosc, int... indeks) {
         sprawdzIndeks(indeks);
+        Wektor nastepny = wskazniki[indeks[0]].wektor;
         wartosci[indeks[0]] = wartosc;
+        // czyt. tablice.Macierz
+        if (nastepny != this) {
+            int szukaneId = wskazniki[indeks[0]].id;
+            int[] pozycja = nastepny.znajdzPozycje(szukaneId);
+            nastepny.ustaw(wartosc, pozycja[0]);
+        }
     }
 
     @Override
     public Wektor wycinek(int... obszar) {
         sprawdzObszar(obszar);
-        // TODO
-        return null;
+        int dlugosc = obszar[1] - obszar[0] + 1;
+        // czyt. tablice.Macierz
+        Wektor wynik = new Wektor(new double[dlugosc], orientacja());
+        for (int i=obszar[0]; i<=obszar[1]; i++) {
+            double wartosc = daj(i);
+            int ni = i - obszar[0];
+            wynik.ustaw(wartosc, ni);
+            wynik.wskazniki[ni].wektor = this;
+            wynik.wskazniki[ni].id = id[i];
+        }
+        return wynik;
+    }
+
+    // czyt. tablice.Macierz
+    @Override
+    protected int[] znajdzPozycje(int id) {
+        int[] wynik = new int[1];
+        for (int i=0; i<liczba_elementow(); i++) {
+            if (this.id[i] == id) {
+                wynik[0] = i;
+            }
+        }
+        return wynik;
     }
 
     @Override
@@ -267,23 +323,23 @@ public class Wektor extends Tablica {
     @Override
     protected void sprawdzObszar(int... obszar) {
         if (obszar.length != 2) {
-            throw new ZlyObszar("Wektor przjmuje dwa argumenty");
+            throw new NiezgodnoscRozmiarow("Wektor przjmuje dwa argumenty");
         }
         if (pozaZakresem(obszar[0]) || pozaZakresem(obszar[1])) {
-            throw new ZlyObszar("Argument poza zakresem");
+            throw new NiezgodnoscRozmiarow("Argument poza zakresem");
         }
         if (obszar[0] > obszar[1]) {
-            throw new ZlyObszar("Zdegenerowany obszar");
+            throw new NiezgodnoscRozmiarow("Zdegenerowany obszar");
         }
 
     }
 
     private void sprawdzWektor(Wektor w) {
         if (orientacja() != w.orientacja()) {
-            throw new ZlyKsztalt("Rozna orientacja wektorow");
+            throw new NiezgodnoscRozmiarow("Rozna orientacja wektorow");
         }
         if (liczba_elementow() != w.liczba_elementow()) {
-            throw new ZlyKsztalt("Rozny rozmiar wektorow");
+            throw new NiezgodnoscRozmiarow("Rozny rozmiar wektorow");
         }
     }
 

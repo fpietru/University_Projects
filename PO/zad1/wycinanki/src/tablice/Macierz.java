@@ -1,16 +1,56 @@
+/*
+    Autor: Franciszek Pietrusiak
+*/
 package tablice;
 
-import wyjatki.NiezgodnoscRozmiarow;
-import wyjatki.ZlyIndeks;
-import wyjatki.ZlyKsztalt;
-import wyjatki.ZlyWymiar;
+import tablice.wyjatki.*;
 
 public class Macierz extends Tablica {
+
+    /*
+        Niech W bedzie wycinkiem macierzy M.
+        Obiekty klasy Wskaznik sa wykorzystywane w metodzie
+        daj i ustaw, aby W posiadal uaktualnione wartosci
+        wzgledem M oraz mogl propagowac zmiany wartosci do M.
+        Kazdy element macierzy ma przypisany do siebie unikalny id,
+        ktory nie zmienia sie przy operacjach arytmetycznych i
+        transpozycji.
+    */
+    private static class Wskaznik {
+        public Macierz macierz;
+        public int id;
+
+        public Wskaznik(Macierz macierz, int id) {
+            this.macierz = macierz;
+            this.id = id;
+        }
+
+        public Wskaznik kopia() {
+            return new Wskaznik(macierz, id);
+        }
+    }
+
     private double[][] wartosci;
+    private int[][] id;
+    private Wskaznik[][] wskazniki;
 
     public Macierz(double[][] wartosci) {
         super(2);
         this.wartosci = wartosci;
+        /*
+            Kazda macierz jest wycinkiem innej macierzy (byc moze samej siebie).
+            Przy inicjacji macierz jest wycinkiem samej siebie,
+            wiec kazdy element macierzy wskazuje na samego siebie.
+        */
+        int licznik = 0;
+        id = new int[liczbaWierszy()][liczbaKolumn()];
+        wskazniki = new Wskaznik[liczbaWierszy()][liczbaKolumn()];
+        for (int i=0; i<liczbaWierszy(); i++) {
+            for (int j=0; j<liczbaKolumn(); j++) {
+                id[i][j] = licznik++;
+                wskazniki[i][j] = new Wskaznik(this, id[i][j]);
+            }
+        }
     }
 
     @Override
@@ -90,10 +130,10 @@ public class Macierz extends Tablica {
     @Override
     public Wektor iloczyn(Wektor w) {
         if (w.orientacja()) {
-            throw new ZlyKsztalt("Wynik nie bedzie wektorem.");
+            throw new NiezgodnoscRozmiarow("Wynik nie bedzie wektorem.");
         }
         if (w.liczba_elementow() != liczbaKolumn()) {
-            throw new ZlyKsztalt("Nie mozna pomnozyc przez wektor tego ksztaltu.");
+            throw new NiezgodnoscRozmiarow("Nie mozna pomnozyc przez wektor tego ksztaltu.");
         }
         Wektor wynik = new Wektor(new double[liczbaWierszy()], false);
         for (int i=0; i<liczbaWierszy(); i++) {
@@ -109,7 +149,7 @@ public class Macierz extends Tablica {
     @Override
     public Macierz iloczyn(Macierz m) {
         if (liczbaKolumn() != m.liczbaWierszy()) {
-            throw new ZlyKsztalt("Zly ksztalt przy mnozeniu");
+            throw new NiezgodnoscRozmiarow("Zly ksztalt przy mnozeniu");
         }
         Macierz wynik = new Macierz(new double[liczbaWierszy()][m.liczbaKolumn()]);
         for (int i=0; i<liczbaWierszy(); i++) {
@@ -131,7 +171,7 @@ public class Macierz extends Tablica {
 
     @Override
     public void przemnoz(Wektor w) {
-        throw new ZlyWymiar("Wynikiem mnozenia nie jest macierz.");
+        throw new NiezgodnoscRozmiarow("Wynikiem mnozenia nie jest macierz.");
     }
 
     @Override
@@ -201,18 +241,74 @@ public class Macierz extends Tablica {
     @Override
     public double daj(int... indeks) {
         sprawdzIndeks(indeks);
-        return wartosci[indeks[0]][indeks[1]];
+        Macierz nastepny = wskazniki[indeks[0]][indeks[1]].macierz;
+        if (nastepny == this) {
+            return wartosci[indeks[0]][indeks[1]];
+        }
+        /*
+            Jesli nastepny != this to rekurencyjnie wywoluje
+            metode daj dla nastepnej macierzy i sprawdzam
+            wartosc pod indeksem odpowiadającym szukanemu id.
+         */
+        int szukaneId = wskazniki[indeks[0]][indeks[1]].id;
+        int[] pozycja = nastepny.znajdzPozycje(szukaneId);
+        return nastepny.daj(pozycja[0], pozycja[1]);
     }
 
     @Override
     public void ustaw(double wartosc, int... indeks) {
         sprawdzIndeks(indeks);
+        Macierz nastepny = wskazniki[indeks[0]][indeks[1]].macierz;
         wartosci[indeks[0]][indeks[1]] = wartosc;
+        /*
+            Jesli nastepny != this to rekurencyjnie wywoluje
+            metode ustaw dla nastepnej macierzy, gdzie zmieniam
+            wartosc na pozycji odpowiadajacej szukanemu id.
+         */
+        if (nastepny != this) {
+            int szukaneId = wskazniki[indeks[0]][indeks[1]].id;
+            int[] pozycja = nastepny.znajdzPozycje(szukaneId);
+            nastepny.ustaw(wartosc, pozycja[0], pozycja[1]);
+        }
     }
 
     @Override
     public Macierz wycinek(int... obszar) {
-        return null;
+        sprawdzObszar(obszar);
+        int wysokosc = obszar[1] - obszar[0] + 1;
+        int szerokosc = obszar[3] - obszar[2] + 1;
+        /*
+            Tworze wycinek W z macierzy M i kazdemu elementowi
+            w \in W przypisuje odpowiadajacy mu element z m \in M
+            co zapisuje w tablicy wskazniki[][].
+        */
+        Macierz wynik = new Macierz(new double[wysokosc][szerokosc]);
+        for (int i=obszar[0]; i<=obszar[1]; i++) {
+            for (int j=obszar[2]; j<=obszar[3]; j++) {
+                double wartosc = daj(i, j);
+                int ni = i - obszar[0];
+                int nj = j - obszar[2];
+                wynik.ustaw(wartosc, ni, nj);
+                wynik.wskazniki[ni][nj].macierz = this;
+                wynik.wskazniki[ni][nj].id = id[i][j];
+            }
+        }
+        return wynik;
+    }
+
+    // Zwraca pozycje elementu ktoremu odpowiada zadany id.
+    @Override
+    protected int[] znajdzPozycje(int id) {
+        int[] wynik = new int[2];
+        for (int i=0; i<liczbaWierszy(); i++) {
+            for (int j=0; j<liczbaKolumn(); j++) {
+                if (this.id[i][j] == id) {
+                    wynik[0] = i;
+                    wynik[1] = j;
+                }
+            }
+        }
+        return wynik;
     }
 
     @Override
@@ -263,12 +359,19 @@ public class Macierz extends Tablica {
     @Override
     public void transponuj() {
         double[][] noweWartosci = new double[liczbaKolumn()][liczbaWierszy()];
+        Wskaznik[][] noweWskazniki = new Wskaznik[liczbaKolumn()][liczbaWierszy()];
+        int[][] noweId = new int[liczbaKolumn()][liczbaWierszy()];
+        int licznik = 0;
         for (int i=0; i<liczbaWierszy(); i++) {
             for (int j=0; j<liczbaKolumn(); j++) {
                 noweWartosci[j][i] = wartosci[i][j];
+                noweWskazniki[j][i] = wskazniki[i][j].kopia();
+                noweId[j][i] = licznik++;
             }
         }
         wartosci = noweWartosci;
+        wskazniki = noweWskazniki;
+        id = noweId;
     }
 
     private int liczbaWierszy() {
@@ -297,23 +400,31 @@ public class Macierz extends Tablica {
 
     @Override
     protected void sprawdzObszar(int... obszar) {
-
+        if (obszar.length != 4) {
+            throw new NiezgodnoscRozmiarow("Macierz przyjmuje 4 argumenty");
+        }
+        if (pozaZakresem(obszar[0], obszar[2]) || pozaZakresem(obszar[1], obszar[3])) {
+            throw new NiezgodnoscRozmiarow("Obszar poza zakresem");
+        }
+        if (obszar[0] > obszar[1] || obszar[2] > obszar[3]) {
+            throw new NiezgodnoscRozmiarow("Zdegenerowany obszar");
+        }
     }
 
     private void sprawdzWektor(Wektor w) {
         if (!w.orientacja() && w.liczba_elementow() != liczbaWierszy()) {
-            throw new ZlyKsztalt("Pionowy wektor ma rozna liczbe elementow od liczby wierszy macierzy.");
+            throw new NiezgodnoscRozmiarow("Pionowy wektor ma rozna liczbe elementow od liczby wierszy macierzy.");
         }
         if (w.orientacja() && w.liczba_elementow() != liczbaKolumn()) {
-            throw new ZlyKsztalt("Poziomy wektor ma rozna liczbe elementow od liczby kolumn macierzy.");
+            throw new NiezgodnoscRozmiarow("Poziomy wektor ma rozna liczbe elementow od liczby kolumn macierzy.");
         }
     }
 
     private void sprawdzMacierz(Macierz m) {
         if (liczbaWierszy() != m.liczbaWierszy()) {
-            throw new ZlyKsztalt("Macierze maja rozna liczbe wierszy.");
+            throw new NiezgodnoscRozmiarow("Macierze maja rozna liczbe wierszy.");
         } else if (liczbaKolumn() != m.liczbaKolumn()) {
-            throw new ZlyKsztalt("Macierze maja rozna liczbe kolumn.");
+            throw new NiezgodnoscRozmiarow("Macierze maja rozna liczbe kolumn.");
         }
     }
 

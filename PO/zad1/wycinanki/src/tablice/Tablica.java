@@ -1,3 +1,6 @@
+/*
+    Autor: Franciszek Pietrusiak
+*/
 package tablice;
 
 public abstract class Tablica {
@@ -35,6 +38,7 @@ public abstract class Tablica {
 
     // Wycinki
     public abstract Tablica wycinek(int... obszar);
+    protected abstract int[] znajdzPozycje(int id);
 
     // Inne Operacje
     public abstract int wymiar();
