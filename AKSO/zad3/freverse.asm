@@ -57,7 +57,7 @@ _start:
     jne .revert_stack
 
     mov r13, [rsp+ST_SIZE]
-    add rsp, STAT_SIZE      ; zwolnij bufor na struct stat
+    add rsp, STAT_SIZE      ; zwalnia bufor na struct stat
 
     ; Sprawdza czy plik nie jest za krotki
     ; jesli plik ma mniej niz 2 bajty to nie trzeba go odwracac
