@@ -1,4 +1,4 @@
-# nsqrt: Square Root for big integer numbers in Assembly
+# nsqrt: Square Root for big integers in Assembly
 
 ## Function Description
 Given non-negative `2n`-bit integer `X` function computes non-negative `n`-bit integer `Q` such that `Q^2 <= X < (Q+1)^2`.
