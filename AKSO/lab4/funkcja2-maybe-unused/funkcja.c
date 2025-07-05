@@ -1,1 +1,0 @@
-#include "funkcja.h"
