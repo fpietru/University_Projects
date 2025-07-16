@@ -43,7 +43,7 @@ This repository contains projects and exercises completed as part of my universi
  - [String Expression Evaluator](/POiCPP/projektZal/)
 
 ### PO (Object-oriented programming)
- - [Operations on Skalars, Vectors and Matrices](/PO/zad1/wycinanki/)
+ - [Operations on Scalars, Vectors and Matrices](/PO/zad1/wycinanki/)
  - [Simulating Lottery with many types of player strategies](/PO/zad2/totolotek/)
 
 ### AKSO (Computer Architecture and Operating Systems)
