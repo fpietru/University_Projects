@@ -1,76 +1,55 @@
 # University Projects
 
-A collection of academic projects completed during my studies at MIM UW.
+A collection of academic projects completed during my studies at
+Faculty of Mathematics, Informatics, and Mechanics, University of Warsaw.
 
 ## Table of Contents
 
 - [About](#about)
 - [Projects](#projects)
-  - [WDP (Wprowadzenie do Programowania*)](#wdp-wprowadzenie-do-programowania)
-  - [WDI (Wprowadzenie do Informatyki)](#wdi-wprowadzenie-do-informatyki)
-  - [POiCPP (Programowanie obiektowe i C++)](#poicpp-programowanie-obiektowe-i-c)
-- [Structure](#structure)
-- [Technologies](#technologies)
+  - [WDP* (Introductory programming (extended))](#wdp-introductory-programming-extended)
+  - [WDI (Introduction to computer science 1)](#wdi-introduction-to-computer-science-1)
+  - [POiCPP (Object-oriented programming and C++)](#poicpp-object-oriented-programming-and-c)
+  - [PO (Object-oriented programming)](#po-object-oriented-programming)
+  - [AKSO (Computer Architecture and Operating Systems)](#akso-computer-architecture-and-operating-systems)
 - [License](#license)
 
 ---
 
 ## About
 
-This repository contains projects and exercises I completed as part of my university coursework.
-The projects are split into categories based on the classes they belong to:
- - *Wprowadzenie do Programowania (gwiazdka) (Introduction to Programming (extended))*
- - *Wprowadzenie do Informatyki (Introduction to Computer Science)*.
- - *Programowanie obiektowe i C++ (MAT)*
+This repository contains projects and exercises completed as part of my university coursework. The projects are organized into categories based on the corresponding courses.
+ - [WDP (Introductory programming (extended))](https://informatorects.uw.edu.pl/en/courses/view?prz_kod=1000-211bWPI)
+ - WDI (Introduction to computer science 1)
+ - [POiCPP (Object-oriented programming and C++)](https://informatorects.uw.edu.pl/en/courses/view?prz_kod=1000-135POC)
+ - [PO (Object-oriented programming)](https://informatorects.uw.edu.pl/en/courses/view?prz_kod=1000-212cPO)
+ - [AKSO (Computer Architecture and Operating Systems)](https://informatorects.uw.edu.pl/pl/courses/view?prz_kod=1000-212bAKSO)
 
 ---
 
 ## Bigger Projects
 
-### WDP (Wprowadzenie do Programowania)
+### WDP (Introductory programming (extended))
  - [Efficient Set Operation Library based on Partitioning Set into disjoint arithmetic sequences](/WDP/lab3/)
  - [Origami-like paper folding problem](/WDP/lab5/)
  - [Double-linked lists library](/WDP/lab6/)
  - [Persistent Segment Tree on Pointers](/WDP/lab7/)
  - [n Jug Water Pouring Problem](/WDP/lab8/)
 
-### WDI (Wprowadzenie do Informatyki)
+### WDI (Introduction to computer science 1)
  - [Red-Black Tree Implementation](/WDI/redblacktree)
 
-### POiCPP (Programowanie obiektowe i C++)
+### POiCPP (Object-oriented programming and C++)
+ - [String Expression Evaluator](/POiCPP/projektZal/)
 
----
+### PO (Object-oriented programming)
+ - [Operations on Skalars, Vectors and Matrices](/PO/zad1/wycinanki/)
+ - [Simulating Lottery with many types of player strategies](/PO/zad2/totolotek/)
 
-## Structure
-
-The repository is organized as follows:
-```
-University_Projects/
-├── WDP/
-│   ├── lab1/
-│   ├── lab2/
-│   └── ...
-├── WDI/
-│   ├── lab1/
-│   ├── lab2/
-│   └── ...
-├── POiCPP/
-│   ├── lab1/
-│   ├── lab2/
-│   └── ...
-└── README.md
-```
-
-Each subfolder contains project-specific files, including source code, documentation, and any additional resources.
-
----
-
-## Technologies
-
-The projects in this repository were developed using:
-- **Languages**: C, C++, Bash
-- **Tools**: GCC, G++, VS Code, Make, Valgrind
-- **Version Control**: Git
+### AKSO (Computer Architecture and Operating Systems)
+ - [Moore Automata C Library](/AKSO/zad1/)
+ - [Square Root for big integers in Assembly](/AKSO/zad2/)
+ - [In-place file reverser in Assembly](/AKSO/zad3/)
 
 ---
 
