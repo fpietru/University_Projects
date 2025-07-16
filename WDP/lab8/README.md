@@ -1,38 +1,42 @@
-# n Jug Water Pouring Problem
-## Problem Description
+# Multi-Jug Water Pouring Solver
 
-You are given `n` jugs, numbered from 1 to `n`, with capacities `x1, x2, ..., xn`. Initially, all jugs are empty. You can perform the following operations:
+This project implements a **generalized water jug problem solver** for *n* jugs of arbitrary capacities. The algorithm finds the **minimum number of steps** required to reach a desired configuration of water levels using breadth-first search (BFS).
 
-1. **Fill a jug completely** with water from the tap.
-2. **Empty a jug** completely into the sink.
-3. **Pour water from one jug to another**:
-   - If all the water fits, pour the entire amount.
-   - If not, pour only enough to fill the second jug completely.
+## Problem Overview
 
-Your goal is to achieve a state where each jug contains a specific amount of water `y1, y2, ..., yn`.
+Given:
+- `x[i]`: Capacity of the *i*-th jug
+- `y[i]`: Desired final water level in the *i*-th jug
 
-Write a program that, given the values of `x1, x2, ..., xn` and `y1, y2, ..., yn`, determines the minimum number of operations needed to achieve the described state. If achieving the state is impossible, the program should return `-1`.
+Operations allowed per step:
+1. **Fill** a jug to its maximum capacity
+2. **Empty** a jug completely
+3. **Pour** water from one jug into another (until source is empty or destination is full)
 
-### Input Format
-The input is read from standard input in the following format:
+The goal is to reach the exact configuration `y` from the initial state where all jugs are empty.
 
+## Constraints & Observations
+
+- A solution exists **only if** all target levels `y[i]` are divisible by the greatest common divisor of the capacities `x`.
+- If a solution exists, the program outputs the **minimum number of steps** to reach it.
+- Otherwise, it outputs `-1`.
+
+## Implementation Details
+
+- The algorithm performs a **BFS** on all possible water states.
+- States are represented as `vector<int>` and stored in a `unordered_map` with a **custom hash function**.
+- The hash function uses a combination of bitwise operations to reduce collision risk for vector keys.
+
+## Sample Input
+Input:
+```bash
+3
+8 4
+5 2
+3 1
 ```
-n
-x1 y1
-x2 y2
-...
-xn yn
+
+Output:
+```bash
+7
 ```
-
-Where:
-- `n` is the number of jugs.
-- For each jug `i`, `xi` is its capacity, and `yi` is the target amount of water.
-
-### Assumptions
-- `0 \leq n`.
-- `0 \leq yi \leq xi` for `i = 1, 2, ..., n`.
-- All input values are integers.
-- The values of `n`, `x1 + x2 + ... + xn`, and `y1 + y2 + ... + yn` fit within the `int` type.
-
-### Output
-The program should output the minimal number of operations needed, or `-1` if the target state is not achievable.

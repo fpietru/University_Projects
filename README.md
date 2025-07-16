@@ -32,9 +32,9 @@ This repository contains projects and exercises completed as part of my universi
 ### WDP (Introductory programming (extended))
  - [Efficient Set Operation Library based on Partitioning Set into disjoint arithmetic sequences](/WDP/lab3/)
  - [Origami-like paper folding problem](/WDP/lab5/)
- - [Double-linked lists library](/WDP/lab6/)
- - [Persistent Segment Tree on Pointers](/WDP/lab7/)
- - [n Jug Water Pouring Problem](/WDP/lab8/)
+ - [Queue Menagement System double-linked lists library](/WDP/lab6/)
+ - [Persistent Segment Tree for Range Querying](/WDP/lab7/)
+ - [Multi-Jug Water Pouring Solver](/WDP/lab8/)
 
 ### WDI (Introduction to computer science 1)
  - [Red-Black Tree Implementation](/WDI/redblacktree)

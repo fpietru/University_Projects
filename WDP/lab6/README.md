@@ -1,7 +1,22 @@
-This library provides following operations:
- - create set of n double-linked lists. [O(n)]
- - add element x at the end of k-th list. [O(1)]
- - return element from the beginning of k-th list. [O(1)]
- - move some element from list a to the end of list b (element can be in the middle). [O(1)]
- - merge two lists. [O(1)]
- - remove a piece of the list from element a to element b. [O(s), where s - size of list]
+# Queue Management System
+
+This C++ project implements a queue management system for a fictional government office ("urząd"). It simulates operations on multiple queues (one per service window) and models the behavior of clients ("interesanci") arriving, being served, switching queues, or being fast-tracked.
+
+## Features
+
+- **Initialization**: Open an office with `n` service windows. **`O(n)`**
+- **Client Handling**:
+  - Add new clients to a queue. **`O(1)`**
+  - Serve the first client in a queue. **`O(1)`**
+  - Move a client to a different queue. **`O(1)`**
+  - Fast-track a range of `k` clients for immediate service. **`O(k)`**
+- **Queue Operations**:
+  - Reverse the order of a queue. **`O(1)`**
+  - Merge two queues. **`O(1)`**
+  - Transfer `k` clients between queues when a window closes. **`O(k)`**
+- **Shutdown**: Close the office and retrieve all remaining `k` clients in order. **`O(k)`**
+
+## Key Structures
+
+- `interesant`: Represents a single client with unique number and pointers to neighbors.
+- `Okienko`: Internal representation of a service window queue using double-linked list
