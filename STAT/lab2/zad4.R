@@ -9,4 +9,5 @@ d <- data.frame(x, y)
 
 d
 
-ggplot(X) + geom_histogram(aes(x=X, y=..density..)) + geom_line(aes(x=x, y=y), data=d)
+ggplot(X) + geom_histogram(aes(x=X, y=..density..)) +
+  geom_line(aes(x=x, y=y), data=d)
