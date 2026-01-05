@@ -1,0 +1,288 @@
+---
+title: "STATYSTYKA - Projekt Zaliczeniowy"
+author: "Franciszek Pietrusiak"
+date: "2026-01-05"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(ggplot2)
+library(fitdistrplus)
+library(knitr)
+```
+
+## a) Podstawowe omówienie zbioru danych
+
+```{r}
+df <- read.csv("Results.csv")
+df <- df[df$Age >= 18 & df$Age < 90, ]
+```
+
+Tabela `df` opisuje wyniki pojedynczych uczestników maratonów w Stanach
+Zjednoczonych na przełomie lat 2010 - 2019.
+
+Znalazłem ją pod na kaggle [pod tym linkiem](https://www.kaggle.com/datasets/runningwithrock/2010-2019-fall-marathons).
+
+Każdy rekord w `df` zawiera
+imię i nazwisko uczestnika (`Name`),
+płeć (`Gender`),
+wiek (`Age`),
+przedział wiekowy (`Age.Bracket`),
+czas ukończenia biegu (w sekundach) (`Finish`),
+nazwę biegu (`Race`),
+rok w którym odbywał się bieg (`Year`).
+Tabela zawiera około 2000000 obserwacji i 7 zmiennych.
+
+Niektóre rekordy były błędne, ponieważ zawierały ujemny wiek uczestnika, dlatego
+wykluczyłem te rekordy z tabeli. Dodatkowo wykluczyłem uczestników z wiekiem
+większym bądź równym 90, ponieważ jak zakładam, wiele z tych osób celowo ustawiło
+swój wiek jako 99 będąc znacznie młodszymi, aby np. wygrać daną kategorię wiekową.
+
+Poniżej wyznaczam podstawowe statystyki dla zmiennych w `df`.
+
+```{r}
+numeric_variables <- df[c("Age", "Finish", "Year")]
+
+stats_summary <- data.frame(
+  Mean = sapply(numeric_variables, mean),
+  SD = sapply(numeric_variables, sd),
+  min = sapply(numeric_variables, min),
+  max = sapply(numeric_variables, max)
+)
+kable(stats_summary, caption="Podstawowe statystyki dla zmiennych ilościowych")
+```
+
+```{r}
+# chcę aby 'Under 35' było na początku
+df$Age.Bracket <- as.factor(df$Age.Bracket)
+lev <- levels(df$Age.Bracket)
+df$Age.Bracket <- factor(
+  df$Age.Bracket,
+  levels = c(tail(lev, 1), head(lev, -1))
+)
+table(df$Age.Bracket)
+```
+
+```{r}
+table(df$Gender)
+```
+
+```{r}
+n_distinct(df$Race)
+```
+
+```{r}
+n_distinct(df$Name)
+```
+
+
+## b) Porównanie rozkładu zmiennej `Finish` dla możliwych wartości zmiennej `Age.Bracket`.
+
+```{r}
+ggplot(df, aes(x=Age.Bracket, y=Finish)) + geom_boxplot()
+```
+
+Dodatkowo poniżej zamieszczam tabelkę, w której w podziale na możliwe wartości `Age.Bracket`
+wyznaczona jest średnia, mediana, minimum, maximum i odchylenie standardowe zmiennej `Finish`.
+
+```{r}
+df %>%
+  group_by(Age.Bracket) %>%
+  summarise(
+    mean = mean(Finish),
+    median = median(Finish),
+    min = min(Finish),
+    max = max(Finish),
+    sd = sd(Finish)
+  )
+```
+
+
+## c) Zależność między zmienną `Finish` a `Age`.
+
+```{r}
+
+model <- lm(Finish ~ Age, df)
+beta0 <- coef(model)[1]
+beta1 <- coef(model)[2]
+
+ggplot(df, aes(Age, Finish)) +
+  geom_bin2d(bins = 60) +
+  scale_fill_viridis_c(trans = "log") +
+  geom_abline(slope=beta1, intercept=beta0, col='red')
+```
+
+Tabela ma ponad 2 miliony rekordów, dlatego użycie wykresu punktowego jest nieefektywne
+obliczeniowo i nieczytelne. Zamiast tego użyłem `geom_bin2d()` z biblioteki `ggplot2`.
+
+Kolorem czerwonym zaznaczono model regresji liniowej, gdzie zmienną objaśnianą jest `Finish`,
+a zmienną objaśniającą `Age`. Na podstawie wykresu można ocenić, że dopasowanie prostej
+do danych wydaje się rozsądne i czas ukończenia maratonu rośnie liniowo z wiekiem.
+
+
+## d) Dopasowanie rozkładu normalnego do zmiennej `log(Age)`.
+
+Hipoteza `H0`: Zmienna `log(Age)` ma rozkład normalny.
+
+Hipoteza `H1`: Rozkład zmiennej `log(Age)` istotnie różni się od rozkładu normalnego.
+
+Aby to sprawdzić użyję próbki 500 rekordów z tabeli `df`.
+Parametry rozkładu normalnego znajduję za pomocą metody największej wiarygodności.
+
+```{r}
+df$log_Age <- log(df$Age)
+
+set.seed(123)
+df_sample <- sample(df$log_Age, 500)
+
+fit_norm <- fitdist(df_sample, "norm", method="mle")
+mu_hat <- fit_norm$estimate["mean"]
+sd_hat <- fit_norm$estimate["sd"]
+fit_norm
+```
+
+Następnie tworzę wykres kwantylowy dla tego dopasowania.
+```{r}
+qqnorm(df_sample, main = "Wykres QQ-plot dla zmiennej log(Age)")
+qqline(df_sample, col = "red", lwd = 2)
+```
+
+A także wykres dystrybuanty empirycznej z dopasowaną dystrybuantą.
+```{r}
+plot(ecdf(df_sample), main = "Dystrybuanta Empiryczna vs Dopasowana")
+curve(
+  pnorm(x, mean = mu_hat, sd = sd_hat), 
+  add = TRUE, 
+  col = "blue", 
+  lwd = 2
+)
+legend(
+  "bottomright",
+  legend = c("Empiryczna", "Teoretyczna (Normalny)"),
+  col = c("black", "blue"),
+  lwd = 2
+)
+```
+
+Wynik testu Kołmogorowa-Smirnowa
+```{r warning=FALSE}
+ks_test <- ks.test(df_sample, "pnorm", mean=mu_hat, sd=sd_hat)
+ks_test
+```
+
+a zatem skoro `p-value = 0.1314` jest znacząco większy od `0.05`, to nie ma podstaw do
+odrzucenia hipotezy zerowej `H0`.
+
+## e) Dla zmiennych jakościowych estymuję prawdopodobieństwo jej występowania w całej populacji wraz z 99% przedziałem ufności Cloppera-Pearsona
+
+W tej analizie nie uwzględniam zmiennych `Race` oraz `Name`, ponieważ zawierają
+zbyt wiele różnych wartości i w konsekwencji utworzone tabele byłyby nieczytelne.
+
+```{r}
+alfa <- 1 - 0.99
+categorical_variables <- c("Gender", "Age.Bracket")
+
+for (col in categorical_variables) {
+  tab <- table(df[[col]])
+  n_total <- sum(tab)
+  x_counts <- as.numeric(tab)
+  categories <- names(tab)
+  
+  p_hat <- x_counts / n_total
+  # jak w slajdach z wykładu 7
+  left_end <- qbeta(alfa/2, x_counts, n_total - x_counts + 1)
+  right_end <- qbeta(1 - alfa/2, x_counts + 1, n_total - x_counts)
+  
+  table_final <- data.frame(
+    Category = categories,
+    N = x_counts,
+    Prob = p_hat,
+    left_end = left_end,
+    right_end = right_end
+  )
+  print(kable(table_final, caption=paste("Estymacja dla zmiennej", col)))
+}
+```
+
+
+## f) Model regresji liniowej zmiennej `Finish` względem zmiennych `Age` oraz `Gender`
+
+```{r}
+df$Gender <- as.factor(df$Gender)
+model <- lm(Finish ~ Age + Gender, df)
+model_summary <- summary(model)
+model_summary
+```
+
+W tym podsumowaniu można zauważyć, że zarówno `Age`, jak i `Gender` mają w kolumnie `Pr(>|t|)`
+wartości `<2e-16`, a zatem są to istotne zmienne.
+
+Dodatkowo z tego podsumowania można wywnioskować, że z każdym kolejnym rokiem życia
+czas ukończenia maratonu wydłuża się średnio o `55` sekund. A także, że mężczyźni biegają średnio
+o `1772` (co odpowiada 29 minutom i 32 sekundom) sekundy szybciej niż kobiety w tym samym wieku.
+
+Dopasowane współczynniki dla tego modelu wynoszą
+```{r}
+coef(model)
+```
+
+, a błąd średniokwadratowy to
+```{r}
+model_summary$sigma^2
+```
+
+co pokazuje dużą rozbieżność wyników od średniej. Wynika to z tego, że w biegach ulicznych startują
+zarówno amatorzy jak i profesjonaliści.
+
+## g) Hipotezy statystyczne
+
+### Hipoteza 1: Czy płeć ma wpływ na czas ukończenia maratonu?
+
+`H0`: Średni czas ukończenia maratonu przez mężczyzn i kobiety jest taki sam.
+
+`H1`: Średni czas ukończenia maratonu istotnie różni się w zależności od płci.
+
+```{r}
+test_gender <- t.test(Finish ~ Gender, df)
+test_gender
+```
+
+Przeprowadzony test t-Welcha wykazał statystycznie istotne różnice w czasie
+ukończenia maratonu ze względu na płeć `(t=340,51; df=1886935; p-value<2.2e-16)`.
+Średni czas kobiet `(F=17408,44)` był wyższy niż średni czas mężczyzn `(M=15821,78)`.
+Wynik pozwala na odrzucenie hipotezy zerowej o braku różnic między płciami.
+
+### Hipoteza 2: Czy biegacze stają się coraz szybsi?
+
+`H0`: Średni czas ukończenia maratonu maleje na przestrzeni lat 2010-2019.
+
+`H1`: Średni czas ukończenia maratonu nie maleje na przestrzeni lat 2010-2019.
+
+Do sprawdzenia tej hipotezy użyję ponownie modelu regresji liniowej. W tym przypadku
+zmienną objaśnianą jest `Finish`, a objaśniającą `Year`.
+Jeśli współczynnik nachylenia linii regresji jest ujemny, to zachodzi hipoteza `H0`,
+w przeciwnym wypadku zachodzi `H1`.
+
+```{r}
+model_trend <- lm(Finish ~ Year, df)
+summary(model_trend)
+```
+
+Co ciekawe widzimy, że współczynnik nachylenia `Estimate` dla `Year` wynosi `2.493e+01` oraz
+wartość `p-value < 2e-16`, a to oznacza, że średni czas ukończenia maratonu rośnie, a nie maleje!
+
+Jednak wartość `Multiple R-squared: 0.0004355` wskazuje, że zmienna `Year` wyjaśnia zaledwie 0.04%
+zmienności czasu biegu.
+
+Uzyskany wynik odzwierciedla fakt, że maratony stały się sportem masowym.
+Z roku na rok na maratony zapisuje się systematycznie rosnąca liczba amatorów, których
+głównym celem jest "przebiec maraton". Ta fala nowych, wolniejszych biegaczy przesuwa
+średnią w górę, mimo że elita prawdopodobnie wciąż poprawia swoje rekordy.
+
+
+
+
+
+
