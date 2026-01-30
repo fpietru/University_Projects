@@ -100,5 +100,11 @@ vignettes/*.pdf
 # Datasets
 *.csv
 
-# venvs
-/venv/
+# Python virtual environment
+venv/
+.venv/
+env/
+ENV/
+
+# dotenv
+.env*
