@@ -16,7 +16,40 @@ Podaj przykład bijekcji:
 
 \paragraph{Rozwiązanie} % można wpisać więcej niż jedno!
 
-\paragraph{Wskazówka} % może być więcej niż jedna!
+\subparagraph{(b)}
+Zacznijmy od funkcji $f_1: \left(-\frac{\pi}{2}, \frac{\pi}{2}\right) \to \R$
+określonej wzorem $f_1(x) = \tg(x)$.
+
+Z własności funkcji tangens wiemy, że na tym zbiorze
+argumentów $f_1$ jest funkcją ściśle rosnącą $\implies$
+$f_1$ jest funkcją różnowartościową.
+
+Dodatkowo wiadomo, że $f_1$ jest funkcją ciągłą oraz
+$$\lim_{x \to (-\frac{\pi}{2})^+} f_1(x) = -\infty \quad \lim_{x \to (\frac{\pi}{2})^-} f_1(x) = +\infty$$
+więc $f_1$ przyjmuje wszystkie wartości z $\R$ więc jest funkcją "na".
+
+Skoro $f_1$ jest zarówno funkcją różnowartościową jak i funkcją "na",
+to jest ona bijekcją.
+
+Jednak w naszym zadaniu potrzebujemy bijekcji, której dziedzina to $(0,1)$.
+
+Aby to naprawić zdefiniujemy dwie dodatkowe funkcje:
+
+Niech $f_2: \left(-\frac{1}{2}, \frac{1}{2}\right) \to \left(-\frac{\pi}{2}, \frac{\pi}{2}\right)$
+t.że $f_2(x) = \pi x$
+oraz
+$f_3: (0,1) \to \left(-\frac{1}{2}, \frac{1}{2}\right)$ t.że $f_3(x) = x - \frac{1}{2}$.
+Nietrudno zauważyć, że te funkcje są zarówno różnowartościowe jak i "na"
+$\implies$ są to bijekcje.
+
+Wtedy funkcja
+$$f(x) = (f_1 \circ f_2 \circ f_3)(x) = f_1(f_2(f_3(x))) = \tg\left(\pi \left(x - \frac{1}{2}\right)\right)$$
+będąca złożeniem trzech bijekcji jest szukaną bijekcją.
+
+
+% \paragraph{Wskazówka} % może być więcej niż jedna!
+\subparagraph{Wskazówka 1. (b)}
+Pomyśl o funkcjach, które mają asymptoty pionowe.
 
 \paragraph{Komentarz} % pogłębiony komentarz metodyczny dotyczący zadania
 
