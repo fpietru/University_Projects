@@ -1,0 +1,80 @@
+%% TREŚĆ ZADANIA, NUMER, IMIĘ I NAZWISKO
+
+\begin{problem}{2.23}{Łukasz Bożyk}
+Liczby dodatnie $a$, $b$, $c$ spełniają nierówność \begin{equation}\label{2.23:teza}
+% etykiety równań proszę zaczynać od numeru zadania jak zilustrowano wyżej, żeby po wrzuceniu wszystkich prac do jednego pliku nie było kolizji
+\frac{a^2+b^2+c^2}{ab+bc+ca}<2.\end{equation}
+Wykaż, że istnieje trójkąt o bokach $\sqrt{a}$, $\sqrt{b}$, $\sqrt{c}$.
+\end{problem}
+
+%% MIEJSCE NA ZAWARTOŚĆ OPRACOWANIA
+
+\paragraph{Rozwiązanie 1.} Załóżmy bez straty ogólności, że $a\leq b\leq c$. Teza zadania przybiera wówczas postać $\sqrt{a}+\sqrt{b}>\sqrt{c}$. Skoro obie strony są dodatnie, to równoważnie mamy
+\begin{align*}
+    a+b+2\sqrt{ab}&>c,\\
+    2\sqrt{ab}&>c-a-b.
+\end{align*}
+Jeżeli $c-a-b<0$, to ostatnia nierówność jest oczywiście spełniona (w~tym wypadku teza zadania jest więc spełniona). Przyjmując dodatkowe założenie $c-a-b\geq 0$, możemy ponownie podnieść nierówność stronami do kwadratu, uzyskując \emph{równoważną} postać tezy (w~tym przypadku):
+\begin{align*}
+    4ab&>c^2+a^2+b^2+2ab-2ac-2bc,\\
+    2(ab+bc+ca)&>a^2+b^2+c^2,\\
+    2&>\dfrac{a^2+b^2+c^2}{ab+bc+ca}.
+\end{align*}
+Otrzymaliśmy nierówność \eqref{2.23:teza}. Ponieważ przekształcenia były równoważne, więc rozwiązanie jest zakończone.
+
+\paragraph{Rozwiązanie 2.}
+    Przyjmijmy oznaczenia $x=\sqrt{a}$, $y=\sqrt{b}$, $z=\sqrt{c}$. Daną nierówność można przepisać jako
+    \[2x^2y^2+2y^2z^2+2z^2x^2-x^4-y^4-z^4>0,\]
+    czyli równoważnie
+    \begin{equation}\label{2.23:iloczyn}(x+y+z)(x+y-z)(y+z-x)(z+x-y)> 0.\end{equation}
+    Czynnik $x+y+z$ jest dodatni, więc spośród pozostałych trzech czynników albo wszystkie są dodatnie (i~zadanie jest rozwiązane, gdyż to dokładnie oznacza, że istnieje trójkąt o~bokach $x$, $y$, $z$), albo dwa są ujemne. Jednak drugi przypadek nie może mieć miejsca: gdyby np. $x+y-z<0$ oraz $y+z-x<0$, to dodając te dwie nierówności stronami, uzyskalibyśmy $2y<0$ --- sprzeczność.
+
+\paragraph{Rozwiązanie 3.} Korzystając (dwukrotnie) z~faktu, że nierówność $|x-y|<z$ jest równoważna układowi nierówności $-z<x-y<z$, przekształcamy daną nierówność równoważnie (równoważnie, gdyż $ab+bc+ca>0$):
+\begin{align*}
+    a^2+b^2+c^2&<2ab+2bc+2ca,\\
+    a^2+b^2+c^2+2ab-2bc-2ca&<4ab,\\
+    (a+b)^2-2(a+b)c+c^2&<4ab,\\
+    (a+b-c)^2&<4ab,\\
+    |a+b-c|&<2\sqrt{ab}.
+\end{align*}
+Ostatnia nierówność oznacza, że
+\[-2\sqrt{ab}<a+b-c<2\sqrt{ab},\]
+czyli $a+b+2\sqrt{ab}>c$ oraz $a+b-2\sqrt{ab}<c$. Te warunki oznaczają odpowiednio, że
+\[\sqrt{a}+\sqrt{b}>\sqrt{c}\quad\text{oraz}\quad \left|\sqrt{a}-\sqrt{b}\right|<\sqrt{c}.\]
+Z~kolei drugi warunek jest równoważny układowi warunków 
+\[-\sqrt{c}<\sqrt{a}-\sqrt{b}<\sqrt{c},\]
+czyli $\sqrt{a}+\sqrt{c}>\sqrt{b}$ oraz $\sqrt{c}+\sqrt{b}>\sqrt{a}$. Uzyskaliśmy więc wszystkie trzy nierówności trójkąta dla liczb $\sqrt{a}$, $\sqrt{b}$, $\sqrt{c}$, z~których wynika teza zadania.
+
+\paragraph{Rozwiązanie 4.} Podobnie jak w rozwiązaniu 3 przekształcamy założenie równoważnie do postaci
+\[c^2-2(a+b)c+(a-b)^2<0\]
+i~traktujemy ją jako kwadratową względem $c$ (z~parametrami $a$ oraz $b$). Wyróżnik trójmianu po lewej stronie jest równy
+\[\Delta_c =4(a+b)^2-4(a-b)^2=16ab,\]
+więc jego pierwiastkami są
+\[c_1=\frac{2(a+b)+4\sqrt{ab}}{2}=\left(\sqrt a+\sqrt b\right)^2,\qquad c_2=\frac{2(a+b)-4\sqrt{ab}}{2}=\left(\sqrt{a}-\sqrt{b}\right)^2.\]
+To zaś oznacza (skoro $|\sqrt{a}-\sqrt{b}|<\sqrt{a}+\sqrt{b}$), że nierówność jest spełniona wtedy i~tylko wtedy, gdy $c\in\left((\sqrt{a}-\sqrt{b})^2,(\sqrt{a}+\sqrt{b})^2\right)$, a~zatem
+\[\sqrt{c}<\sqrt{a}+\sqrt{b}\quad\land\quad \sqrt{c}>|\sqrt{a}-\sqrt{b}|.\]
+Drugi warunek jest z~kolei równoważny koniunkcji $\sqrt{c}>\sqrt{a}-\sqrt{b}$ oraz $\sqrt{c}>\sqrt{b}-\sqrt{a}$, czyli ostatecznie otrzymujemy
+\[\sqrt{a}+\sqrt{b}>\sqrt{c}\quad\land\quad \sqrt{b}+\sqrt{c}>\sqrt{a}\quad\land\quad \sqrt{c}+\sqrt{a}>\sqrt{b},\]
+a~to właśnie oznacza, że istnieje trójkąt o~bokach $\sqrt{a}$, $\sqrt{b}$, $\sqrt{c}$.
+
+\paragraph{Komentarz} Zadanie można rozwiązać na wiele sposobów --- wspólną trudnością ich wszystkich są umiejętne przekształcenia algebraiczne (z~zastosowaniem wzorów skróconego mnożenia), umiejętna algebraizacja danego warunku (być może z~dodatkowym użyciem symetrii i~przyjęciem wygodnych założeń porządkujących $a$, $b$, $c$) oraz ostrożne wnioskowanie przy dowodzeniu nierówności. 
+
+Warto zwrócić uwagę na to, że teza zadania ma postać implikacji: jeśli liczby $a$, $b$, $c$ spełniają warunek \eqref{2.23:teza}, to istnieje trójkąt. Nie kontrolując świadomie równoważności przekształceń w~rozwiązaniu 1 łatwo popełnić błąd logiczny polegający na wywnioskowaniu założenia z~tezy.
+
+W rozwiązaniu 2. warto zwrócić uwagę na fakt, że dodatniość iloczynu czterech czynników nie jest równoważna dodatniości każdego z~nich (a:~parzystej liczbie ujemnych czynników i~braku zerowych). Potencjalny błąd polega więc na stwierdzeniu, że z~nierówności \eqref{2.23:iloczyn} wynika wprost teza zadania (nie wykluczając przypadku, gdy dwa lub cztery czynniki są ujemne).
+
+Sztuczka ze zwinięciem w~rozwiązaniu 2 jest bardziej dostępna dla osób znających rozwiniętą postać wzoru Herona na pole trójkąta (lewa strona nierówności \eqref{2.23:iloczyn} to dokładnie $16P^2$, gdzie $P$ jest polem trójkąta o~bokach $x$, $y$, $z$.
+
+Rozwiązanie numer 4 jest ładną ilustracją metody traktowania wyrażenia wielu zmiennych jako funkcji kwadratowej ze względu na jedną z~nich --- w~ten sposób uzyskujemy \emph{de facto} najbardziej szkolną metodę, sprowadzającą się do rozwiązania nierówności kwadratowej. Przy okazji można skontrolować, czy rozwiązujący nie popełni błędu przy ,,pierwiastkowaniu'' nierówności (czyli, czy nie zgubi modułu).
+
+Do każdego rozwiązania pasuje inna seria wskazówek. Na przykład do rozwiązania numer 1 można rozważyć następujące:
+
+\paragraph{Wskazówka 1.} W~jaki sposób można algebraicznie wyrazić tezę zadania?
+
+\paragraph{Wskazówka 2.} Warunek jest symetryczny ze względu na $a$, $b$, $c$, więc można bez straty ogólności przyjąć np. $a\leq b\leq c$.
+
+\paragraph{Wskazówka 3.} Spróbuj przekształcić tezę zadania tak, aby pozbyć się pierwiastków.
+
+\paragraph{Uogólnienia i modyfikacje} Warto rozważyć zadanie pytania, jakie trójki (niekoniecznie dodatnich) liczb rzeczywistych $a$, $b$, $c$ spełniają równość
+\[\frac{a^2+b^2+c^2}{ab+bc+ca}=2.\]
+W~tym zadaniu dodatkowo trzeba zadbać o~wykluczenie zera w~mianowniku (i~ostrożnie kontrolować znaki --- np. argument z~deltą z~rozwiązania 4 pokazuje, że pośród $a$, $b$, $c$ nie może być dwóch o~ujemnym iloczynie).

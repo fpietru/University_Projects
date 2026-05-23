@@ -1,0 +1,40 @@
+\usepackage[margin=1cm,a5paper]{geometry}
+
+\usepackage{bold-extra}
+\usepackage{polski}
+\usepackage{iwona}
+\usepackage[OT4]{fontenc}
+
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{pgf,tikz}
+
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\renewcommand\leq\leqslant
+\renewcommand\geq\geqslant
+
+\colorlet{maincolor}{ForestGreen}
+\usepackage[most]{tcolorbox}
+\usepackage{varwidth}
+
+\newtcolorbox{tresc}[3][]{enhanced, sharp corners, boxrule=0mm, colback=maincolor!10,
+colframe=black,toptitle=1mm,fonttitle=\bfseries,
+colbacktitle=maincolor!25, coltitle=black,
+title={Zadanie #2\hfill{\it Opracowanie: #3}},#1}
+
+\newenvironment{problem}[3]{\newpage\begin{tresc}{#1}{#2}{#3}}{\end{tresc}}
+
+% Dodatkowe makra
+
+\usepackage{multicol}
+
+\def\Z{\mathbb{Z}}
+\def\Q{\mathbb{Q}}
+\def\R{\mathbb{R}}
+
+\def\nwd{\mathrm{NWD}}
+
+\usepackage{enumitem}
+\setlist[enumerate,1]{label={(\alph*)},topsep=0pt}
+
