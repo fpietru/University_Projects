@@ -149,13 +149,141 @@ Wtedy funkcja
 $$f(x) = (f_1 \circ f_2 \circ f_3)(x) = f_1(f_2(f_3(x))) = \tg\left(\pi \left(x - \frac{1}{2}\right)\right)$$
 będąca złożeniem trzech bijekcji jest szukaną bijekcją.
 
+\subparagraph{(c)}
+
+Niech
+$$A := \left\{\frac{1}{2}, \frac{1}{4}, \frac{1}{8}, \frac{1}{16}, \dots \right\}
+= \left\{ 2^{-n} : n \in \Z_+ \right\}
+$$
+a także niech
+$$B := (0,1) \setminus A \quad \quad B^c := [0,1] \setminus B$$
+Zdefiniujmy funkcję $f: (0, 1) \to [0, 1]$ jako
+$$
+f(x) = \begin{cases}
+  0 & \text{jeśli } x = \frac{1}{2} \\
+  1 & \text{jeśli } x = \frac{1}{4} \\
+  2^{-(n-2)} & \text{jeśli } x = 2^{-n} \text{ dla pewnego } n \geq 3 \\
+  x & \text{jeśli } x \in B
+\end{cases}
+$$
+
+\begin{lemat}
+Funkcja $f$ jest bijekcją.
+\end{lemat}
+
+\begin{proof}[Dowód (różnowartościowość)]
+\sloppy
+Pokażemy, że dla dowolnych $x_1, x_2 \in (0, 1)$,
+jeśli $f(x_1) = f(x_2)$ to $x_1 = x_2$.
+
+Przypadek 1: Gdy $x_1, x_2 \in B$ to
+$x_1 = f(x_1) = f(x_2) = x_2$
+
+Przypadek 2: Gdy $x_1, x_2 \in A$.
+Niech $x_1 = 2^{-n}, x_2 = 2^{-m}$ dla pewnych $n, m \in \Z_+$.
+Obrazem zbioru $A$ względem funkcji $f$ jest
+$f(A) := \{0, 1\} \cup \left\{ 2^{-n} : n \in \Z_+ \right\}$.
+Wartości $0, 1$ są przyjmowane jedynie dla argumentów odpowiednio $\frac{1}{2}, \frac{1}{4}$.
+Dla $n,m \geq 3$ jeśli zachodzi $f(x_1) = f(2^{-n}) = f(2^{-m}) = f(x_2)$, to
+$2^{-(n-2)} = 2^{-(m-2)} \iff 2^{-n} = 2^{-m} \iff x_1 = x_2$.
+
+Przypadek 3: Gdy BSO $x_1 \in A, x_2 \in B$.
+Wtedy $f(x_1) \in f(A)$ oraz $f(x_2) \in f(B)$.
+Ale $f(A) \cap f(B) = (\{0,1\} \cup A) \cap B = (\{0,1\} \cap B) \cup (A \cap B)
+= \emptyset \cup \emptyset = \emptyset$ więc niemożliwe jest aby $f(x_1) = f(x_2)$.
+\end{proof}
+
+\begin{proof}[Dowód ("na")] Pokażemy, że dla każdego $y \in [0, 1]$ istnieje
+$x \in (0, 1)$ t.że $f(x) = y$.
+
+Przypadek 1: Gdy $y \in B \subset [0, 1]$. Wtedy wystarczy wziąć $x = y$ i
+z definicji $f$ zachodzi: $f(x)=f(y)=y$.
+
+Przypadek 2: Gdy $y \in B^c := (\{0,1\} \cup A) \subset [0, 1]$. Jeśli $y=0$, to
+$x=\frac{1}{2} \in (0, 1)$. Jeśli $y=1$, to $x=\frac{1}{4} \in (0,1)$. Jeśli $y \in A$, to $y = 2^{-k}$
+dla pewnego $k \in \Z_+$. Biorąc $x=2^{-(k+2)} \in (0, 1)$ dostajemy:
+$f(x) = f(2^{-(k+2)}) = 2^{-((k+2)-2)} = 2^{-k} = y$.
+
+Skoro $B \cup B^c = [0, 1]$, to rozpatrzyliśmy wszystkie przypadki.
+\end{proof}
+
 
 % \paragraph{Wskazówka} % może być więcej niż jedna!
+
+\subparagraph{Wskazówka 1. (a)}
+Pomyśl, jaki jest największy problem przy szukaniu bijekcji do zbioru liczb wymiernych.
+Zastanów się jak rozwiązać ten problem.
+
+\subparagraph{Wskazówka 2. (a)}
+Przypomnij sobie jak działa \textit{Algorytm Euklidesa} (w wersji z odejmowaniem).
+Pomyśl jak go odwrócić zaczynając od dwóch liczb względnie pierwszych.
+
 \subparagraph{Wskazówka 1. (b)}
 Pomyśl o funkcjach, które mają asymptoty pionowe.
 
+\subparagraph{Wskazówka 1. (c)}
+Zastanów się czy szukana bijekcja może być funkcją ciągłą.
+
+\subparagraph{Wskazówka 2. (c)}
+Zastanów się jakie argumenty przejdą na $0$ i $1$, a co wejdzie na miejsce tych argumentów.
+Spróbuj skojarzyć to zadanie z \textit{Paradoksem hotelu Hilberta}.
+
 \paragraph{Komentarz} % pogłębiony komentarz metodyczny dotyczący zadania
+
+Przedstawione zadanie stanowi wprowadzenie do teorii mnogości i
+badania mocy zbiorów nieskończonych. Każdy z podpunktów ilustruje
+inny, często nieoczywisty, wynik w tym dziale matematyki.
+
+Podpunkt (a) dotyczy przeliczalności zbioru liczb wymiernych $(\Q_+)$.
+Standardowy dowód tego faktu przypisuje się Cantorowi. Polega on na
+utożsamieniu punktów kratowych w pierwszej ćwiartce układu współrzędnych
+z dodatnimi liczbami wymiernymi. Następnie tworzy się "zygzak", który je
+numeruje. Wadą tego rozwiązania jest fakt, że zygzak wielokrotnie
+natrafi na tę samą liczbę, ale zapisaną jako inny ułamek
+(np. $\frac{1}{2}, \frac{2}{4}, \frac{4}{8}, \dots$). Wymusza to
+konieczność sprawdzania, czy dla każdego ułamka, liczba wymierna, którą
+reprezentuje została już ponumerowana.
+Przedstawione przeze mnie rozwiązanie opiera się na
+\textit{drzewie Calkina-Wilfa}
+\href{https://www2.math.upenn.edu/~wilf/website/recounting.pdf}{(opisanym w roku 2000)}.
+Każda liczba wymierna pojawia się w nim tylko raz i to w postaci
+nieskracalnej. Dodatkowo, mając takie drzewo, można wyznaczyć
+jawny wzór na $n$-tą dodatnią liczbę wymierną. Stanowi to istotną przewagę
+nad metodą Cantora.
+
+Podpunkt (b) pokazuje, że zbiór ograniczony $(0,1)$ może mieć taką samą moc
+co zbiór nieograniczony $\R$. Użycie funkcji tangens (z przeskalowaniem
+i przesunięciem dziedziny) jest standardowym rozwiązaniem.
+Alternatywnie, zamiast tangensa można użyć funkcji \textit{logit} lub
+funkcji wymiernej.
+
+Podpunkt (c) może być najbardziej nieintuicyjny, ponieważ wydaje
+się, że zbiór $[0,1]$ jest "większy" od $(0,1)$ o dokładnie dwa
+elementy: $0$ i $1$. Twierdzenie z topologii mówi, że obraz zbioru zwartego
+przez przekształcenie ciągłe jest przestrzenią zwartą. Gdyby istniała
+ciągła bijekcja $f: (0,1) \to [0,1]$, to funkcja odwrotna
+$f^{-1}: [0,1] \to (0,1)$ również musiałaby być ciągła (poza $\R$ to nie zawsze prawda).
+Wtedy jednak ciągły obraz przestrzeni zwartej $[0,1]$ (czyli przedział $(0,1)$) musiałby być
+zwarty, co prowadzi do sprzeczności. Oznacza to, że nie istnieje ciągła
+bijekcja pomiędzy tymi zbiorami. Da się jednak wskazać wiele przykładów
+nieciągłych bijekcji, które łączy to, że w swojej konstrukcji opierają się na
+\textit{paradoksie hotelu Hilberta}.
+
 
 \paragraph{Uogólnienia i modyfikacje} % jeśli są naturalne, np. łatwiejsze / trudniejsze wersje zadania nadające się do pracy na różnych poziomach edukacyjnych
 
-% można dopisywać kolejne akapity, np. ciekawostki, możliwe dygresje, linki do wartościowych źródeł itp.
+Mając przykład bijekcji w podpunkcie (a) łatwo zmodyfikować ją tak,
+aby dostać bijekcję $\Z_+\to\Q$. 
+
+Naturalnym uogólnieniem podpunktu (b) jest podanie przykładu bijekcji
+$(a, b) \to \R$ dla dowolnych $a, b \in \R$ t.że $a < b$.
+
+Innym pomysłem na uogólnienie podpunktu (b) jest polecenie wskazania bijekcji
+pomiędzy otwartą kostką $(0, 1)^n$ a przestrzenią $\R^n$, dla ustalonego
+$n \in \Z_+$.
+
+Można zmodyfikować podpunkt (c) rozpatrując bijekcje pomiędzy otwartą a 
+domkniętą $n$-wymiarową kulą jednostkową.
+
+Kolejnym pomysłem dla (c) jest szukanie bijekcji $(0, 1) \cup A \to (0, 1)$,
+gdzie $A \subset \R$ jest pewnym zbiorem co najwyżej przeliczalnym.
