@@ -1,0 +1,149 @@
+\documentclass[dvipsnames]{book}
+
+\input makra.tex
+
+\begin{document}
+
+\begin{center}
+  {\Large\bfseries Wykład 1 --- 2026-10-02}
+\end{center}
+
+\section*{Sprawy organizacyjne}
+
+\begin{itemize}[topsep=0pt,itemsep=0pt]
+  \item będą wejściówki,
+  \item jedno kolokwium,
+  \item egzamin ustny z teorii.
+\end{itemize}
+
+\hrulefill
+
+\section*{Proces stochastyczny}
+
+\begin{definicja}[Proces stochastyczny]
+$(\Omega, \mathcal{F}, \P)$ --- przestrzeń probabilistyczna, gdzie $\Omega$ jest
+niepusty.
+
+$(S, \mathcal{B})$ --- przestrzeń mierzalna, gdzie $S \subseteq \Omega$ oraz
+$\mathcal{B} \subseteq \mathcal{F}$ \ (np. $(\R, \mathcal{B}(\R))$, $(\N, 2^{\N})$).
+
+$X \colon (\Omega, \mathcal{F}) \to (S, \mathcal{B})$ --- zmienna losowa.
+
+$T$ --- zbiór indeksów, $T \neq \emptyset$.
+
+Jeżeli $\forall_{t \in T}\ X_t \colon (\Omega, \mathcal{F}) \to (S, \mathcal{B})$,
+to $(X_t)_{t \in T}$ nazywamy \emph{procesem stochastycznym} określonym na
+$(\Omega, \mathcal{F}, \P)$, o wartościach w $(S, \mathcal{B})$.
+\end{definicja}
+
+\begin{przyklad}
+Niech $X_1, X_2, X_3, \ldots \overset{\text{iid}}{\sim} \mu$, gdzie $\mu$ jest
+rozkładem prawdopodobieństwa na $(\R, \mathcal{B}(\R))$, tzn.
+$\forall_{B \in \mathcal{B}(\R)}\ \mu(B) \in [0,1]$.
+
+Wtedy $(X_n)_{n \in \N}$ jest procesem stochastycznym --- głupim, bo wszystkie
+zmienne losowe są iid.
+\end{przyklad}
+
+\begin{obserwacja}
+$\forall_{k \in \N}\ \forall_{n_1, \ldots, n_k \in \N}\
+ \forall_{A_1, \ldots, A_k \in \mathcal{B}(\R)}$:
+\[
+  \P\big(X_{n_1} \in A_1, \ldots, X_{n_k} \in A_k\big)
+  = \prod_{i=1}^{k} \P\big(X_{n_i} \in A_i\big)
+  = \prod_{i=1}^{k} \mu(A_i).
+\]
+\end{obserwacja}
+
+\section*{Łańcuchy Markowa z czasem dyskretnym}
+
+\begin{definicja}[Warunek Markowa]
+Niech $T := \N_0 := \N \cup \{0\}$, $S$ --- zbiór stanów, co najwyżej
+przeliczalny, a $(X_n)_{n \in T}$ --- proces stochastyczny o wartościach w $S$.
+
+$\forall_{n \in \N}\ \forall_{i_0, i_1, \ldots, i_{n-1}, i, j \in S}$:
+\begin{align*}
+  \P\big(X_{n+1} &= j \mid X_0 = i_0, X_1 = i_1, \ldots, X_{n-1} = i_{n-1}, X_n = i\big) \\
+  &= \P\big(X_{n+1} = j \mid X_n = i\big),
+\end{align*}
+gdzie prawa strona to prawdopodobieństwo przejścia w jednym kroku z $i$ do $j$.
+Powyższą równość nazywamy \emph{warunkiem Markowa}.
+\end{definicja}
+
+\begin{definicja}[Jednorodność łańcucha Markowa]
+Łańcuch Markowa jest \emph{jednorodny}, jeśli
+\[
+  \exists_{p \colon S^2 \to [0,1]}\ \ \forall_{\substack{n \in \N \\ i,j \in S}}\
+  \P\big(X_{n+1} = j \mid X_n = i\big) = p(i,j).
+\]
+\end{definicja}
+
+\begin{definicja}[Macierz przejścia i macierz stochastyczna]
+$P := \big[p(i,j)\big]_{i,j \in S}$ --- \emph{macierz przejścia}.
+
+$P$ jest macierzą \emph{stochastyczną}, tzn.
+\begin{enumerate}[label=\arabic*)]
+  \item $\forall_{i,j}\ P_{i,j} \in [0,1]$,
+  \item $\forall_{i \in S}\ \sum_{j \in S} P_{i,j} = 1$.
+\end{enumerate}
+\end{definicja}
+
+\begin{definicja}[Macierz przejścia w $k$ krokach]
+\[
+  \forall_{k \in \N}\ \exists_{p_k \colon S^2 \to [0,1]}\ \colon\
+  \forall_{\substack{n \in \N \\ i,j \in S}}\
+  \P\big(X_{n+k} = j \mid X_n = i\big) = p_k(i,j).
+\]
+Wtedy $P(k) := \big[p_k(i,j)\big]_{i,j \in S}$ --- \emph{macierz przejścia w $k$
+krokach}. Wtedy $P(0) = I$.
+\end{definicja}
+
+\begin{stwierdzenie}[Równanie Chapmana--Kołmogorowa]
+\[
+  \forall_{\substack{i,j \in S \\ m,n \in \N}}\quad
+  p_{m+n}(i,j) = \sum_{k \in S} p_n(i,k) \cdot p_m(k,j).
+\]
+\end{stwierdzenie}
+
+\begin{proof}
+Korzystając z jednorodności:
+\begin{align*}
+  p_{n+m}(i,j)
+  &= \P\big(X_{n+m} = j \mid X_0 = i\big)
+   = \frac{\P\big(X_{n+m} = j,\ X_0 = i\big)}{\P\big(X_0 = i\big)} \\[2mm]
+  &= \frac{\sum\limits_{k \in S} \P\big(X_{n+m} = j,\ X_n = k,\ X_0 = i\big)}
+          {\P\big(X_0 = i\big)} \\[2mm]
+  &= \frac{\sum\limits_{k \in S}
+      \P\big(X_{n+m} = j \mid X_n = k, \cancel{X_0 = i}\big) \cdot
+      \P\big(X_n = k \mid X_0 = i\big) \cdot \cancel{\P\big(X_0 = i\big)}}
+          {\cancel{\P\big(X_0 = i\big)}} \\[2mm]
+  &= \sum_{k \in S} p_m(k,j) \cdot p_n(i,k),
+\end{align*}
+gdzie skreślenie warunku $X_0 = i$ wynika z $(*)$.
+\end{proof}
+
+\begin{wniosek}
+\[
+  P(n+m) = P(n) \cdot P(m) \implies P(k) = P^k.
+\]
+\end{wniosek}
+
+\paragraph{$(*)$} Warunek Markowa jest równoważny temu, że
+\[
+  \forall_{n \in \N}\ \forall_{k \in \{1,2,\ldots,n\} =: [n]}\
+  \forall_{0 \leq n_1 < n_2 < \ldots < n_k \leq n}\
+  \forall_{x_{n_1}, \ldots, x_{n_k}, x_{n+1} \in S}
+\]
+\[
+  \P\big(X_{n+1} = x_{n+1} \mid X_{n_1} = x_{n_1}, \ldots, X_{n_k} = x_{n_k}\big)
+  = \P\big(X_{n+1} = x_{n+1} \mid X_{n_k} = x_{n_k}\big).
+\]
+
+\begin{definicja}[Rozkład początkowy]
+\[
+  \alpha := \big[\P(X_0 = i)\big]_{i \in S}
+\]
+--- wektor prawdopodobieństwa, \textbf{wierszowy!}
+\end{definicja}
+
+\end{document}

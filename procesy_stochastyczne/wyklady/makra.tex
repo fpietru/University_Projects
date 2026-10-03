@@ -1,0 +1,90 @@
+\usepackage[margin=1cm,a5paper]{geometry}
+
+\usepackage{bold-extra}
+\usepackage{polski}
+\usepackage{iwona}
+\usepackage[OT4]{fontenc}
+
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{pgf,tikz}
+\usepackage{hyperref}
+
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\renewcommand\leq\leqslant
+\renewcommand\geq\geqslant
+
+\colorlet{maincolor}{ForestGreen}
+\usepackage[most]{tcolorbox}
+\usepackage{varwidth}
+
+\newtcolorbox{tresc}[3][]{enhanced, sharp corners, boxrule=0mm, colback=maincolor!10,
+colframe=black,toptitle=1mm,fonttitle=\bfseries,
+colbacktitle=maincolor!25, coltitle=black,
+title={Zadanie #2\hfill{\it Opracowanie: #3}},#1}
+
+\newenvironment{problem}[3]{\newpage\begin{tresc}{#1}{#2}{#3}}{\end{tresc}}
+
+% Dodatkowe makra
+
+\usepackage{multicol}
+\usepackage{cancel}
+
+\def\N{\mathbb{N}}
+\def\P{\mathbb{P}}
+\def\E{\mathbb{E}}
+\def\Z{\mathbb{Z}}
+\def\Q{\mathbb{Q}}
+\def\R{\mathbb{R}}
+
+\def\nwd{\mathrm{NWD}}
+
+\newtheorem*{lemat}{Lemat}
+
+\usepackage{enumitem}
+\setlist[enumerate,1]{label={(\alph*)},topsep=0pt}
+
+% ------------------------------------------------------------------
+% Kolorowe boxy: definicje (zielone), twierdzenia/obserwacje/wnioski (niebieskie)
+% ------------------------------------------------------------------
+
+\colorlet{defcolor}{ForestGreen}
+\colorlet{thmcolor}{RoyalBlue}
+
+\newcounter{defcnt}
+\newcounter{thmcnt}
+
+% wspólny styl boxa
+\tcbset{notatkibox/.style={enhanced, sharp corners, boxrule=0mm, frame hidden,
+  toptitle=0.5mm, bottomtitle=0.5mm, left=2mm, right=2mm, top=1.5mm, bottom=1.5mm,
+  fonttitle=\bfseries, coltitle=black, breakable, before skip=6pt, after skip=6pt}}
+
+% \begin{definicja}[nazwa]
+\NewDocumentEnvironment{definicja}{o}{%
+  \refstepcounter{defcnt}%
+  \begin{tcolorbox}[notatkibox, colback=defcolor!8, colframe=defcolor!25,
+    colbacktitle=defcolor!25,
+    title={Definicja \thedefcnt\IfValueT{#1}{\ (#1)}}]%
+}{\end{tcolorbox}}
+
+% generator środowisk niebieskich: #1 = nazwa środowiska, #2 = etykieta
+\newcommand{\newthmbox}[2]{%
+  \NewDocumentEnvironment{#1}{o}{%
+    \refstepcounter{thmcnt}%
+    \begin{tcolorbox}[notatkibox, colback=thmcolor!8, colframe=thmcolor!25,
+      colbacktitle=thmcolor!25,
+      title={#2 \thethmcnt\IfValueT{##1}{\ (##1)}}]%
+  }{\end{tcolorbox}}%
+}
+
+\newthmbox{twierdzenie}{Twierdzenie}
+\newthmbox{obserwacja}{Obserwacja}
+\newthmbox{wniosek}{Wniosek}
+\newthmbox{stwierdzenie}{Stwierdzenie}
+
+% przykład -- bez boxa, wyróżniony nagłówkiem
+\theoremstyle{definition}
+\newtheorem*{przyklad}{Przykład}
+
+\renewcommand{\qedsymbol}{$\square$}
