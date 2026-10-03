@@ -31,7 +31,7 @@ $X \colon (\Omega, \mathcal{F}) \to (S, \mathcal{B})$ --- zmienna losowa.
 
 $T$ --- zbiór indeksów, $T \neq \emptyset$.
 
-Jeżeli $\forall_{t \in T}\ X_t \colon (\Omega, \mathcal{F}) \to (S, \mathcal{B})$,
+Jeżeli $\forall t \in T\ X_t \colon (\Omega, \mathcal{F}) \to (S, \mathcal{B})$,
 to $(X_t)_{t \in T}$ nazywamy \emph{procesem stochastycznym} określonym na
 $(\Omega, \mathcal{F}, \P)$, o wartościach w $(S, \mathcal{B})$.
 \end{definicja}
@@ -39,29 +39,28 @@ $(\Omega, \mathcal{F}, \P)$, o wartościach w $(S, \mathcal{B})$.
 \begin{przyklad}
 Niech $X_1, X_2, X_3, \ldots \overset{\text{iid}}{\sim} \mu$, gdzie $\mu$ jest
 rozkładem prawdopodobieństwa na $(\R, \mathcal{B}(\R))$, tzn.
-$\forall_{B \in \mathcal{B}(\R)}\ \mu(B) \in [0,1]$.
+$\forall B \in \mathcal{B}(\R)\ \ \mu(B) \in [0,1]$.
 
 Wtedy $(X_n)_{n \in \N}$ jest procesem stochastycznym --- głupim, bo wszystkie
-zmienne losowe są iid.
-\end{przyklad}
+zmienne losowe są iid, a zatem zachodzi:
 
-\begin{obserwacja}
-$\forall_{k \in \N}\ \forall_{n_1, \ldots, n_k \in \N}\
- \forall_{A_1, \ldots, A_k \in \mathcal{B}(\R)}$:
+$\forall k \in \N\ \forall n_1, \ldots, n_k \in \N\
+ \forall A_1, \ldots, A_k \in \mathcal{B}(\R)$:
 \[
   \P\big(X_{n_1} \in A_1, \ldots, X_{n_k} \in A_k\big)
   = \prod_{i=1}^{k} \P\big(X_{n_i} \in A_i\big)
   = \prod_{i=1}^{k} \mu(A_i).
 \]
-\end{obserwacja}
+\end{przyklad}
 
 \section*{Łańcuchy Markowa z czasem dyskretnym}
 
 \begin{definicja}[Warunek Markowa]
-Niech $T := \N_0 := \N \cup \{0\}$, $S$ --- zbiór stanów, co najwyżej
+Niech $T = \N_0 := \N \cup \{0\}$, $S$ --- zbiór stanów, co najwyżej
 przeliczalny, a $(X_n)_{n \in T}$ --- proces stochastyczny o wartościach w $S$.
+Wtedy
 
-$\forall_{n \in \N}\ \forall_{i_0, i_1, \ldots, i_{n-1}, i, j \in S}$:
+$\forall n \in \N\ \ \forall i_0, i_1, \ldots, i_{n-1}, i, j \in S$:
 \begin{align*}
   \P\big(X_{n+1} &= j \mid X_0 = i_0, X_1 = i_1, \ldots, X_{n-1} = i_{n-1}, X_n = i\big) \\
   &= \P\big(X_{n+1} = j \mid X_n = i\big),
@@ -73,7 +72,7 @@ Powyższą równość nazywamy \emph{warunkiem Markowa}.
 \begin{definicja}[Jednorodność łańcucha Markowa]
 Łańcuch Markowa jest \emph{jednorodny}, jeśli
 \[
-  \exists_{p \colon S^2 \to [0,1]}\ \ \forall_{\substack{n \in \N \\ i,j \in S}}\
+  \exists p \colon S^2 \to [0,1] \ \colon\ \ \forall n \in \N\ \ \forall i,j \in S\ \ \
   \P\big(X_{n+1} = j \mid X_n = i\big) = p(i,j).
 \]
 \end{definicja}
@@ -83,24 +82,25 @@ $P := \big[p(i,j)\big]_{i,j \in S}$ --- \emph{macierz przejścia}.
 
 $P$ jest macierzą \emph{stochastyczną}, tzn.
 \begin{enumerate}[label=\arabic*)]
-  \item $\forall_{i,j}\ P_{i,j} \in [0,1]$,
-  \item $\forall_{i \in S}\ \sum_{j \in S} P_{i,j} = 1$.
+  \item $\forall i,j\ P_{i,j} \in [0,1]$,
+  \item $\forall i \in S\ \sum_{j \in S} P_{i,j} = 1$ \text{(Czyli każdy wiersz
+  sumuje się do 1)}.
 \end{enumerate}
 \end{definicja}
 
 \begin{definicja}[Macierz przejścia w $k$ krokach]
-\[
-  \forall_{k \in \N}\ \exists_{p_k \colon S^2 \to [0,1]}\ \colon\
-  \forall_{\substack{n \in \N \\ i,j \in S}}\
+\begin{gather*}
+  \forall k \in \N\ \ \exists p_k \colon S^2 \to [0,1]\ \colon\ \
+  \forall n \in \N\ \ \forall i,j \in S \\
   \P\big(X_{n+k} = j \mid X_n = i\big) = p_k(i,j).
-\]
+\end{gather*}
 Wtedy $P(k) := \big[p_k(i,j)\big]_{i,j \in S}$ --- \emph{macierz przejścia w $k$
-krokach}. Wtedy $P(0) = I$.
+krokach}. Dodatkowo zakładamy, że $P(0) = I$.
 \end{definicja}
 
-\begin{stwierdzenie}[Równanie Chapmana--Kołmogorowa]
+\begin{stwierdzenie}[Równania Chapmana--Kołmogorowa]
 \[
-  \forall_{\substack{i,j \in S \\ m,n \in \N}}\quad
+  \forall i,j \in S\ \ \forall m,n \in \N\quad
   p_{m+n}(i,j) = \sum_{k \in S} p_n(i,k) \cdot p_m(k,j).
 \]
 \end{stwierdzenie}
@@ -119,7 +119,7 @@ Korzystając z jednorodności:
           {\cancel{\P\big(X_0 = i\big)}} \\[2mm]
   &= \sum_{k \in S} p_m(k,j) \cdot p_n(i,k),
 \end{align*}
-gdzie skreślenie warunku $X_0 = i$ wynika z $(*)$.
+gdzie skreślenie warunku $X_0 = i$ wewnątrz $\P$ wynika z $(*)$.
 \end{proof}
 
 \begin{wniosek}
@@ -129,15 +129,15 @@ gdzie skreślenie warunku $X_0 = i$ wynika z $(*)$.
 \end{wniosek}
 
 \paragraph{$(*)$} Warunek Markowa jest równoważny temu, że
-\[
-  \forall_{n \in \N}\ \forall_{k \in \{1,2,\ldots,n\} =: [n]}\
-  \forall_{0 \leq n_1 < n_2 < \ldots < n_k \leq n}\
-  \forall_{x_{n_1}, \ldots, x_{n_k}, x_{n+1} \in S}
-\]
-\[
+\begin{gather*}
+  \forall n \in \N\ \ \forall k \in \{1,2,\ldots,n\} =: [n]\ \
+  \forall\, 0 \leq n_1 < n_2 < \ldots < n_k \leq n \\
+  \forall x_{n_1}, \ldots, x_{n_k}, x_{n+1} \in S \\
   \P\big(X_{n+1} = x_{n+1} \mid X_{n_1} = x_{n_1}, \ldots, X_{n_k} = x_{n_k}\big)
   = \P\big(X_{n+1} = x_{n+1} \mid X_{n_k} = x_{n_k}\big).
-\]
+\end{gather*}
+Czyli możemy zapomnieć o wszystkich chwilach z przeszłości, z wyjątkiem tej
+ostatniej.
 
 \begin{definicja}[Rozkład początkowy]
 \[
