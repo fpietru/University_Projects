@@ -30,6 +30,9 @@ title={Zadanie #2\hfill{\it Opracowanie: #3}},#1}
 
 \usepackage{multicol}
 \usepackage{cancel}
+\usepackage{bbm}
+
+\def\ind{\mathbbm{1}}
 
 \def\N{\mathbb{N}}
 \def\P{\mathbb{P}}
@@ -82,6 +85,15 @@ title={Zadanie #2\hfill{\it Opracowanie: #3}},#1}
 \newthmbox{obserwacja}{Obserwacja}
 \newthmbox{wniosek}{Wniosek}
 \newthmbox{stwierdzenie}{Stwierdzenie}
+
+% treść zadania -- żółty box, \begin{zadanie}{1.1}
+\colorlet{zadcolor}{Dandelion}
+
+\NewDocumentEnvironment{zadanie}{m}{%
+  \begin{tcolorbox}[notatkibox, colback=zadcolor!15, colframe=zadcolor!40,
+    colbacktitle=zadcolor!40,
+    title={Zadanie #1}]%
+}{\end{tcolorbox}}
 
 % przykład -- bez boxa, wyróżniony nagłówkiem
 \theoremstyle{definition}

@@ -1,0 +1,436 @@
+\documentclass[dvipsnames]{book}
+
+\input{../makra.tex}
+
+\begin{document}
+
+\begin{center}
+  {\Large\bfseries Ćwiczenia 1 --- 2026-10-03}
+\end{center}
+
+\section*{Sprawy organizacyjne}
+
+\begin{itemize}[topsep=0pt,itemsep=0pt]
+  \item email: \texttt{kacper.kurowski.dokt@pw.edu.pl},
+  \item aktywność: $0$--$5$ ptk.,
+  \item kartkówki: $0$--$10$ ptk.,
+  \item kolokwium: $0$--$30$ ptk.,
+  \item egz. pisemny: $0$--$50$ ptk.,
+  \item egz. ustny.
+\end{itemize}
+
+Aby przystąpić do egz. ustnego trzeba mieć:
+\begin{enumerate}[label=\arabic*)]
+  \item $\geq 25$ ptk. z egz. pisemnego \textbf{oraz}
+  \item $\geq 40$ ptk. z całości cz. ćwiczeniowej.
+\end{enumerate}
+
+Dopuszczalna $1$ nieusprawiedliwiona nieobecność oraz $3$ usprawiedliwione
+nieobecności.
+
+\hrulefill
+
+\begin{zadanie}{1.1}
+Rzucamy wielokrotnie zwyczajną kostką do gry. Które z poniższych ciągów
+zmiennych losowych są łańcuchami Markowa? Dla tych, które nimi są, wyznaczyć
+macierze prawdopodobieństw przejścia.
+\begin{enumerate}
+  \item Największa liczba $X_n$ uzyskana w pierwszych $n$ rzutach,
+  \item Liczba $N_n$ szóstek uzyskana w pierwszych $n$ rzutach.
+\end{enumerate}
+\end{zadanie}
+
+\paragraph{(a)} Niech $A_n$ --- liczba uzyskana w $n$-tym rzucie; $A_1, A_2,
+\ldots$ są iid o rozkładzie jednostajnym na $S = \{1, \ldots, 6\}$. Przyjmujemy
+$X_0 := 1$ (bo $\max$ po zbiorze pustym nie jest określony). Wtedy
+\[
+  X_n = \max\big(A_1, A_2, \ldots, A_n\big) = \max\big(A_n,\, X_{n-1}\big),
+\]
+czyli $X_{n+1} = \max(A_{n+1}, X_n)$ --- nowy stan zależy od starego stanu i od
+jednego świeżego rzutu. Ustalmy $x_0, \ldots, x_{n+1} \in S$ i oznaczmy
+\[
+  C := \{X_n = x_n,\ X_{n-1} = x_{n-1},\ \ldots,\ X_0 = x_0\}.
+\]
+Liczymy:
+\begin{align*}
+  \P\big(X_{n+1} = x_{n+1} \mid C\big)
+  &\overset{(1)}{=} \P\big(\max(A_{n+1},\, X_n) = x_{n+1} \mid C\big) \\[1mm]
+  &\overset{(2)}{=} \P\big(\max(A_{n+1},\, x_n) = x_{n+1} \mid C\big) \\[1mm]
+  &\overset{(3)}{=} \P\big(\max(A_{n+1},\, x_n) = x_{n+1}\big) \\[1mm]
+  &\overset{(3')}{=} \P\big(\max(A_{n+1},\, x_n) = x_{n+1} \mid X_n = x_n\big) \\[1mm]
+  &\overset{(2')}{=} \P\big(X_{n+1} = x_{n+1} \mid X_n = x_n\big).
+\end{align*}
+
+Uzasadnienia poszczególnych kroków:
+\begin{description}[topsep=2pt,itemsep=1pt,leftmargin=10mm]
+  \item[(1)] Definicja $X_{n+1}$.
+
+  \item[(2)] \emph{Podstawienie $X_n \to x_n$.} Po podstawieniu zdarzenie pod $\P$ należy już do
+  $\sigma(A_{n+1})$ --- nie zależy od historii.
+
+  \item[(3)] \emph{Właściwy krok.} Skoro
+  $\{\max(A_{n+1}, x_n) = x_{n+1}\} \in \sigma(A_{n+1})$, a rzuty są niezależne,
+  to $A_{n+1}$ jest niezależne od
+  $\sigma(A_1, \ldots, A_n) \supseteq \sigma(X_0, \ldots, X_n) \ni C$.
+  Warunkowanie przez $C$ niczego więc nie zmienia.
+
+  \item[(3$'$), (2$'$)] Te same dwa kroki wykonane w drugą stronę, dla samego
+  warunku $\{X_n = x_n\}$.
+\end{description}
+
+Warunek Markowa jest zatem spełniony. Wyznaczmy macierz przejścia. Ustalmy
+$X_n = i$; wtedy $X_{n+1} = \max(A_{n+1}, i)$, więc:
+\begin{itemize}[topsep=2pt,itemsep=1pt]
+  \item $j < i$: niemożliwe, bo $X_n$ jest niemalejący, czyli $p(i,j) = 0$;
+  \item $j = i$: zachodzi dokładnie gdy $A_{n+1} \leq i$, czyli
+  $p(i,i) = \tfrac{i}{6}$;
+  \item $j > i$: zachodzi dokładnie gdy $A_{n+1} = j$, czyli
+  $p(i,j) = \tfrac{1}{6}$.
+\end{itemize}
+Ostatecznie
+\[
+  p(i,j) =
+  \begin{cases}
+    \tfrac{1}{6} & \colon j > i, \\[1mm]
+    \tfrac{i}{6} & \colon i = j, \\[1mm]
+    0            & \colon j < i,
+  \end{cases}
+  \qquad
+  P = \big[p(i,j)\big]_{i,j \in \{1,\ldots,6\}}.
+\]
+Sprawdzenie stochastyczności: $\sum_{j > i} \tfrac{1}{6} + \tfrac{i}{6}
+= \tfrac{6-i}{6} + \tfrac{i}{6} = 1$. \checkmark
+
+\paragraph{(b)} Tutaj schemat jest identyczny --- zmienia się tylko funkcja
+wiążąca nowy stan ze starym:
+\[
+  \begin{cases}
+    N_n = N_{n-1} + \ind_{\{A_n = 6\}}, \\
+    N_0 = 0.
+  \end{cases}
+\]
+Oznaczmy $D := \{N_{n-1} = i_{n-1},\ \ldots,\ N_0 = i_0\}$. Wtedy
+\begin{align*}
+  \P\big(N_n = i_n \mid D\big)
+  &\overset{(1)}{=} \P\big(N_{n-1} + \ind_{\{A_n = 6\}} = i_n \mid D\big) \\[1mm]
+  &\overset{(2)}{=} \P\big(i_{n-1} + \ind_{\{A_n = 6\}} = i_n \mid D\big) \\[1mm]
+  &\overset{(3)}{=} \P\big(i_{n-1} + \ind_{\{A_n = 6\}} = i_n\big) \\[1mm]
+  &\overset{(3')}{=} \P\big(i_{n-1} + \ind_{\{A_n = 6\}} = i_n \mid N_{n-1} = i_{n-1}\big) \\[1mm]
+  &\overset{(2')}{=} \P\big(N_n = i_n \mid N_{n-1} = i_{n-1}\big),
+\end{align*}
+gdzie uzasadnienia kroków $(1)$--$(3')$ są dokładnie te same co w (a): $(2)$ to
+podstawienie $N_{n-1} \to i_{n-1}$, a
+$(3)$ korzysta z tego, że $\ind_{\{A_n = 6\}} \in \sigma(A_n)$, zaś $A_n$ jest
+niezależne od $\sigma(A_1, \ldots, A_{n-1}) \supseteq \sigma(N_0, \ldots, N_{n-1})$.
+
+Czyli $(N_n)_n$ też jest łańcuchem Markowa. Macierz przejścia: ze stanu $i$
+albo wyrzucamy szóstkę (prawdopodobieństwo $\tfrac16$) i przechodzimy do $i+1$,
+albo nie (prawdopodobieństwo $\tfrac56$) i zostajemy w $i$:
+\[
+  p(i,j) =
+  \begin{cases}
+    \tfrac{1}{6} & \colon j = i+1, \\[1mm]
+    \tfrac{5}{6} & \colon i = j, \\[1mm]
+    0            & \colon \text{wpp},
+  \end{cases}
+  \qquad
+  P = \big[p(i,j)\big]_{i,j \in \N}.
+\]
+
+\begin{zadanie}{1.2}
+Niech $(\xi_n)_n$ będzie ciągiem niezależnych zmiennych losowych o jednakowym
+rozkładzie zadanym funkcją prawdopodobieństwa
+\[
+  p(k) = \P(\xi_0 = k), \quad k \in \Z.
+\]
+Niech $X_0$ będzie zmienną losową przyjmującą wartości w zbiorze
+$S = \{1, 2, \ldots, N\}$, niezależną od ciągu $(\xi_n)_n$ oraz niech $f$ będzie
+pewną funkcją $f \colon S \times \Z \to S$. Zdefiniujmy ciąg zmiennych losowych
+$X_1, X_2, \ldots$:
+\[
+  X_{n+1} = f(X_n, \xi_n), \quad n = 0, 1, 2, \ldots
+\]
+Pokazać, że ciąg $(X_n)_n$ jest łańcuchem Markowa.
+\end{zadanie}
+
+\begin{proof}
+Podstawiamy $X_{n+1} = f(X_n, \xi_n)$:
+\begin{align*}
+  \P\big(X_{n+1} &= i_{n+1} \mid X_n = i_n, \ldots, X_0 = i_0\big) \\
+  &= \P\big(f(X_n, \xi_n) = i_{n+1} \mid X_n = i_n, \ldots, X_0 = i_0\big) \\
+  &= \P\big(f(i_n, \xi_n) = i_{n+1} \mid X_n = i_n, \ldots, X_0 = i_0\big) \\
+  &= \P\big(f(i_n, \xi_n) = i_{n+1} \mid X_n = i_n\big)
+   = \P\big(X_{n+1} = i_{n+1} \mid X_n = i_n\big),
+\end{align*}
+bo wyrażenie $f(i_n, \xi_n)$ nie mówi nic o $X_{n-1}, X_{n-2}, \ldots, X_0$
+(zmienna $\xi_n$ jest niezależna od $X_0$, a więc i od $X_1, \ldots, X_n$),
+więc możemy się ich pozbyć. Warunek Markowa jest zatem spełniony.
+\end{proof}
+
+\begin{zadanie}{1.3}
+Rozważmy łańcuch Markowa o przestrzeni stanów $S = \{0,1,2\}$, jednostajnym
+(na $S$) rozkładzie początkowym i macierzy przejścia
+\[
+  \mathbf{P} =
+  \begin{bmatrix}
+    0           & \tfrac{1}{2} & \tfrac{1}{2} \\[1mm]
+    \tfrac{1}{2} & \tfrac{1}{2} & 0 \\[1mm]
+    1           & 0            & 0
+  \end{bmatrix}
+\]
+oraz funkcję $f$ taką, że $f(0) = 0$, a $f(1) = f(2) = 1$. Czy $(f(X_n))_n$ jest
+łańcuchem Markowa?
+\end{zadanie}
+
+\textbf{Nie.} Kluczowa obserwacja: przejście ze stanu $2$ do $0$ jest
+\emph{prawie na pewno} (trzeci wiersz macierzy $\mathbf{P}$ to $[1,0,0]$).
+
+Policzmy dwa prawdopodobieństwa, które gdyby $(f(X_n))_n$ było łańcuchem
+Markowa musiałyby być równe.
+
+\paragraph{Pierwsze.} Warunek $f(X_1) = 1$ oznacza $X_1 \in \{1,2\}$, a
+$f(X_0) = 1$ oznacza $X_0 \in \{1,2\}$. Gdyby $X_0 = 2$, to $X_1 = 0$ p.n., co
+jest sprzeczne z $X_1 \in \{1,2\}$; zatem $X_0 = 1$. Ze stanu $1$ idziemy do
+$0$ lub do $1$, więc $X_1 = 1$. Stąd
+\begin{align*}
+  \P\big(f(X_2) = 0 \mid f(X_1) = 1,\ f(X_0) = 1\big)
+  &= \P\big(X_2 = 0 \mid X_1 = 1,\ X_0 = 1\big) \\
+  &= \P\big(X_2 = 0 \mid X_1 = 1\big) = \tfrac{1}{2}.
+\end{align*}
+
+\paragraph{Drugie.} Teraz $X_0 = 0$ i $X_1 \in \{1,2\}$, przy czym
+$\P\big(X_1 \in \{1,2\} \mid X_0 = 0\big) = 1$. Zatem
+\begin{align*}
+  \P\big(f(X_2) &= 0 \mid f(X_1) = 1,\ f(X_0) = 0\big)
+  = \P\big(X_2 = 0 \mid X_1 \in \{1,2\},\ X_0 = 0\big) \\[1mm]
+  &= \frac{\begin{aligned}
+             &\P\big(X_2 = 0 \mid X_1 = 1\big)\P\big(X_1 = 1 \mid X_0 = 0\big) \\
+             + &\P\big(X_2 = 0 \mid X_1 = 2\big)\P\big(X_1 = 2 \mid X_0 = 0\big)
+           \end{aligned}}
+          {\P\big(X_1 \in \{1,2\} \mid X_0 = 0\big)} \\[1mm]
+  &= \tfrac{1}{2} \cdot \tfrac{1}{2} + 1 \cdot \tfrac{1}{2} = \tfrac{3}{4}.
+\end{align*}
+
+Ponieważ $\tfrac{1}{2} \neq \tfrac{3}{4}$, warunek Markowa nie jest spełniony
+--- $(f(X_n))_n$ \textbf{nie} jest łańcuchem Markowa.
+
+\begin{zadanie}{1.4}
+Rozważmy jednorodny łańcuch Markowa o zbiorze stanów $S = \{0,1,2\}$, macierzy
+prawdopodobieństw przejścia w jednym kroku
+\[
+  \mathbf{P} =
+  \begin{bmatrix}
+    0.1 & 0.2 & 0.7 \\
+    0.9 & 0.1 & 0 \\
+    0.1 & 0.8 & 0.1
+  \end{bmatrix}
+\]
+oraz wektorze prawdopodobieństw początkowych $(0.3, 0.4, 0.3)$. Obliczyć:
+\begin{multicols}{2}
+\begin{enumerate}
+  \item $\P(X_3 = 1 \mid X_2 = 0)$,
+  \item $\P(X_0 = 0, X_1 = 1, X_2 = 2)$,
+  \item $\P(X_1 = 1, X_2 = 1 \mid X_0 = 2)$,
+  \item $\P(X_1 = 2)$,
+  \item $\P(X_0 = 0 \mid X_1 = 2)$,
+  \item $\E X_1$.
+\end{enumerate}
+\end{multicols}
+\end{zadanie}
+
+\paragraph{(a)}
+\[
+  \P\big(X_3 = 1 \mid X_2 = 0\big) = \frac{2}{10}.
+\]
+
+\paragraph{(b)}
+\begin{align*}
+  \P\big(X_0 = 0, X_1 = 1, X_2 = 2\big)
+  &= \underbrace{\P\big(X_2 = 2 \mid X_1 = 1\big)}_{= 0} \cdot
+     \P\big(X_1 = 1 \mid X_0 = 0\big) \cdot \P\big(X_0 = 0\big) \\
+  &= 0.
+\end{align*}
+
+\paragraph{(c)} Licznik rozkładamy łańcuchowo, po czym korzystamy z warunku
+Markowa (skreślenie warunku $X_0 = 2$) --- czynnik $\P(X_0 = 2)$ się skraca:
+\begin{align*}
+  \P\big(X_1 = 1, X_2 = 1 \mid X_0 = 2\big)
+  &= \frac{\P\big(X_2 = 1,\ X_1 = 1,\ X_0 = 2\big)}{\P\big(X_0 = 2\big)} \\[2mm]
+  &\hspace{-16mm} = \frac{\P\big(X_2 = 1 \mid X_1 = 1\big) \cdot
+                          \P\big(X_1 = 1 \mid X_0 = 2\big) \cdot
+                          \cancel{\P\big(X_0 = 2\big)}}
+                         {\cancel{\P\big(X_0 = 2\big)}} \\[2mm]
+  &= \P\big(X_2 = 1 \mid X_1 = 1\big) \cdot \P\big(X_1 = 1 \mid X_0 = 2\big) \\[1mm]
+  &= \frac{1}{10} \cdot \frac{8}{10} = \frac{8}{100} = \frac{2}{25}.
+\end{align*}
+
+\paragraph{(d)}
+\[
+  \P\big(X_1 = 2\big)
+  = \sum_{k=0}^{2} \P\big(X_1 = 2 \mid X_0 = k\big) \cdot \P\big(X_0 = k\big)
+  = \frac{24}{100}.
+\]
+
+\paragraph{(e)}
+\[
+  \P\big(X_0 = 0 \mid X_1 = 2\big)
+  = \frac{\P\big(X_1 = 2 \mid X_0 = 0\big) \cdot \P\big(X_0 = 0\big)}
+         {\P\big(X_1 = 2\big)}
+  = \frac{\frac{7}{10} \cdot \frac{3}{10}}{\frac{24}{100}}
+  = \frac{\frac{21}{100}}{\frac{24}{100}}
+  = \frac{21}{24}.
+\]
+
+\paragraph{(f)}
+\[
+  \E X_1 = \sum_{k=0}^{2} \P\big(X_1 = k\big) \cdot k
+  = 0 + 1 \cdot \frac{34}{100} + 2 \cdot \frac{24}{100} = \frac{82}{100}.
+\]
+
+\begin{zadanie}{1.5}
+Niech $(X_n)_n$ będzie ciągiem niezależnych zmiennych losowych o wartościach w
+co najwyżej przeliczalnej przestrzeni stanów $S$. Udowodnić, że $(X_n)_n$ jest
+łańcuchem Markowa. Przy jakim założeniu jest on jednorodny?
+\end{zadanie}
+
+\begin{proof}
+Niech $n \in \N$ oraz $s_0, s_1, \ldots, s_n \in S$. Z niezależności
+\begin{align*}
+  \P\big(X_n = s_n \mid X_{n-1} &= s_{n-1}, \ldots, X_1 = s_1, X_0 = s_0\big) \\
+  &\overset{\text{niezal.}}{=} \P\big(X_n = s_n\big) \\
+  &\overset{\text{niezal.}}{=} \P\big(X_n = s_n \mid X_{n-1} = s_{n-1}\big),
+\end{align*}
+czyli warunek Markowa zachodzi.
+
+Jednorodność oznacza, że
+\[
+  \P\big(X_n = s_n \mid X_{n-1} = s_{n-1}\big) = \P\big(X_1 = s_n \mid X_0 = s_{n-1}\big),
+\]
+co --- wobec powyższego --- jest równoważne temu, że
+\[
+  \P\big(X_n = s_n\big) = \P\big(X_1 = s_n\big) \quad \forall n \in \N,
+\]
+czyli że wszystkie $X_n$ mają ten sam rozkład. Mamy więc jednorodność
+$\iff (X_n)_{n \in \N}$ są iid.
+\end{proof}
+
+\begin{zadanie}{1.6}
+Pokazać, że jeśli $(X_n)_n$ jest jednorodnym łańcuchem Markowa o macierzy
+przejścia $\mathbf{P}$, której każdy wiersz jest taki sam, to:
+\begin{enumerate}
+  \item $\mathbf{P}(n) = \mathbf{P}$ dla dowolnego $n \in \N$,
+  \item $\P(X_n = s) = \P(X_1 = s \mid X_0 = s_0)$ dla dowolnych $s, s_0 \in S$,
+  \item $X_0, X_1, X_2, \ldots$ są niezależne.
+\end{enumerate}
+\end{zadanie}
+
+\paragraph{(a)} Indukcja po $n$.
+
+Dla $n = 1$: $P(1) = P$.
+
+Dla $n = 2$: $P(2) = P^2 = \big[p_{i,j}(2)\big]_{i,j \in S}$, gdzie --- korzystając
+z tego, że wszystkie wiersze są równe pierwszemu
+\[
+  p_{i,j}(2) = \sum_{s \in S} p_{i,s} \, p_{s,j}
+             = \sum_{s \in S} p_{1,s} \, p_{1,j}
+             = p_{1,j} \cdot \underbrace{\sum_{s \in S} p_{1,s}}_{= 1}
+             = p_{i,j},
+\]
+więc $P(2) = P$.
+
+Krok indukcyjny ($n > 2$): załóżmy, że dla $n \geq 2$ zachodzi $P(n) = P$. Wtedy
+\[
+  P^{n+1} = \big(P^n\big) \cdot P = P \cdot P = P^2 = P.
+\]
+
+\paragraph{(b)}
+\begin{align*}
+  \P\big(X_n = s\big)
+  &= \sum_{s_0 \in S} \P\big(X_n = s \mid X_0 = s_0\big) \cdot \P\big(X_0 = s_0\big) \\
+  &\overset{\text{(a)}}{=} \sum_{s_0 \in S} \P\big(X_1 = s \mid X_0 = s_0\big) \cdot \P\big(X_0 = s_0\big)
+   = \P\big(X_1 = s \mid X_0 = s_0\big),
+\end{align*}
+bo prawdopodobieństwo $\P\big(X_1 = s \mid X_0 = s_0\big)$ nie zależy od $s_0$
+(wszystkie wiersze $\mathbf{P}$ są takie same), a $\sum_{s_0 \in S} \P(X_0 = s_0) = 1$.
+
+\paragraph{(c)} Z warunku Markowa, jednorodności i punktu (b):
+\begin{align*}
+  \P\big(X_n = s_n,\ X_{n-1} &= s_{n-1},\ \ldots,\ X_0 = s_0\big) \\
+  &= \P\big(X_n = s_n \mid X_{n-1} = s_{n-1}\big) \cdot \ldots \\
+  &\qquad \cdot \P\big(X_1 = s_1 \mid X_0 = s_0\big) \cdot \P\big(X_0 = s_0\big) \\
+  &= \P\big(X_1 = s_n \mid X_0 = s_{n-1}\big) \cdot \ldots \\
+  &\qquad \cdot \P\big(X_1 = s_1 \mid X_0 = s_0\big) \cdot \P\big(X_0 = s_0\big) \\
+  &= \P\big(X_n = s_n\big) \cdot \ldots \cdot \P\big(X_1 = s_1\big) \cdot
+     \P\big(X_0 = s_0\big),
+\end{align*}
+czyli $X_0, X_1, X_2, \ldots$ są niezależne.
+
+\begin{zadanie}{1.7}
+Pokazać, że produkt dwóch macierzy stochastycznych jest macierzą stochastyczną.
+\end{zadanie}
+
+\begin{proof}
+Niech $A, B$ --- macierze stochastyczne.
+
+\textbf{Teza:} $P = A \cdot B$ jest macierzą stochastyczną.
+
+Po pierwsze,
+\[
+  p_{ij} = \sum_{k \in S} a_{ik} b_{kj} \geq 0 \qquad \forall i,j \in S,
+\]
+jako suma iloczynów liczb nieujemnych. Wtedy $\forall i \in S$:
+\[
+  \sum_{j \in S} p_{ij}
+  = \sum_{j \in S} \sum_{k \in S} a_{ik} b_{kj}
+  = \sum_{k \in S} a_{ik} \cdot \underbrace{\sum_{j \in S} b_{kj}}_{= 1}
+  = \underbrace{\sum_{k \in S} a_{ik}}_{= 1} = 1.
+\]
+(W szczególności $p_{ij} \in [0,1]$.)
+\end{proof}
+
+\begin{zadanie}{1.8}
+Niech $(X_n)_{n \geq 0}$ będzie łańcuchem Markowa na przestrzeni stanów
+$S = \{0,1\}$ o macierzy przejścia:
+\[
+  \mathbf{P} =
+  \begin{pmatrix}
+    1-a & a \\
+    b   & 1-b
+  \end{pmatrix},
+\]
+gdzie $a, b > 0$. Definiujemy nowy proces $(Z_n)_{n \geq 1}$ wzorem
+$Z_n = (X_{n-1}, X_n)$, $n \geq 1$. Czy $(Z_n)_{n \geq 1}$ jest łańcuchem
+Markowa? Jeśli tak, wyznaczyć macierz przejścia.
+\end{zadanie}
+
+\begin{zadanie}{1.9}
+Niech $(X_k)_{k \in \N}$ będzie łańcuchem Markowa o przestrzeni stanów
+$S = \{0,1,2,3\}$ oraz macierzy przejścia:
+\[
+  \mathbf{P} =
+  \begin{pmatrix}
+    1/4 & 0   & 1/2 & 1/4 \\
+    0   & 1/5 & 0   & 4/5 \\
+    0   & 1   & 0   & 0   \\
+    1/3 & 1/3 & 0   & 1/3
+  \end{pmatrix}.
+\]
+Definiujemy nowy proces $Z_n = X_n \ind_{\{X_n \in \{2,3\}\}}$, $n \geq 0$.
+\begin{enumerate}
+  \item Obliczyć $\P(Z_{n+1} = 2 \mid Z_n = 0, Z_{n-1} = 2)$ i
+  $\P(Z_{n+1} = 2 \mid Z_n = 0, Z_{n-1} = 3)$, $n \geq 1$.
+  \item Czy $(Z_n)_{n \geq 1}$ jest łańcuchem Markowa?
+\end{enumerate}
+\end{zadanie}
+
+\begin{zadanie}{1.10}
+Niech $(X_n)_{n \geq 1}$ będą wynikami kolejnych rzutów symetryczną kostką do
+gry. Rozważmy
+\[
+  Z_n = X_1 \cdot \ldots \cdot X_n \bmod 5.
+\]
+Wykazać, że ciąg $(Z_n)_{n \geq 1}$ jest jednorodnym łańcuchem Markowa. Znaleźć
+przestrzeń stanów oraz macierz przejścia dla tego łańcucha.
+\end{zadanie}
+
+\end{document}
