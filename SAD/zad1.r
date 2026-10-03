@@ -1,0 +1,7 @@
+data(iris)
+help(iris)
+View(iris)
+plot(iris$Sepal.Length, iris$Sepal.Width, pch=19, col=iris$Species)
+legend('topright', legend=levels(iris$Species), fill=1:3)
+help(mean)
+tapply(iris$Sepal.Length, iris$Species, mean)
