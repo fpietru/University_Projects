@@ -1,0 +1,350 @@
+\documentclass[dvipsnames]{book}
+
+\input{../makra.tex}
+
+\begin{document}
+
+\begin{center}
+  {\Large\bfseries Optymalizacja stochastyczna --- Wykład 1 --- 2026-10-05}
+\end{center}
+
+\section*{Sprawy organizacyjne}
+
+\begin{itemize}[topsep=0pt,itemsep=0pt]
+  \item Wykład: 9:30--11:00 \quad (sala 105)
+  \item Ćwiczenia: 11:15--12:00 \quad (sala 105)
+  \item Laboratoria: 12:30--14:00 \quad (sala 219)
+\end{itemize}
+
+Punktacja (min. 50 pkt.\ na ocenę 3.0):
+\begin{itemize}[topsep=0pt,itemsep=0pt]
+  \item Egzamin: 0--50 pkt.
+  \item Kolokwium: 0--20 pkt.
+  \item 5$\times$ zadanie z labów: 0--20 pkt.
+  \item 4$\times$ kartkówki: 0--10 pkt.
+  \item Aktywność na ćwiczeniach: 0--10 pkt.
+\end{itemize}
+
+Strona prowadzącego:
+\url{http://pages.mini.pw.edu.pl/~joziakp/os}
+
+\paragraph{Literatura:}
+\begin{itemize}[topsep=0pt,itemsep=0pt]
+  \item 1--5: różne źródła,
+  \item 6--10: \emph{Introduction to Stochastic Search \& Optimization} --- James C. Spall,
+  \item 11--15: \emph{Monte Carlo Statistical Methods} --- Ch.\ Robert, G.\ Casella.
+\end{itemize}
+
+\hrulefill
+
+\section*{Czym zajmuje się optymalizacja stochastyczna?}
+
+Zagadnienia postaci:
+\[
+  x^* = \operatorname*{arg\,min}_{x \in S} f(x).
+\]
+
+\begin{enumerate}[label=\arabic*)]
+  \item $\nabla f(x) = 0$ $\longrightarrow$ zbiór punktów krytycznych
+  $\longrightarrow$ wśród nich może być minimum.
+
+  Ale: równanie $\nabla f(x) = 0$ może być bardzo trudne do rozwiązania
+  analitycznie.
+
+  \item Przybliżone rozwiązanie można uzyskać metodą kroku gradientowego.
+
+  Ale:
+  \begin{itemize}[topsep=0pt,itemsep=0pt]
+    \item zbieżność tylko do minimum lokalnego,
+    \item $\nabla$ może być trudny/niemożliwy do policzenia.
+  \end{itemize}
+\end{enumerate}
+
+\begin{przyklad}
+Szukamy $x^* = \operatorname*{arg\,min}_{x \in S} f(x)$, ale obserwujemy jedynie
+$g(x, \omega)$ takie, że $f(x) = \E\big[g(x,\omega)\big]$, gdzie $\omega$ to
+element przestrzeni probabilistycznej.
+
+Np. $g(x,\omega) = f(x) + Z(\omega)$, gdzie $Z(\omega) \sim \mathcal{N}(0,\nu^2)$
+jest szumem.
+\end{przyklad}
+
+\hrulefill
+
+\begin{algorytm}[Przeszukiwanie Stochastyczne --- PRS, \emph{Pure Random Search}]
+Znaleźć $x^* = \operatorname*{arg\,min}_{x \in S} f(x)$, gdzie $f$ jest ciągła,
+$S \subseteq \R^d$.
+
+Weźmy rozkład $\delta \colon \mathcal{B}(S) \to [0,1]$.
+
+\begin{itemize}[topsep=0pt,itemsep=0pt]
+  \item \textbf{Krok 0:} $y_0 \sim \delta$, \ $x_0 = y_0$.
+  \item \textbf{Krok 1:} $y_{k+1} \sim \delta$, \quad
+  $x_{k+1} = \begin{cases}
+    y_{k+1} & : f(y_{k+1}) < f(x_k), \\
+    x_k & : \text{wpp.}
+  \end{cases}$
+  \item \textbf{Krok 2:} $k \mathrel{{+}{=}} 1$.
+\end{itemize}
+Przerywamy, gdy $k$ przekroczy ustalony wcześniej limit.
+\end{algorytm}
+
+\section*{Model matematyczny PRS}
+
+Niech $X_k = X_k(\omega)$, $Y_k = Y_k(\omega)$ dla pewnej $\omega \in \Omega$.
+
+Zakładamy, że $Y_0, Y_1, \ldots \overset{\text{iid}}{\sim} \delta$ oraz
+\[
+  X_{k+1} = \begin{cases}
+    Y_{k+1} & : f(Y_{k+1}) < f(X_k), \\
+    X_k & : \text{wpp.}
+  \end{cases}
+\]
+
+Oznaczamy:
+\begin{gather*}
+  m := \min_{x \in S} f(x), \\
+  S_\varepsilon := \{x \in S : f(x) < m + \varepsilon\}, \\
+  X^* := \{x \in S : f(x) = m\}.
+\end{gather*}
+
+\begin{twierdzenie}
+Jeśli $f$ ciągła, to przy powyższych oznaczeniach:
+\begin{gather*}
+  \P\big(X_k \xrightarrow{k \to \infty} X^*\big) = 1, \\
+  \P\big(\{\omega \in \Omega : d(X_k(\omega), X^*) \xrightarrow{k \to \infty} 0\}\big) = 1.
+\end{gather*}
+\end{twierdzenie}
+
+\begin{proof}
+\begin{enumerate}[label=\arabic*)]
+  \item Ciąg $f(X_k)$ jest nierosnący i ograniczony z dołu przez $m$ (dla
+  każdego $\omega \in \Omega$), więc z twierdzenia Bolzano--Weierstrassa jest
+  zbieżny do $\eta(\omega) \geq m$.
+
+  \item Ustalmy $\varepsilon > 0$. Niech
+  \[
+    R_k = \{\omega \in \Omega : f(Y_k(\omega)) < m + \varepsilon\} = Y_k^{-1}(S_\varepsilon)
+  \]
+  --- zdarzenia niezależne.
+
+  \item $\P(R_k) = \P\big(Y_k^{-1}(S_\varepsilon)\big) = \delta(S_\varepsilon) =: \alpha > 0$.
+
+  Z Lematu Borela--Cantelliego: $(\Omega, \mathcal{F}, \P)$ --- przestrzeń
+  probabilistyczna, $R_1, R_2, \ldots$ --- zdarzenia niezależne,
+  \[
+    \sum_{k \geq 1} \P(R_k) = +\infty
+    \implies
+    \P\Big(\bigcap_{t=1}^{\infty} \bigcup_{i=t}^{\infty} R_i\Big) = 1.
+  \]
+
+  \item $\eta \geq m + \varepsilon \implies \forall k\ f(Y_k) \geq \eta \geq m + \varepsilon$, zatem
+  \begin{gather*}
+    \{\omega \in \Omega : \eta(\omega) \geq m + \varepsilon\}
+      \subseteq \bigcap_{k=1}^{\infty} (\Omega \setminus R_k)
+      = \Omega \setminus \bigcup_{k=1}^{\infty} R_k, \\
+    \{\omega \in \Omega : \eta(\omega) \leq m + \varepsilon\}
+      \supseteq \bigcup_{k=1}^{\infty} R_k
+      \supseteq \bigcap_{t=1}^{\infty} \bigcup_{i=t}^{\infty} R_t,
+  \end{gather*}
+  więc $\P\big(\{\omega \in \Omega : \eta(\omega) \leq m + \varepsilon\}\big) = 1$.
+\end{enumerate}
+\end{proof}
+
+\paragraph{Zalety PRS:}
+\begin{itemize}[topsep=0pt,itemsep=0pt]
+  \item łatwość implementacji,
+  \item używa tylko pomiarów funkcji $f$,
+  \item rozsądny koszt obliczeniowy,
+  \item ogólność,
+  \item mocne ugruntowanie teoretyczne.
+\end{itemize}
+
+\hrulefill
+
+\begin{algorytm}[Localized Random Search]
+\begin{itemize}[topsep=0pt,itemsep=0pt]
+  \item \textbf{Krok 0:} ustalam punkt początkowy $x_0$ (losowo albo na podstawie
+  wiedzy o problemie).
+  \item \textbf{Krok 1:} losujemy $d_k \in \R^d$. Jeśli $x_k + d_k \in S$, to
+  $y_{k+1} = x_k + d_k$.
+
+  Wpp.\ $y_{k+1} = \operatorname*{arg\,min}_{x \in S} \|x - (x_k + d_k)\|$
+  (najbliższy $x_k + d_k$ punkt z $S$).
+  \item \textbf{Krok 2:} $x_{k+1} = \begin{cases}
+    y_{k+1} & : f(y_{k+1}) < f(x_k), \\
+    x_k & : \text{wpp.}
+  \end{cases}$
+  \item \textbf{Krok 3:} $k \mathrel{{+}{=}} 1$
+\end{itemize}
+Całość powtarzamy dopóki nie przekroczymy ustalonego limitu na $k$.
+\end{algorytm}
+
+Typowo $d_k \sim \mathcal{N}_d$ (wielowymiarowy normalny) oraz wariancja maleje ze
+wzrostem $k$. Wtedy algorytm stabilizuje się, mamy mniejsze ,,skoki''.
+
+\begin{twierdzenie}
+$f \colon S \to \R$ ciągła, $m := \min_{x \in S} f(x)$,
+$X^* := \{x \in S : f(x) = m\}$.
+
+Rozważmy wariant algorytmu z $d_k \sim \mathcal{N}_d(0, I_d)$. Losujemy, dopóki
+$x_k + d_k \in S$. Niech $\varepsilon > 0$, niech
+$S_\varepsilon := \{x \in S : f(x) < m + \varepsilon\}$. Wtedy
+\[
+  \lim_{n \to \infty} \P\big(X_k \in S_\varepsilon\big) = 1.
+\]
+\end{twierdzenie}
+
+\hrulefill
+
+\begin{algorytm}[Poprawiony Localized Random Search]
+\begin{itemize}[topsep=0pt,itemsep=0pt]
+  \item \textbf{Krok 0:} ustal $x_0 \in S$ losowo bądź na podstawie wiedzy o
+  problemie. $k = 0$, $b_k = 0$.
+  \item \textbf{Krok 1:} losujemy niezależnie $d_k \sim \mathcal{N}_d(b_k, \sigma^2 I_d)$.
+  Jeśli $x_k + d_k \notin S$, to losujemy ponownie lub rzutujemy $x_k + d_k$ na $S$.
+  \item \textbf{Krok 2:} (wektor)
+  \[
+    \begin{bmatrix} x_{k+1} \\ b_{k+1} \end{bmatrix} =
+    \begin{cases}
+      \begin{bmatrix} x_k + d_k \\[1mm] (2d_k - b_k)/5 \end{bmatrix}
+        & \text{jeśli } f(x_k + d_k) < f(x_k), \\[8mm]
+      \begin{bmatrix} x_k + 2b_k - d_k \\[1mm] (7b_k - 2d_k)/5 \end{bmatrix}
+        & : f(x_k + 2b_k - d_k) < f(x_k), \\[8mm]
+      \begin{bmatrix} x_k \\[1mm] \tfrac{1}{2} b_k \end{bmatrix}
+        & \text{wpp.}
+    \end{cases}
+  \]
+  \item \textbf{Krok 3:} $k \mathrel{{+}{=}} 1$; jeśli kryterium stopu
+  $\longrightarrow$ koniec, wpp.\ $\longrightarrow$ Krok 1.
+\end{itemize}
+\end{algorytm}
+
+\hrulefill
+
+\section*{Tempo zbieżności PRS I}
+
+Naszym celem jest szacowanie liczby kroków, po której $X_k \in S_\varepsilon$
+($\varepsilon > 0$ ustalony, reprezentuje tolerancję na odchylenie od minimum).
+Oznaczamy
+\[
+  \rho(\varepsilon) := \delta(S_\varepsilon)
+\]
+i zakładamy, że $\rho(\varepsilon) > 0$ (w przeciwnym razie algorytm nigdy nie
+trafi do $S_\varepsilon$).
+
+\paragraph{Redukcja do prób Bernoulliego.}
+Z definicji $X_k$ mamy $f(X_k) = \min_{j \leq k} f(Y_j)$ (indukcja po $k$: w
+każdym kroku zostawiamy lepszy z punktów $Y_{k+1}$, $X_k$). Przynależność do
+$S_\varepsilon$ zależy tylko od wartości $f$, więc
+\[
+  \{X_k \in S_\varepsilon\} = \bigcup_{j \leq k} \{Y_j \in S_\varepsilon\},
+\]
+czyli ,,do kroku $k$ trafiliśmy do $S_\varepsilon$'' $\iff$ ,,choć jedno
+losowanie $Y_j$ wpadło do $S_\varepsilon$''. Zdarzenia
+$\{Y_k \in S_\varepsilon\}$ są niezależne i każde ma prawdopodobieństwo
+$\delta(S_\varepsilon) = \rho(\varepsilon)$, zatem szansa, że nie odwiedzimy
+tego zbioru w krokach $1, 2, \ldots, n$, wynosi
+\[
+  \P\big(X_n \notin S_\varepsilon\big)
+  = \prod_{k=1}^{n} \big(1 - \P(Y_k \in S_\varepsilon)\big)
+  = \big(1-\rho(\varepsilon)\big)^n.
+\]
+
+\paragraph{Liczba kroków przy zadanej pewności.}
+Ile kroków potrzeba, by trafić do $S_\varepsilon$ z prawdopodobieństwem
+$\geq 1 - \gamma$ (dla małego $\gamma \in (0,1)$)? Ponieważ
+$\log\big(1-\rho(\varepsilon)\big) < 0$, dzielenie przez tę liczbę odwraca
+nierówność:
+\begin{align*}
+  1 - \big(1-\rho(\varepsilon)\big)^n \geq 1 - \gamma
+  &\iff \big(1-\rho(\varepsilon)\big)^n \leq \gamma \\
+  &\iff n \log\big(1-\rho(\varepsilon)\big) \leq \log \gamma \\
+  &\iff n \geq \frac{\log \gamma}{\log\big(1-\rho(\varepsilon)\big)}.
+\end{align*}
+Oba logarytmy są ujemne, więc prawa strona jest dodatnia. Z nierówności
+$\log(1-t) \leq -t$ dla $t \in [0,1)$ dostajemy wygodniejsze oszacowanie
+\[
+  \frac{\log \gamma}{\log\big(1-\rho(\varepsilon)\big)}
+  \leq \frac{\log(1/\gamma)}{\rho(\varepsilon)},
+\]
+czyli koszt rośnie jak $1/\rho(\varepsilon)$, a od żądanej pewności zależy
+jedynie logarytmicznie.
+
+\paragraph{Czas pierwszego trafienia.}
+Niech
+\[
+  N(\varepsilon) := \min\{k : X_k \in S_\varepsilon\}
+  = \min\{k : Y_k \in S_\varepsilon\}
+  = \min\{k : f(Y_k) < m + \varepsilon\}
+\]
+(druga równość to znów fakt, że $f(X_k)$ jest minimum dotychczasowych wartości).
+Zatem $N(\varepsilon)$ to numer pierwszego sukcesu w ciągu niezależnych prób
+Bernoulliego z prawdopodobieństwem sukcesu $\rho(\varepsilon)$:
+\[
+  \P\big(N(\varepsilon) = n\big) = \big(1-\rho(\varepsilon)\big)^{n-1} \rho(\varepsilon),
+\]
+czyli $N(\varepsilon) \sim \mathrm{Geo}\big(\rho(\varepsilon)\big)$, skąd
+\[
+  \E\big[N(\varepsilon)\big] = \frac{1}{\rho(\varepsilon)},
+  \qquad
+  \mathrm{Var}\big[N(\varepsilon)\big] = \frac{1 - \rho(\varepsilon)}{\rho(\varepsilon)^2}.
+\]
+
+\paragraph{Przypadek rozkładu jednostajnego.}
+Niech $S \subseteq \R^d$ będzie ograniczony o mierze $|S| \in (0,\infty)$, a
+$\delta$ --- rozkładem jednostajnym na $S$, tzn.
+$\rho(\varepsilon) = |S_\varepsilon| / |S|$. Ustalmy $x^* \in X^*$; z ciągłości
+$f$ istnieje $\varepsilon' > 0$ takie, że $B(x^*, \varepsilon') \subseteq S_\varepsilon$.
+Ponieważ $|B(x^*, \varepsilon')| = c_d \cdot (\varepsilon')^d$, mamy
+$\rho(\varepsilon) \geq c_d (\varepsilon')^d / |S|$, a więc
+\[
+  \E\big[N(\varepsilon)\big] \leq \frac{|S|}{c_d \cdot (\varepsilon')^d},
+\]
+z równością, gdy $S_\varepsilon = B(x^*, \varepsilon')$. Kluczowa jest tu
+zależność $(\varepsilon')^{-d}$: oczekiwany czas rośnie wykładniczo z wymiarem
+$d$ (,,przekleństwo wymiaru''), np.\ dziesięciokrotne zmniejszenie promienia
+tolerancji mnoży koszt przez $10^d$.
+
+\hrulefill
+
+\begin{algorytm}[Pure Adaptive Search]
+\begin{itemize}[topsep=0pt,itemsep=0pt]
+  \item \textbf{Krok 0:} ustalmy $x_0 \in S$ (losowo lub na podstawie wiedzy o
+  problemie). $k = 0$, $w_0 = f(x_0)$.
+  \item \textbf{Krok 1:} losuj $x_{k+1}$ z rozkładu jednostajnego na
+  \[
+    S_k = \{x \in S : f(x) < w_k\}.
+  \]
+  \item \textbf{Krok 2:} $k \mathrel{{+}{=}} 1$. Jeśli kryterium stopu spełnione
+  $\longrightarrow$ koniec, wpp.\ $\longrightarrow$ Krok 1.
+\end{itemize}
+\end{algorytm}
+
+\hrulefill
+
+\section*{Teoria rekordów}
+
+Niech $X_1, X_2, \ldots$ --- ciąg zmiennych losowych iid o wspólnej dystrybuancie
+$F(x)$.
+
+Konstruujemy ciąg zmiennych losowych $N(k)$ w następujący sposób:
+\begin{align*}
+  N(1) &= 1, \\
+  N(k) &= \min\big\{j > N(k-1) : X_j > X_{N(k-1)}\big\} \\
+       &= \min\big\{j > N(k-1) : X_j > \max(X_1, \ldots, X_{N(k-1)})\big\}.
+\end{align*}
+
+Wtedy $\P\big(N(k) < \infty\big) = 1$, zatem
+$\forall k\ \ p_{n,k} := \P\big(N(k) = n\big)$, więc $p_{n,k}$ jest rozkładem
+prawdopodobieństwa na $\N$.
+
+\begin{lemat}
+Jeśli $F(x)$ to funkcja ciągła, to rozkład $N(k)$ nie zależy od $F$.
+\end{lemat}
+
+\begin{proof}
+Ćwiczenie.
+\end{proof}
+
+\end{document}
