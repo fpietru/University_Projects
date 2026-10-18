@@ -1,0 +1,302 @@
+\documentclass[dvipsnames]{book}
+
+\input{../makra.tex}
+
+\begin{document}
+
+\begin{center}
+  {\Large\bfseries Wykład 2 --- 2026-10-09}
+\end{center}
+
+\section*{Nieprzywiedlność}
+
+Odtąd, do odwołania, $(X_n)_{n \in \N_0}$ będzie jednorodnym łańcuchem Markowa
+na co najwyżej przeliczalnej przestrzeni stanów $S$, o (jednokrokowych)
+prawdopodobieństwach przejścia $p(i,j)$ (macierzowo:
+$\mathbf{P} = \big(p(i,j)\big)_{i,j \in S}$) i rozkładzie początkowym $\alpha$.
+
+\begin{definicja}[Osiągalność i komunikacja]
+Niech $i,j \in S$. Powiemy, że
+\begin{itemize}[topsep=0pt,itemsep=0pt]
+  \item $j$ jest \emph{osiągalny} z $i$, jeśli
+  $\exists n \in \N_0\colon\ p_n(i,j) > 0$ \ (oznaczenie: $i \to j$),
+  \item $i,j$ \emph{komunikują się}, jeśli $i \to j$ i $j \to i$
+  \ (oznaczenie: $i \leftrightarrow j$).
+\end{itemize}
+\end{definicja}
+
+\begin{stwierdzenie}
+Komunikacja jest relacją równoważności na zbiorze stanów $S$.
+\end{stwierdzenie}
+
+\begin{definicja}[Klasy komunikacji, nieprzywiedlność]
+\begin{itemize}[topsep=0pt,itemsep=0pt]
+  \item Klasy abstrakcji względem relacji komunikacji nazywają się
+  \emph{klasami komunikacji} (ang.\ \emph{communication classes}).
+  \item Łańcuch $(X_n)_n$ nazywamy \emph{nieprzywiedlnym}, ewentualnie
+  \emph{nieredukowalnym} (ang.\ \emph{irreducible}), jeśli $i \leftrightarrow j$
+  dla wszystkich $i,j \in S$; w przeciwnym razie mówimy, że $(X_n)_n$ jest
+  \emph{przywiedlny} (ang.\ \emph{reducible}).
+\end{itemize}
+\end{definicja}
+
+\section*{Okres stanu. Nieokresowość}
+
+\begin{definicja}[Okres stanu]
+\emph{Okresem} (ang.\ \emph{period}) stanu $j \in S$ nazywamy liczbę
+\[
+  o(j) := \nwd\{n \geq 1 : p_n(j,j) > 0\}.
+\]
+Jeśli stan $j$ nie jest osiągalny z samego siebie, wówczas $o(j)$ jest
+największym wspólnym dzielnikiem zbioru pustego --- kładziemy wtedy
+$o(j) = +\infty$. Jeżeli $o(i) = 1$, to stan $i$ nazywa się
+\emph{nieokresowym} (ang.\ \emph{aperiodic}), a w przeciwnym razie
+\emph{okresowym} (ang.\ \emph{periodic}).
+\end{definicja}
+
+\begin{zadanie}{(Minizadanie 1)}
+\begin{enumerate}[label=\arabic*.]
+  \item Zbadać okres każdego ze stanów łańcucha o macierzy przejścia
+  \[
+    \mathbf{P} =
+    \begin{bmatrix}
+      0 & \frac12 & \frac12 \\
+      1 & 0 & 0 \\
+      1 & 0 & 0
+    \end{bmatrix}.
+  \]
+  Co się stanie z okresem każdego ze stanów, jeśli graf opisujący jednokrokową
+  dynamikę łańcucha zmodyfikujemy poprzez dodanie pętli w stanie $1$
+  (oczywiście taka zmiana musi pociągać zmianę w macierzy przejścia)?
+  \item Podać przykład łańcucha Markowa (równoważnie, macierzy przejścia)
+  o okresie $d \in \N$.
+  \item Podać przykład możliwie małego (w sensie liczebności przestrzeni stanów)
+  łańcucha, w którym istnieją zarówno stany o okresie $2$, jak i stany
+  o okresie $3$.
+  \item Zauważyć, że jeśli $p(j,j) = 1$, to $o(j) = 1$.
+  \item Ile wynosi $o(j)$, jeśli istnieje $n$ taki, że zarówno $p_n(j,j) > 0$,
+  jak i $p_{n+1}(j,j) > 0$?
+\end{enumerate}
+\end{zadanie}
+
+Wartość okresu jest własnością klas komunikujących, tzn.\ zachodzi następujące
+
+\begin{stwierdzenie}
+Jeśli $i \leftrightarrow j$, to $o(i) = o(j)$.\footnote{Oczywiście implikacja
+odwrotna nie jest prawdziwa --- dlaczego?}
+\end{stwierdzenie}
+
+\begin{wniosek}
+W nieprzywiedlnym łańcuchu Markowa wszystkie stany mają ten sam okres.
+\end{wniosek}
+
+Jeśli więc wszystkie stany łańcucha nieprzywiedlnego są nieokresowe, łańcuch
+nazywamy \textbf{nieokresowym}. Jeśli okresem każdego stanu w łańcuchu
+nieprzywiedlnym jest liczba $d \neq 1$, łańcuch nazywamy \textbf{okresowym,
+o okresie $d$}.\footnote{Podobnie można mówić o klasach okresowych o okresie
+$d$.}
+
+Można wykazać, że prawdziwy jest następujący opis struktury przestrzeni stanów
+skończonych (łańcuch \textbf{skończony} to taki, którego przestrzeń stanów jest
+zbiorem skończonym) okresowych łańcuchów Markowa:
+
+\begin{stwierdzenie}
+Niech $(X_n)_n$ --- nieprzywiedlny łańcuch Markowa na skończonej przestrzeni
+stanów $S$. Jeśli $(X_n)_n$ jest okresowy, o okresie $d$, to istnieją parami
+rozłączne $S_0, \ldots, S_{d-1} \subset S$ takie, że
+$S = S_0 \cup \ldots \cup S_{d-1}$ i dla dowolnych $i,j \in S$ zachodzi
+implikacja
+\[
+  p(i,j) > 0 \ \ \&\ \ i \in S_k \text{ dla pewnego } k \in \{0,\ldots,d-1\}
+  \implies j \in S_l,
+\]
+gdzie $l = k+1 \mod d$.
+\end{stwierdzenie}
+
+Innymi słowy, przestrzeń stanów dzieli się na $d$ rozłącznych podzbiorów,
+a przejścia w jednym kroku możliwe są tylko pomiędzy stanami należącymi do
+dwóch kolejnych (modulo $d$) podzbiorów.
+
+\begin{zadanie}{(Minizadanie 2)}
+Opisać strukturę przestrzeni stanów nieprzywiedlnych i nieokresowych łańcuchów
+Markowa z Minizadania 1.
+\end{zadanie}
+
+\section*{Chwilowość i powracalność}
+
+Poniżej $(X_n)_n$ oznaczać będzie jednorodny łańcuch Markowa na co najwyżej
+przeliczalnej przestrzeni stanów $S$. Jednokrokowe prawdopodobieństwa przejścia
+oznaczamy dla $i,j \in S$ jako $p_{i,j}$ --- macierz przejścia to
+$\mathbf{P} = [p_{i,j}]_{i,j \in S}$. Prawdopodobieństwa przejścia w $n$
+krokach to $p_n(i,j)$. Rozkład początkowy reprezentujemy za pomocą
+(wierszowego) wektora prawdopodobieństwa $\alpha = (\alpha_j)_{j \in S}$.
+
+Dla $j \in S$ rozważamy moment $T_j$ pierwszej wizyty (po chwili $0$)
+w stanie $j$
+\[
+  T_j = \min\{n \geq 1 : X_n = j\}
+\]
+(jeśli $X_n(\omega) \neq j$ dla wszystkich $n \in \N$, to kładziemy
+$T_j(\omega) = \infty$). Zatem $T_j$ jest zmienną losową o wartościach
+w $\N \cup \{\infty\}$.
+
+\begin{uwaga}[Moment zatrzymania]
+Zmienna $T_j$ jest przykładem \emph{momentu zatrzymania} lub \emph{momentu
+stopu} (ang.\ \emph{stopping time}) względem tzw.\ \emph{filtracji naturalnej}
+(ang.\ \emph{natural filtration}) łańcucha $(X_n)_n$, a więc niemalejącego
+ciągu $\sigma$-ciał $\big(\sigma(X_0, \ldots, X_n)\big)_n$.
+
+Ogólnie, jeśli $(\Omega, \mathcal{F}, \P)$ jest przestrzenią probabilistyczną,
+\emph{filtracją} nazywamy dowolny niemalejący (w sensie inkluzji) ciąg
+$(\mathcal{F}_n)_n$ pod-$\sigma$-ciał $\mathcal{F}$, czyli
+$\mathcal{F}_n \subset \mathcal{F}$ dla dowolnego $n$, zaś
+$\mathcal{F}_n \subset \mathcal{F}_m$ dla $n < m$.
+
+Kiedy rozważamy proces stochastyczny (niekoniecznie łańcuch Markowa!)
+określony na $(\Omega, \mathcal{F}, \P)$, to ma sens rozważać \emph{filtrację
+naturalną procesu} $(X_n)_n$, a więc ciąg $(\mathcal{F}_n)_n$, zdefiniowany
+\[
+  \mathcal{F}_n := \sigma(X_0, \ldots, X_n).
+\]
+Takie pod-$\sigma$-ciało rozumiemy jako zawierające zdarzenia dotyczące procesu
+$(X_n)_n$ zachodzące w chwili $n$, zaś filtracja $(\mathcal{F}_n)_n$ opisuje,
+jak zmieniają się takie zdarzenia wraz z upływem czasu $n$.
+
+Ogólnie, dla danej przestrzeni probabilistycznej $(\Omega, \mathcal{F}, \P)$
+i filtracji $(\mathcal{F}_n)_n$, funkcja
+$T \colon \Omega \to \N \cup \{+\infty\}$ jest \emph{momentem zatrzymania
+względem} $(\mathcal{F}_n)_n$ (ewentualnie \emph{momentem stopu} lub
+\emph{momentem Markowa}), jeśli
+\[
+  \{T = n\} \in \mathcal{F}_n
+\]
+dla każdego $n$. Chodzi więc o to, by wiedzieć w chwili $n$, czy
+$T = n$.\footnote{Naszą wiedzę na temat procesu w chwili $n$ reprezentuje
+$\mathcal{F}_n$.}
+
+Jak wspomniano wyżej --- $T_j$ jest momentem stopu względem filtracji naturalnej
+łańcucha. Oznacza to, że dla dowolnego $n \in \N$
+\[
+  \{T_j = n\} \in \sigma(X_0, \ldots, X_n).
+\]
+Tak z kolei jest, ponieważ
+\[
+  \{T_j = n\} = \{X_1 \neq j, \ldots, X_{n-1} \neq j, X_n = j\}.
+\]
+\end{uwaga}
+
+\begin{uwaga}[Mocna własność Markowa]
+Pojęcie momentu stopu związane jest ściśle z tzw.\ \emph{mocną własnością
+Markowa} (ang.\ \emph{strong Markov property}). Jedno ze sformułowań tej
+własności brzmi następująco: jeśli $(X_n)_n$ jest łańcuchem Markowa o macierzy
+przejścia $\mathbf{P}$, a $T$ --- momentem stopu względem filtracji naturalnej,
+to ciąg zmiennych losowych $(Y_n)_{n \in \N_0}$, dany przez
+\[
+  Y_n := X_{T+n}
+\]
+także jest łańcuchem Markowa, o takiej samej macierzy przejścia $\mathbf{P}$.
+Intuicyjnie oznacza to tyle, że łańcuch w momencie stopu zapomina o przeszłości
+i startuje od nowa od stanu $X_T$.
+\end{uwaga}
+
+Dla $i,j \in S$ oznaczmy przez $f_{ij}$ prawdopodobieństwo tego, że startując
+z $i$ kiedykolwiek osiągniemy $j$, czyli
+\[
+  f_{ij}
+  = \P\Big(\bigcup_{n=1}^{\infty} \{X_n = j\} \,\Big|\, X_0 = i\Big)
+  = \P\Big(\bigcup_{n=1}^{\infty} \{T_j = n\} \,\Big|\, X_0 = i\Big)
+  = \P\big(T_j < \infty \mid X_0 = i\big).
+\]
+
+Zdefiniujmy także zmienną losową zliczającą liczbę wizyt w stanie (poza chwilą
+$n = 0$):\footnote{$N_j$ także jest zmienną losową o wartościach
+w $\N \cup \{\infty\}$.}
+\[
+  N_j := \sum_{n=1}^{\infty} \ind_{\{X_n = j\}}.
+\]
+
+Nietrudno udowodnić, że dla dowolnych $i,j \in S$ i $k \in \N$
+\begin{align*}
+  \P\big(N_j \geq 1 \mid X_0 = i\big) &= f_{ij}, \\
+  \P\big(N_j \geq k \mid X_0 = i\big) &= f_{ij} f_{jj}^{k-1}
+\end{align*}
+(w szczególności $\P\big(N_j \geq k \mid X_0 = j\big) = f_{jj}^k$).%
+\footnote{Jak należy zinterpretować te równości?}
+Oczywiście, powyższe równości wynikają z własności Markowa,\footnote{W jaki
+sposób wynikają?} w szczególności do ich wykazania można posłużyć się
+obserwacją (wynikającą z markowskości): jeśli $k < n$, a
+$i_0, i_1, \ldots, i_n \in S$, to
+\begin{align*}
+  &\P\big(X_1 = i_1, \ldots, X_n = i_n \mid X_0 = i_0\big) \\
+  &\quad= \P\big(X_1 = i_1, \ldots, X_k = i_k \mid X_0 = i_0\big)\,
+    \P\big(X_{k+1} = i_{k+1}, \ldots, X_n = i_n \mid X_k = i_k\big) \\
+  &\quad= \P\big(X_1 = i_1, \ldots, X_k = i_k \mid X_0 = i_0\big)\,
+    \P\big(X_1 = i_{k+1}, \ldots, X_{n-k} = i_n \mid X_0 = i_k\big),
+\end{align*}
+w której ostatnia równość wynika ze stacjonarności (czyli niezmienniczości na
+przesunięcia czasowe rozkładów warunkowych łańcucha Markowa) ---
+jak?\footnote{Jak można interpretować tę równość?}
+
+\begin{definicja}[Stan powracający i chwilowy]
+Stan $i \in S$ nazywa się
+\begin{itemize}[topsep=0pt,itemsep=0pt]
+  \item \emph{powracającym}, ewentualnie \emph{powracalnym}
+  (ang.\ \emph{recurrent}), jeśli $f_{ii} = 1$,
+  \item \emph{chwilowym} (ang.\ \emph{transient}), jeśli $f_{ii} < 1$.
+\end{itemize}
+\end{definicja}
+
+Zatem
+\begin{itemize}[topsep=0pt]
+  \item jeśli stan $j$ jest powracający, to
+  $\P\big(N_j \geq k \mid X_0 = j\big) = 1$ dla każdego $k$
+  (z prawdopodobieństwem $1$ łańcuch wystartowany z $j$ powraca do $j$
+  nieskończenie wiele razy),
+  \item jeśli stan $j$ jest chwilowy, to
+  $\lim_{k \to \infty} \P\big(N_j \geq k \mid X_0 = i\big) = 0$ dla każdego
+  $i \in S$, bez względu na jego chwilowość czy powracalność (na prawie każdej
+  realizacji łańcucha wystartowanego z dowolnego $i$ stan $j$ jest odwiedzany
+  skończenie wiele razy).
+\end{itemize}
+
+\begin{przyklad}
+Jeśli macierzą przejścia łańcucha $(X_n)_n$ na $S = [3]$ jest
+\[
+  \mathbf{P} =
+  \begin{bmatrix}
+    \frac13 & \frac23 & 0 \\
+    1 & 0 & 0 \\
+    \frac14 & \frac12 & \frac14
+  \end{bmatrix},
+\]
+to $f_{11} = 1$, $f_{22} = 1$ (bo szansa, że łańcuch na zawsze pozostanie w $1$
+wynosi $\lim_n (1/3)^n = 0$), a $f_{33} < 1$, czyli $1$ i $2$ są powracające,
+zaś $3$ jest chwilowy.
+\end{przyklad}
+
+Prawdziwe jest następujące twierdzenie:
+
+\begin{twierdzenie}
+Niech $j \in S$.
+\begin{itemize}[topsep=0pt,itemsep=0pt]
+  \item $j$ jest powracający
+  \begin{align*}
+    &\iff \P\big(N_j = \infty \mid X_0 = j\big) = 1 \\
+    &\iff \sum_{n=1}^{\infty} p_n(j,j) = \infty,
+  \end{align*}
+  \item $j$ jest chwilowy
+  \begin{align*}
+    &\iff \P\big(N_j = \infty \mid X_0 = i\big) = 0 \quad \forall i \in S \\
+    &\iff \sum_{n=1}^{\infty} p_n(i,j) = \frac{f_{ij}}{1 - f_{jj}} < \infty
+      \quad \forall i \in S.
+  \end{align*}
+\end{itemize}
+\end{twierdzenie}
+
+Przy tym $\sum_{n=1}^{\infty} p_n(j,j) = \E\big[N_j \mid X_0 = j\big]$ ---
+dlaczego?
+
+Zauważmy, że z powyższego wynika, że jeśli $j$ jest chwilowy, to dla dowolnego
+$i \in S$ zachodzi $\lim_{n \to \infty} p_n(i,j) = 0$.
+
+\end{document}

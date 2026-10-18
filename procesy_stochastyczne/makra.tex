@@ -85,9 +85,18 @@ title={Zadanie #2\hfill{\it Opracowanie: #3}},#1}
 \newthmbox{obserwacja}{Obserwacja}
 \newthmbox{wniosek}{Wniosek}
 \newthmbox{stwierdzenie}{Stwierdzenie}
+% uwaga -- żółty box, \begin{uwaga}[nazwa]
+\colorlet{uwagacolor}{Dandelion}
 
-% treść zadania -- żółty box, \begin{zadanie}{1.1}
-\colorlet{zadcolor}{Dandelion}
+\NewDocumentEnvironment{uwaga}{o}{%
+  \refstepcounter{thmcnt}%
+  \begin{tcolorbox}[notatkibox, colback=uwagacolor!15, colframe=uwagacolor!40,
+    colbacktitle=uwagacolor!40,
+    title={Uwaga \thethmcnt\IfValueT{#1}{\ (#1)}}]%
+}{\end{tcolorbox}}
+
+% treść zadania -- szary box, \begin{zadanie}{1.1}
+\colorlet{zadcolor}{Gray}
 
 \NewDocumentEnvironment{zadanie}{m}{%
   \begin{tcolorbox}[notatkibox, colback=zadcolor!15, colframe=zadcolor!40,
