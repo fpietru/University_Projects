@@ -1,0 +1,287 @@
+\documentclass[dvipsnames]{book}
+
+\input{../makra.tex}
+
+% numerowany lemat w niebieskim boxie (wspólny licznik z twierdzeniami)
+\newthmbox{lematbox}{Lemat}
+
+\begin{document}
+
+\begin{center}
+  {\Large\bfseries Optymalizacja stochastyczna --- Wykład 2 --- 2026-10-12}
+\end{center}
+
+\section*{Teoria rekordów (cd.)}
+
+Przypomnienie: $X_1, X_2, \ldots$ --- iid o ciągłej dystrybuancie $F$,
+$N(1) = 1$, $N(k) = \min\big\{j > N(k-1) : X_j > X_{N(k-1)}\big\}$ --- indeks
+$k$-tego rekordu.
+
+\textbf{Lemat 1.} Jeśli $F$ jest ciągła, to rozkład $N(k)$ nie zależy od $F$.
+(Dowód będzie na ćwiczeniach.)
+
+Dzięki Lematowi 1 we wszystkich dowodach poniżej możemy bez straty ogólności
+(BSO) przyjąć, że $\bar X_i \sim \mathcal{U}(0,1)$ iid.
+
+% numeracja zgodna z wykładem: Lemat 1 był na poprzednim wykładzie
+\setcounter{thmcnt}{1}
+
+\begin{twierdzenie}
+Rozkład $N(2)$ zadany jest przez
+\[
+  \P\big(N(2) = n\big) = \frac{1}{n(n-1)}, \qquad n \geq 2.
+\]
+\end{twierdzenie}
+
+\begin{proof}
+Niech $n \geq 2$. BSO $\bar X_i \sim \mathcal{U}(0,1)$ iid. Ze wzoru na
+prawdopodobieństwo całkowite:
+\begin{align*}
+  \P\big(N(2) = n\big)
+  &= \int_0^1 \P\big(N(2) = n \mid \bar X_1 = x\big)\, dx
+  \overset{(*)}{=} \int_0^1 (1-x)\, x^{n-2}\, dx \\
+  &= \frac{x^{n-1}}{n-1}\bigg|_0^1 - \frac{x^n}{n}\bigg|_0^1
+  = \frac{1}{n-1} - \frac{1}{n} = \frac{1}{n(n-1)}.
+\end{align*}
+Ad $(*)$: zdarzenie $\{N(2) = n\}$ przy $\bar X_1 = x$ oznacza, że
+\[
+  \bar X_2 \in (0,x),\ \bar X_3 \in (0,x),\ \ldots,\ \bar X_{n-1} \in (0,x),
+  \quad \bar X_n \in (x,1),
+\]
+bo w $n$-tym kroku był drugi rekord, więc ta wartość przekroczyła $x$.
+Z niezależności dostajemy $x^{n-2}(1-x)$.
+\end{proof}
+
+\begin{wniosek}
+W szczególności $\E\big[N(k)\big] = +\infty$ dla $k \geq 2$.
+\end{wniosek}
+\begin{proof}
+\[
+  \E\big[N(2)\big] = \sum_{n \geq 2} n \cdot \frac{1}{n(n-1)}
+  = \sum_{n \geq 2} \frac{1}{n-1} = +\infty,
+\]
+a ponieważ $N(k) \geq N(2)$ dla $k \geq 2$, to
+$\E\big[N(k)\big] \geq \E\big[N(2)\big] = +\infty$.
+\end{proof}
+
+\hrulefill
+
+\begin{twierdzenie}
+Proces $\big(N(k)\big)_{k \geq 2}$ ma własność Markowa, tzn.
+\[
+  \P\big(N(k) = n \mid N(l) = j_l,\ l = 2, 3, \ldots, k-1\big)
+  = \P\big(N(k) = n \mid N(k-1) = j_{k-1}\big)
+\]
+dla każdego wektora $(j_2 < j_3 < \ldots < j_{k-1})$. Ponadto
+prawdopodobieństwa przejścia spełniają
+\[
+  \P\big(N(k) = n \mid N(k-1) = j\big) =
+  \begin{cases}
+    \dfrac{j}{n(n-1)} & : n > j \geq k-1 \geq 2, \\[2mm]
+    0 & : \text{wpp.}
+  \end{cases}
+\]
+\end{twierdzenie}
+
+\begin{proof}
+BSO $\bar X_i \sim \mathcal{U}(0,1)$ iid. Oznaczmy $j_1 := 1 = N(1)$. Ze wzoru na
+prawdopodobieństwo całkowite (tak samo jak w poprzednim dowodzie, tylko po
+wszystkich współrzędnych $x_l$):
+\begin{align*}
+  &\P\big(N(l) = j_l : 2 \leq l \leq k\big) = \\
+  &\quad = \int_0^1 \!\!\cdots\! \int_0^1
+    \P\big(N(l) = j_l : 2 \leq l \leq k \;\big|\;
+    \bar X_{j_l} = x_l : 1 \leq l < k\big)\, dx_1 \ldots dx_{k-1}
+  \overset{(\heartsuit)}{=} \ldots
+\end{align*}
+
+\paragraph{Komentarz.}
+Prawdopodobieństwo pod całką wynosi $0$, chyba że
+$x_1 < x_2 < \ldots < x_{k-1}$ (wtedy te rekordy przyjmują właśnie te
+wartości). Ponadto zdarzenie oznacza, że
+\begin{align*}
+  \bar X_{j_1} &= x_1, & \bar X_{j_1+1}, \ldots, \bar X_{j_2-1} &\in (0, x_1), \\
+  \bar X_{j_2} &= x_2, & \bar X_{j_2+1}, \ldots, \bar X_{j_3-1} &\in (0, x_2), \\
+  &\ \ \vdots & &\ \ \vdots \\
+  \bar X_{j_{k-1}} &= x_{k-1}, & \bar X_{j_{k-1}+1}, \ldots, \bar X_{j_k-1} &\in (0, x_{k-1}), \\
+  & & \bar X_{j_k} &\in (x_{k-1}, 1).
+\end{align*}
+Zatem $l$-ta grupa daje czynnik $x_l^{\,j_{l+1} - j_l - 1}$ (np.\ pierwsza
+$x_1^{\,j_2 - 2}$, druga $x_2^{\,j_3 - j_2 - 1}$), a tylko ostatni czynnik jest
+inny: $(1 - x_{k-1})$.
+
+\paragraph{Koniec komentarza.}
+\begin{align*}
+  (\heartsuit)
+  &= \int\limits_{0 < x_1 < x_2 < \ldots < x_{k-1} < 1}
+    x_1^{\,j_2 - j_1 - 1} x_2^{\,j_3 - j_2 - 1} \cdots
+    x_{k-1}^{\,j_k - j_{k-1} - 1} (1 - x_{k-1})\, dx_1 \ldots dx_{k-1}.
+\end{align*}
+Całkujemy po kolei po $x_1, x_2, \ldots$ Po $x_1$:
+\[
+  \int_0^{x_2} x_1^{\,j_2 - j_1 - 1}\, dx_1 = \frac{x_2^{\,j_2 - j_1}}{j_2 - j_1},
+  \qquad\text{więc}\qquad
+  \frac{x_2^{\,j_2 - j_1}}{j_2 - j_1} \cdot x_2^{\,j_3 - j_2 - 1}
+  = \frac{1}{j_2 - j_1}\, x_2^{\,j_3 - j_1 - 1}.
+\]
+Po scałkowaniu po $x_2$ mamy
+\[
+  \int_0^{x_3} x_2^{\,j_3 - j_1 - 1}\, dx_2 = \frac{x_3^{\,j_3 - j_1}}{j_3 - j_1}
+\]
+itd. Po scałkowaniu po $x_1, \ldots, x_{k-2}$ zostaje
+\[
+  (\heartsuit) = \frac{1}{(j_2 - j_1)(j_3 - j_1) \cdots (j_{k-1} - j_1)}
+  \int_0^1 x_{k-1}^{\,j_k - j_1 - 1} (1 - x_{k-1})\, dx_{k-1}.
+\]
+Z dowodu poprzedniego twierdzenia (bo $j_k - j_1 - 1 = j_k - 2$) ostatnia
+całka wynosi $\frac{1}{j_k (j_k - 1)}$, więc
+\[
+  (\heartsuit) = \frac{1}{j_k \prod_{l=2}^{k} (j_l - 1)}.
+\]
+
+Podsumowując (i pamiętając, że $j_1 = 1$):
+\begin{align*}
+  \P\big(N(l) = j_l : 2 \leq l \leq k\big)
+    &= \frac{1}{\prod_{l=2}^{k} (j_l - 1)} \cdot \frac{1}{j_k}, \\
+  \P\big(N(l) = j_l : 2 \leq l \leq k-1\big)
+    &= \frac{1}{\prod_{l=2}^{k-1} (j_l - 1)} \cdot \frac{1}{j_{k-1}}.
+\end{align*}
+Stąd lewa strona tezy:
+\[
+  \text{LHS}
+  = \frac{\frac{1}{j_k - 1} \cdot \frac{1}{j_k}}{\frac{1}{j_{k-1}}}
+  = \frac{j_{k-1}}{j_k (j_k - 1)},
+\]
+co nie zależy od $j_2, j_3, \ldots, j_{k-2}$. Sumując po tych indeksach
+dostajemy, że $\P\big(N(k) = j_k \mid N(k-1) = j_{k-1}\big)$ ma tę samą
+wartość, zatem LHS $=$ RHS. Dla $j_k \leq j_{k-1}$ prawdopodobieństwo jest
+oczywiście zerowe, a $j_{k-1} \geq k-1$, bo $N(l) \geq l$.
+\end{proof}
+
+\begin{wniosek}
+Rozkład $N(k)$ dla dowolnego $k \geq 2$ można wyznaczyć rekurencyjnie
+za pomocą $N(l)$, $l < k$.
+\end{wniosek}
+
+\begin{przyklad}
+\begin{align*}
+  \P\big(N(3) = n\big)
+  &= \sum_{j=2}^{\infty} \P\big(N(3) = n \mid N(2) = j\big)\,
+     \P\big(N(2) = j\big) \\
+  &= \sum_{j=2}^{n-1} \frac{j}{n(n-1)} \cdot \frac{1}{j(j-1)}
+   = \frac{1}{n(n-1)} \sum_{j=2}^{n-1} \frac{1}{j-1}.
+\end{align*}
+\end{przyklad}
+
+\hrulefill
+
+\section*{Wskaźniki rekordów}
+
+Rozważmy zmienne losowe $(e_n)_{n \geq 1}$ zadane następująco:
+\[
+  e_n = \begin{cases}
+    1 & : \exists k\ N(k) = n, \\
+    0 & : \text{wpp.}
+  \end{cases}
+\]
+(czyli $e_n = 1$ $\iff$ w $n$-tym kroku padł rekord; w szczególności $e_1 = 1$).
+
+\begin{lematbox}
+Zmienne $(e_n)_{n \geq 2}$ są niezależne \textup{(1)} oraz
+$\P(e_n = 1) = \frac{1}{n}$ \textup{(2)}.
+\end{lematbox}
+
+\begin{proof}
+BSO $(\bar X_j)_{j \geq 1} \sim \mathcal{U}(0,1)$ iid.
+
+\textbf{Ad (2).} Rozważmy zdarzenie $\{\omega \in \Omega : e_n(\omega) = 1\}$,
+tzn.\ $\bar X_n > \bar X_j$ dla $j = 1, \ldots, n-1$. Wtedy
+\[
+  \P(e_n = 1)
+  = \int_0^1 \P\big(\bar X_j < x : j = 1, \ldots, n-1 \mid \bar X_n = x\big)\, dx
+  = \int_0^1 x^{n-1}\, dx = \frac{1}{n}.
+\]
+
+\textbf{Ad (1).} Rozważmy dowolne całkowite $2 \leq k_1 < k_2 < \ldots < k_m$.
+Wtedy zdarzenie $\{e_{k_l} = 1 : l = 1, \ldots, m\}$ oznacza, że
+$\forall l$: $\bar X_j < \bar X_{k_l}$ dla $j < k_l$. Zatem
+\begin{align*}
+  &\P\big(e_{k_l} = 1 : 1 \leq l \leq m\big) = \\
+  &= \int_0^1 \!\!\cdots\! \int_0^1
+    \P\big(e_{k_l} = 1 : 1 \leq l \leq m \;\big|\;
+    \bar X_{k_l} = x_l : 1 \leq l \leq m\big)\, dx_1 \ldots dx_m \\
+  &= \int\limits_{0 < x_1 < x_2 < \ldots < x_m < 1}
+    x_1^{\,k_1 - 1} x_2^{\,k_2 - k_1 - 1} \cdots x_m^{\,k_m - k_{m-1} - 1}\,
+    dx_1 \ldots dx_m \\
+  &= \frac{1}{k_1 k_2 \cdots k_m}
+   = \prod_{l=1}^{m} \P\big(e_{k_l} = 1\big),
+\end{align*}
+(całkujemy kolejno po $x_1, x_2, \ldots$ jak w dowodzie Twierdzenia 3), czyli
+zachodzi reguła mnożenia prawdopodobieństw.
+
+$\sigma$-ciało generowane przez $e_n$ to
+$\{\emptyset, \Omega, \{e_n = 1\}, \{e_n = 0\}\}$, zatem jeśli reguła mnożenia
+zachodzi dla zdarzeń $\{e_n = 1\}$, to dla innych zbiorów też (przechodząc do
+dopełnień). Stąd niezależność.
+\end{proof}
+
+\begin{wniosek}
+Przy powyższych oznaczeniach:
+\begin{enumerate}
+  \item $\displaystyle
+    \P\Big(\lim_{n \to \infty} \frac{\sum_{k=1}^{n} e_k}{\ln n} = 1\Big) = 1$
+    \hfill (coś jak prawo wielkich liczb),
+  \item $\displaystyle
+    \P\bigg(\limsup_{n \to \infty}
+      \frac{\sum_{k=1}^{n} e_k - \ln n}{\big(2 \ln n \cdot \ln\ln\ln n\big)^{1/2}}
+      = 1\bigg) = 1$
+    \hfill (coś jak prawo iterowanego logarytmu),
+  \item $\displaystyle
+    \lim_{n \to \infty} \P\Big(\sum_{k=1}^{n} e_k - \ln n < x \sqrt{\ln n}\Big)
+    = \Phi(x)$
+    \hfill (coś jak CTG).
+\end{enumerate}
+\end{wniosek}
+
+\begin{proof}[Dowód --- szkic]
+\[
+  \E[e_k] = \frac{1}{k}, \qquad
+  \mathrm{Var}(e_k) = \frac{1}{k} - \frac{1}{k^2} = \frac{1}{k}\Big(1 - \frac{1}{k}\Big), \qquad
+  \sum_{k=1}^{n} \frac{1}{k} \approx \ln n,
+\]
+więc również $\sum_{k=1}^n \mathrm{Var}(e_k) \approx \ln n$.
+\begin{enumerate}
+  \item mocne prawo wielkich liczb,
+  \item prawo iterowanego logarytmu,
+  \item CTG.
+\end{enumerate}
+Jedyne potrzebne założenia to $e_n \in L^\infty$ i niezależność.
+\end{proof}
+
+\hrulefill
+
+\begin{twierdzenie}
+\[
+  \lim_{k \to \infty} \frac{\ln N(k)}{k} = 1
+  \quad \text{z prawdopodobieństwem } 1.
+\]
+\end{twierdzenie}
+
+\begin{proof}
+Praca domowa.
+
+\textbf{Wskazówka:} Lemat 5 $+$ Wniosek 6 $\implies$
+$\forall \varepsilon > 0\ \exists k_0\ \forall k \geq k_0$:
+\[
+  (1 - \varepsilon) k \leq \ln N(k) \leq (1 + \varepsilon) k
+  \quad \text{z prawdopodobieństwem} \geq 1 - \varepsilon.
+\]
+W tym celu należy użyć
+\[
+  \P\big(N(k) > m\big) = \P\big(e_1 + e_2 + \ldots + e_m < k\big)
+\]
+($k$-ty rekord pada po chwili $m$ $\iff$ do chwili $m$ padło mniej niż $k$
+rekordów).
+\end{proof}
+
+\end{document}
